@@ -1,0 +1,9 @@
+/* Student layout styles */
+.sidebar-open {
+  transform: translateX(0);
+}
+.overlay-open {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+

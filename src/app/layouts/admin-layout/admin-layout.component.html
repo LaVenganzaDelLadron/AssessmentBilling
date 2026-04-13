@@ -1,0 +1,41 @@
+<div class="flex h-screen bg-gray-50">
+  <div class="hidden lg:fixed lg:inset-y-0 lg:block lg:w-64">
+    <app-ui-sidebar [logo]="'EduBill'" [items]="sidebarItems"></app-ui-sidebar>
+  </div>
+
+  <div
+    class="fixed inset-y-0 left-0 z-50 w-64 transform bg-white transition duration-200 lg:hidden"
+    [class.-translate-x-full]="!sidebarOpen()"
+  >
+    <app-ui-sidebar [logo]="'EduBill'" [items]="sidebarItems"></app-ui-sidebar>
+  </div>
+
+  <div
+    *ngIf="sidebarOpen()"
+    class="fixed inset-0 z-40 bg-black/30 lg:hidden"
+    (click)="closeSidebar()"
+  ></div>
+
+  <div class="flex min-w-0 flex-1 flex-col lg:ml-64">
+    <app-ui-navbar
+      [title]="title"
+      [userName]="'Admin User'"
+      (menuClick)="toggleSidebar()"
+      (logoutClick)="logout()"
+    >
+      <button
+        navbar-actions
+        type="button"
+        class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100"
+      >
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0v1a3 3 0 1 1-6 0v-1m6 0H9" />
+        </svg>
+      </button>
+    </app-ui-navbar>
+
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

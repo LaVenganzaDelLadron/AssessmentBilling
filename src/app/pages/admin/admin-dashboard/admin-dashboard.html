@@ -1,1 +1,20 @@
-<p>admin-dashboard works!</p>
+<section class="space-y-6">
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <app-ui-card
+      *ngFor="let card of summaryCards"
+      [title]="card.title"
+      [value]="card.value"
+      [subtitle]="card.subtitle"
+    ></app-ui-card>
+  </div>
+
+  <app-ui-card [title]="'Recent Billings'" [subtitle]="'Latest billing activity'">
+    <div class="mb-4 flex flex-wrap items-center justify-end gap-2">
+      <app-ui-button [label]="'Generate Assessment'"></app-ui-button>
+      <app-ui-button [label]="'Create Billing'"></app-ui-button>
+      <app-ui-button [label]="'View Reports'" [variant]="'secondary'"></app-ui-button>
+    </div>
+
+    <app-ui-table [columns]="billingColumns" [rows]="billingRows"></app-ui-table>
+  </app-ui-card>
+</section>

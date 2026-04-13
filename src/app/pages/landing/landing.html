@@ -1,0 +1,65 @@
+<section class="bg-white text-gray-900">
+  <nav class="sticky top-0 z-40 border-b border-gray-100 bg-white/95 backdrop-blur">
+    <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
+      <a routerLink="/" class="text-xl font-semibold tracking-tight text-indigo-700">EduBill</a>
+      <div class="hidden items-center gap-8 md:flex">
+        <a routerLink="/" class="text-sm text-gray-700 hover:text-indigo-700">Home</a>
+        <a href="#features" class="text-sm text-gray-700 hover:text-indigo-700">Features</a>
+        <a href="#about" class="text-sm text-gray-700 hover:text-indigo-700">About</a>
+      </div>
+      <div class="flex items-center gap-3">
+        <a routerLink="/auth"><app-ui-button [label]="'Login'" [variant]="'secondary'"></app-ui-button></a>
+        <a routerLink="/auth"><app-ui-button [label]="'Get Started'"></app-ui-button></a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="mx-auto grid w-full max-w-7xl gap-10 px-6 py-16 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-24">
+    <div class="max-w-xl">
+      <h1 class="text-4xl font-semibold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+        Simple Assessment & Billing System for Schools
+      </h1>
+      <p class="mt-6 text-lg leading-8 text-gray-600">
+        Manage students, fees, and payments in one clean and efficient platform.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center gap-3">
+        <a routerLink="/auth"><app-ui-button [label]="'Get Started'"></app-ui-button></a>
+        <a routerLink="/auth"><app-ui-button [label]="'Login'" [variant]="'secondary'"></app-ui-button></a>
+      </div>
+    </div>
+
+    <app-ui-card [title]="'Dashboard Preview'" [subtitle]="'Live school overview'">
+      <div class="grid grid-cols-2 gap-3">
+        <div class="rounded-xl bg-gray-50 p-4">
+          <p class="text-xs text-gray-500">Students</p>
+          <p class="mt-1 text-2xl font-semibold text-gray-900">1,248</p>
+        </div>
+        <div class="rounded-xl bg-gray-50 p-4">
+          <p class="text-xs text-gray-500">Collected</p>
+          <p class="mt-1 text-2xl font-semibold text-gray-900">$32,450</p>
+        </div>
+      </div>
+    </app-ui-card>
+  </div>
+
+  <section id="features" class="bg-gray-50 py-16 lg:py-20">
+    <div class="mx-auto w-full max-w-7xl px-6 lg:px-8">
+      <h2 class="text-center text-3xl font-semibold tracking-tight sm:text-4xl">Built for school operations</h2>
+      <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <app-ui-card [title]="'Smart Assessment'" [subtitle]="'Track performance with cleaner records.'"></app-ui-card>
+        <app-ui-card [title]="'Automated Billing'" [subtitle]="'Generate fees and invoices quickly.'"></app-ui-card>
+        <app-ui-card [title]="'Payment Tracking'" [subtitle]="'Monitor paid, pending, and overdue balances.'"></app-ui-card>
+        <app-ui-card [title]="'Role-Based Access'" [subtitle]="'Secure access for admin, teacher, and student.'"></app-ui-card>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="mx-auto w-full max-w-7xl px-6 py-16 lg:px-8">
+    <app-ui-card [title]="'Start managing your school the smart way'">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <p class="text-sm text-gray-600">One platform for assessment, billing, and payment visibility.</p>
+        <a routerLink="/auth"><app-ui-button [label]="'Get Started'"></app-ui-button></a>
+      </div>
+    </app-ui-card>
+  </section>
+</section>

@@ -1,1 +1,56 @@
-<p>billing works!</p>
+<div class="p-6">
+  <h1 class="text-2xl font-bold text-gray-900 mb-8">Billing Management</h1>
+  <div class="grid lg:grid-cols-3 gap-8">
+    <!-- Billing Summary -->
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
+        <h3 class="text-lg font-bold mb-6">Billing Overview</h3>
+        <div class="space-y-6">
+          <div class="flex justify-between">
+            <span class="text-gray-600">Generated This Month</span>
+            <span class="font-bold">$45,200</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Pending Payments</span>
+            <span class="font-bold text-yellow-600">$8,450</span>
+          </div>
+        </div>
+        <button class="w-full mt-8 bg-purple-600 text-white py-3 rounded-xl hover:bg-purple-700">Generate Invoices</button>
+      </div>
+    </div>
+
+    <!-- Students Table -->
+    <div class="lg:col-span-2">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <table class="min-w-full">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-4 text-left">Student</th>
+              <th class="px-6 py-4 text-left">Amount Due</th>
+              <th class="px-6 py-4 text-left">Due Date</th>
+              <th class="px-6 py-4 text-left">Status</th>
+              <th class="px-6 py-4 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-6">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-semibold">JD</div>
+                  <span class="ml-4 font-medium">John Doe</span>
+                </div>
+              </td>
+              <td class="px-6 py-6">$1,250</td>
+              <td class="px-6 py-6 text-gray-500">2024-02-01</td>
+              <td><span class="px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800 font-medium">Pending</span></td>
+              <td class="px-6 py-6">
+                <button class="text-purple-600 hover:text-purple-900 text-sm">Send Reminder</button>
+              </td>
+            </tr>
+            <!-- More rows -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

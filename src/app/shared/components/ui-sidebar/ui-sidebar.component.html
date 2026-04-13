@@ -1,0 +1,25 @@
+<aside class="h-full bg-white shadow-sm">
+  <div class="px-4 py-5">
+    <h2 class="text-lg font-semibold text-indigo-700">{{ logo }}</h2>
+  </div>
+  <nav class="space-y-1 px-3 pb-4">
+    <a
+      *ngFor="let item of items"
+      [routerLink]="item.route"
+      routerLinkActive="bg-indigo-50 text-indigo-700"
+      class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+    >
+      <svg
+        *ngIf="item.icon"
+        class="h-4 w-4 shrink-0"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path [attr.d]="item.icon"></path>
+      </svg>
+      <span [class.sr-only]="compact">{{ item.label }}</span>
+    </a>
+  </nav>
+</aside>
