@@ -12,6 +12,8 @@ export const ADMIN_ROUTES: Routes = [
       { path: 'enrollment', loadComponent: () => import('./enrollment/enrollment').then(m => m.Enrollment) },
       { path: 'fees', loadComponent: () => import('./fees/fees').then(m => m.Fees) },
       { path: 'subject', loadComponent: () => import('./subject/subject').then(m => m.Subject) },
+      { path: 'teacher', loadComponent: () => import('./teacher/teacher').then(m => m.Teacher) },
+      { path: 'teacher-subject', loadComponent: () => import('../teacher-admin/teacher-subject/teacher-subject').then(m => m.TeacherSubjectComponent) },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   }

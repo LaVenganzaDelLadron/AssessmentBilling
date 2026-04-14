@@ -14,6 +14,8 @@ export interface SubjectProgram {
 
 export interface Subject {
   id: number | string;
+  code?: string;
+  name?: string;
   subject_code: string;
   subject_name: string;
   units?: number;

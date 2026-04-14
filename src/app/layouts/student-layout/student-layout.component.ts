@@ -13,6 +13,10 @@ import { UiNavbarComponent } from '../../shared/components/ui-navbar/ui-navbar.c
   styleUrl: './student-layout.component.css'
 })
 export class StudentLayoutComponent {
+  get userName(): string {
+    return this.authService.getUserDisplayName('Student');
+  }
+
   sidebarOpen = signal(false);
   title = 'Student Portal';
   sidebarItems: SidebarItem[] = [

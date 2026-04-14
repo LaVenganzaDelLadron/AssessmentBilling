@@ -19,9 +19,12 @@ export class AuthService {
   constructor(private router: Router, private http: HttpClient, private alertService: AlertService) {
     const storedToken = localStorage.getItem('token');
     const storedRole = localStorage.getItem('role');
+    const storedUserName = localStorage.getItem('user_name');
+    const storedUserId = localStorage.getItem('user_id');
     if (storedToken && storedRole) {
       this.token.set(storedToken);
       this.role.set(storedRole);
+      this.user.set(storedUserName || storedUserId ? { id: storedUserId, name: storedUserName } : null);
       this.isAuthenticated.set(true);
       this.currentRole.set(storedRole);
     }
@@ -42,6 +45,8 @@ export class AuthService {
 
         localStorage.setItem('token', token);
         localStorage.setItem('role', role);
+        localStorage.setItem('user_name', (user?.name ?? response?.name ?? role).toString());
+        localStorage.setItem('user_id', (user?.id ?? response?.id ?? '').toString());
 
         this.token.set(token);
         this.role.set(role);
@@ -104,8 +109,11 @@ export class AuthService {
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_id');
     this.token.set(null);
     this.role.set(null);
+    this.user.set(null);
     this.isAuthenticated.set(false);
     this.currentRole.set('');
     this.alertService.info('You have been logged out.');
@@ -130,5 +138,23 @@ export class AuthService {
 
   isTeacher(): boolean {
     return this.hasRole('teacher');
+  }
+
+  getUserDisplayName(fallback = 'User'): string {
+    const name = this.user()?.name ?? localStorage.getItem('user_name');
+    if (name && String(name).trim()) {
+      return String(name);
+    }
+
+    return fallback;
+  }
+
+  getCurrentUserId(): string {
+    const id = this.user()?.id ?? localStorage.getItem('user_id') ?? '';
+    return String(id || '');
+  }
+
+  getCurrentRole(): string {
+    return String(this.role() ?? localStorage.getItem('role') ?? '').toLowerCase();
   }
 }

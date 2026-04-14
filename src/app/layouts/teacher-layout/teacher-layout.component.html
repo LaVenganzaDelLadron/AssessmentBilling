@@ -19,19 +19,10 @@
   <div class="flex min-w-0 flex-1 flex-col lg:ml-64">
     <app-ui-navbar
       [title]="title"
-      [userName]="'Teacher'"
+      [userName]="userName"
       (menuClick)="toggleSidebar()"
       (logoutClick)="logout()"
     >
-      <button
-        navbar-actions
-        type="button"
-        class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100"
-      >
-        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0v1a3 3 0 1 1-6 0v-1m6 0H9" />
-        </svg>
-      </button>
     </app-ui-navbar>
 
     <main class="flex-1 overflow-y-auto p-4 sm:p-6">
