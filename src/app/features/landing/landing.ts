@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { UiCardComponent } from '../../../shared/components/ui-card/ui-card.component';
+import { UiCardComponent } from '../../shared/components/ui-card/ui-card.component';
 
 @Component({
   selector: 'app-landing',
