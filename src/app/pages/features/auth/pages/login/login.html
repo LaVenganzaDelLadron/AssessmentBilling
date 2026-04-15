@@ -1,43 +1,44 @@
-<div class="min-h-screen bg-slate-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 selection:bg-purple-100">
+<div class="min-h-screen bg-[#E0E7FF] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 selection:bg-cyan-200">
   <div class="fixed inset-0 overflow-hidden pointer-events-none">
-    <div class="absolute -top-[10%] -right-[5%] h-64 w-64 rounded-full bg-purple-200/30 blur-3xl"></div>
-    <div class="absolute bottom-[5%] left-[5%] h-80 w-80 rounded-full bg-indigo-200/20 blur-3xl"></div>
+    <div class="absolute -top-[10%] -right-[5%] h-96 w-96 rounded-full bg-white/40 blur-[100px]"></div>
+    <div class="absolute bottom-[5%] left-[5%] h-80 w-80 rounded-full bg-cyan-300/30 blur-3xl"></div>
+    <div class="absolute top-1/4 left-10 h-32 w-32 bg-white/20 rotate-45 blur-sm rounded-lg border border-white/30"></div>
   </div>
 
   <div class="relative z-10 max-w-md w-full mx-auto">
     <div class="text-center mb-10">
-      <div class="mx-auto h-14 w-14 bg-gradient-to-tr from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-xl shadow-purple-200 rotate-3 hover:rotate-0 transition-transform duration-300">
-        <svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="mx-auto h-16 w-16 bg-gradient-to-br from-cyan-100 to-blue-500 rounded-2xl flex items-center justify-center shadow-[0_10px_20px_rgba(0,0,0,0.1),inset_0_-4px_8px_rgba(0,0,0,0.1),inset_0_4px_8px_white] rotate-3 hover:rotate-0 transition-all duration-500 group">
+        <svg class="h-8 w-8 text-white drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
         </svg>
       </div>
-      <h2 class="mt-8 text-3xl font-extrabold tracking-tight text-slate-900">Welcome back</h2>
-      <p class="mt-3 text-slate-500 font-medium">
-        New to EduBill?
-        <a href="#" class="text-purple-600 hover:text-purple-700 underline underline-offset-4 decoration-purple-200 hover:decoration-purple-600 transition-all ml-1">Create an account</a>
+      <h2 class="mt-8 text-4xl font-black tracking-tighter text-blue-900 drop-shadow-sm">Frozen Access</h2>
+      <p class="mt-3 text-blue-700/60 font-medium">
+        Secure your education assets.
+        <a href="#" class="text-blue-600 hover:text-cyan-500 font-bold underline decoration-blue-200 transition-all ml-1">Join the cold.</a>
       </p>
     </div>
 
-    <div class="bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100">
-      <form (ngSubmit)="onSubmit()" #loginNgForm="ngForm" class="space-y-5">
+    <div class="bg-white/60 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-white/80 shadow-[0_20px_50px_rgba(148,163,184,0.15),0_1px_2px_rgba(255,255,255,0.8),inset_0_0_20px_white]">
+      <form (ngSubmit)="onSubmit()" #loginNgForm="ngForm" class="space-y-6">
 
-        <div class="space-y-1.5">
-          <label for="identifier" class="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Login Credentials</label>
-          <div class="relative group">
+        <div class="space-y-2">
+          <label for="identifier" class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-800/50 ml-2">Identity Hub</label>
+          <div class="relative">
             <input
               id="identifier"
               name="identifier"
               type="text"
               [(ngModel)]="loginForm.identifier"
               required
-              class="block w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-600/20 focus:border-purple-600 focus:bg-white transition-all sm:text-sm"
+              class="block w-full px-5 py-4 bg-white/40 border border-white/60 rounded-2xl text-blue-900 placeholder-blue-300 focus:outline-none focus:ring-4 focus:ring-cyan-400/10 focus:border-cyan-400 focus:bg-white/80 transition-all shadow-inner"
               placeholder="Email or Student ID">
           </div>
         </div>
 
-        <div class="space-y-1.5">
-          <div class="flex justify-between items-center px-1">
-            <label for="password" class="text-xs font-bold uppercase tracking-wider text-slate-500">Password</label>
+        <div class="space-y-2">
+          <div class="flex justify-between items-center px-2">
+            <label for="password" class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-800/50">Passkey</label>
           </div>
           <div class="relative">
             <input
@@ -46,29 +47,34 @@
               type="password"
               [(ngModel)]="loginForm.password"
               required
-              class="block w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-600/20 focus:border-purple-600 focus:bg-white transition-all sm:text-sm"
+              class="block w-full px-5 py-4 bg-white/40 border border-white/60 rounded-2xl text-blue-900 placeholder-blue-300 focus:outline-none focus:ring-4 focus:ring-cyan-400/10 focus:border-cyan-400 focus:bg-white/80 transition-all shadow-inner"
               placeholder="••••••••">
           </div>
         </div>
 
-        <div class="flex items-center px-1 py-1">
-          <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-slate-300 rounded">
-          <label for="remember-me" class="ml-2 block text-sm text-slate-600">Remember this device</label>
+        <div class="flex items-center px-2 py-1">
+          <input id="remember-me" name="remember-me" type="checkbox" class="h-5 w-5 text-cyan-500 focus:ring-cyan-400 border-white/60 bg-white/40 rounded-lg cursor-pointer">
+          <label for="remember-me" class="ml-3 block text-sm font-semibold text-blue-800/70">Keep my session frozen</label>
         </div>
 
-        <div class="pt-2">
+        <div class="pt-4">
           <button
             type="submit"
-            class="w-full flex justify-center items-center py-4 px-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-slate-900 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-600 shadow-lg shadow-purple-100 transition-all active:scale-[0.98]">
-            Sign in to Dashboard
+            class="group w-full relative overflow-hidden flex justify-center items-center py-4 px-4 rounded-2xl bg-gradient-to-b from-cyan-400 to-blue-600 text-white font-black text-sm uppercase tracking-widest shadow-[0_10px_20px_rgba(6,182,212,0.3),inset_0_2px_4px_rgba(255,255,255,0.4)] transition-all hover:scale-[1.02] hover:shadow-cyan-300/50 active:scale-95">
+            <span class="relative z-10">Initialize Session</span>
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
           </button>
         </div>
       </form>
 
-      <div class="mt-8 pt-6 border-t border-slate-50 text-center">
-        <p class="text-xs text-slate-400">
-          Secure login encrypted with 256-bit SSL. <br/>
-          Having trouble? <a href="#" class="underline">Contact Support</a>
+      <div class="mt-8 pt-6 border-t border-blue-100/50 text-center">
+        <div class="flex justify-center gap-2 mb-4">
+          <div class="h-1 w-8 rounded-full bg-cyan-200"></div>
+          <div class="h-1 w-2 rounded-full bg-cyan-100"></div>
+        </div>
+        <p class="text-[11px] font-bold text-blue-400 uppercase tracking-tighter">
+          Encryption Level: Arctic Zero <br/>
+          <a href="#" class="text-cyan-600 hover:underline">Request Thermal Support</a>
         </p>
       </div>
     </div>
