@@ -7,8 +7,8 @@ import {
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
-import { AuthInterceptor } from './interceptors/auth.interceptor';
-import { ErrorInterceptor } from './interceptors/error.interceptor';
+import { AuthInterceptor } from './core/interceptors/auth.interceptor';
+import { ErrorInterceptor } from './core/interceptors/error.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [

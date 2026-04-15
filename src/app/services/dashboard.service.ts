@@ -79,8 +79,7 @@ export class DashboardService {
             const aTime = new Date(a.created_at || a.billing_date || 0).getTime();
             const bTime = new Date(b.created_at || b.billing_date || 0).getTime();
             return bTime - aTime;
-          })
-          .slice(0, 6);
+          });
 
         return {
           programsCount: programs.length,
