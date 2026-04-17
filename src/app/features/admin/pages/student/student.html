@@ -1,0 +1,162 @@
+<div class="min-h-screen bg-[#F1F5F9] font-sans text-slate-900 selection:bg-blue-100 antialiased">
+  <nav class="h-14 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-50">
+    <div class="flex items-center gap-4">
+      <div class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-200">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+      </div>
+      <span class="text-sm font-bold text-slate-400">/</span>
+      <span class="text-sm font-bold text-slate-900">Students</span>
+    </div>
+    <div class="flex items-center gap-6">
+      <div class="relative hidden sm:block">
+        <input type="text" class="pl-8 pr-4 py-1.5 bg-slate-100 border-none rounded-lg text-xs font-medium focus:ring-2 focus:ring-blue-500 w-64" placeholder="Search by name or ID...">
+        <svg class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="3"/></svg>
+      </div>
+      <div class="h-8 w-8 rounded-full bg-slate-800 border-2 border-white shadow-sm"></div>
+    </div>
+  </nav>
+
+  <main class="max-w-[1400px] mx-auto p-6 lg:p-10 space-y-8">
+
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div class="space-y-1">
+        <h2 class="text-3xl font-black tracking-tight text-slate-900">Students</h2>
+        <p class="text-slate-500 font-medium italic">Manage student records and track enrollments</p>
+      </div>
+      <button class="px-6 py-3 bg-slate-900 text-white rounded-xl text-sm font-black shadow-xl shadow-slate-200 hover:bg-blue-600 hover:-translate-y-0.5 transition-all flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
+        Add New Student
+      </button>
+    </div>
+
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Students</p>
+        <p class="text-3xl font-black text-slate-900 mt-1">6</p>
+      </div>
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <p class="text-[10px] font-black text-green-500 uppercase tracking-widest">Active</p>
+        <p class="text-3xl font-black text-slate-900 mt-1">5</p>
+      </div>
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-red-500">Inactive</p>
+        <p class="text-3xl font-black text-slate-900 mt-1">1</p>
+      </div>
+      <div class="bg-blue-600 p-5 rounded-2xl shadow-lg shadow-blue-200">
+        <p class="text-[10px] font-black text-blue-100 uppercase tracking-widest">Total Billed</p>
+        <p class="text-3xl font-black text-white mt-1">$5,790</p>
+      </div>
+    </section>
+
+    <div class="bg-white rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50/50 border-b border-slate-100">
+              <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Student</th>
+              <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Contact</th>
+              <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Enrollment</th>
+              <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Billed</th>
+              <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Balance</th>
+              <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+              <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-50">
+
+            <tr class="group hover:bg-slate-50 transition-colors">
+              <td class="px-8 py-5">
+                <div class="flex items-center gap-4">
+                  <div class="h-10 w-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-black text-sm border border-blue-200">JD</div>
+                  <div>
+                    <p class="font-bold text-slate-800">John Doe</p>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">ID: S001</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-8 py-5">
+                <p class="text-xs font-bold text-slate-600">john.doe@example.com</p>
+                <p class="text-[10px] text-slate-400 font-medium">+1 234 567 8901</p>
+              </td>
+              <td class="px-8 py-5 text-center">
+                <span class="text-xs font-bold text-slate-500">2025-09-01</span>
+              </td>
+              <td class="px-8 py-5">
+                <span class="text-sm font-black text-slate-700">$1,250</span>
+              </td>
+              <td class="px-8 py-5">
+                <span class="text-sm font-black text-green-600">$0</span>
+              </td>
+              <td class="px-8 py-5">
+                <span class="px-2.5 py-1 bg-green-50 text-green-700 text-[9px] font-black rounded-md border border-green-100">ACTIVE</span>
+              </td>
+              <td class="px-8 py-5 text-right">
+                <button class="p-2 text-slate-300 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
+              </td>
+            </tr>
+
+            <tr class="group hover:bg-slate-50 transition-colors">
+              <td class="px-8 py-5">
+                <div class="flex items-center gap-4">
+                  <div class="h-10 w-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center font-black text-sm border border-purple-200">SW</div>
+                  <div>
+                    <p class="font-bold text-slate-800">Sarah Wilson</p>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">ID: S002</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-8 py-5">
+                <p class="text-xs font-bold text-slate-600">sarah.wilson@example.com</p>
+                <p class="text-[10px] text-slate-400 font-medium">+1 234 567 8902</p>
+              </td>
+              <td class="px-8 py-5 text-center">
+                <span class="text-xs font-bold text-slate-500">2025-09-01</span>
+              </td>
+              <td class="px-8 py-5"><span class="text-sm font-black text-slate-700">$890</span></td>
+              <td class="px-8 py-5"><span class="text-sm font-black text-red-600">$890</span></td>
+              <td class="px-8 py-5">
+                <span class="px-2.5 py-1 bg-green-50 text-green-700 text-[9px] font-black rounded-md border border-green-100">ACTIVE</span>
+              </td>
+              <td class="px-8 py-5 text-right">
+                <button class="p-2 text-slate-300 hover:text-blue-600 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/></svg></button>
+              </td>
+            </tr>
+
+            <tr class="group bg-slate-50/30 grayscale hover:grayscale-0 transition-all">
+              <td class="px-8 py-5">
+                <div class="flex items-center gap-4">
+                  <div class="h-10 w-10 rounded-xl bg-slate-200 text-slate-600 flex items-center justify-center font-black text-sm border border-slate-300">JJ</div>
+                  <div>
+                    <p class="font-bold text-slate-500 group-hover:text-slate-800 transition-colors">James Johnson</p>
+                    <p class="text-[10px] font-black text-slate-300 uppercase tracking-tighter">ID: S005</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-8 py-5">
+                <p class="text-xs font-bold text-slate-400 group-hover:text-slate-600">james.johnson@example.com</p>
+                <p class="text-[10px] text-slate-300 font-medium">+1 234 567 8905</p>
+              </td>
+              <td class="px-8 py-5 text-center"><span class="text-xs font-bold text-slate-400">2025-09-01</span></td>
+              <td class="px-8 py-5"><span class="text-sm font-black text-slate-400">$0</span></td>
+              <td class="px-8 py-5"><span class="text-sm font-black text-slate-400">$0</span></td>
+              <td class="px-8 py-5">
+                <span class="px-2.5 py-1 bg-slate-200 text-slate-500 text-[9px] font-black rounded-md border border-slate-300">INACTIVE</span>
+              </td>
+              <td class="px-8 py-5 text-right">
+                 <button class="px-3 py-1 bg-white border border-slate-200 text-[10px] font-black text-slate-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all">RESTORE</button>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+      <div class="px-8 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Showing 6 Student Records</p>
+        <div class="flex gap-2">
+          <button class="px-3 py-1 bg-white border border-slate-200 text-xs font-bold rounded-lg opacity-50 cursor-not-allowed">Previous</button>
+          <button class="px-3 py-1 bg-white border border-slate-200 text-xs font-bold rounded-lg hover:bg-slate-100">Next</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

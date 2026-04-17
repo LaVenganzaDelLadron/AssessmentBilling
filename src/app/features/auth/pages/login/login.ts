@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -10,12 +11,16 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './login.css',
 })
 export class LoginComponent {
+  private router = inject(Router);
+
   loginForm = {
     identifier: '',
     password: ''
   };
 
   onSubmit() {
-    void this.loginForm;
+    if (this.loginForm.identifier && this.loginForm.password) {
+      this.router.navigate(['/admin']);
+    }
   }
 }

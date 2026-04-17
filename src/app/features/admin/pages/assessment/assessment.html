@@ -1,0 +1,153 @@
+<div class="min-h-screen bg-[#F1F5F9] font-sans text-slate-900 selection:bg-blue-100 antialiased">
+  <nav class="h-14 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-50">
+    <div class="flex items-center gap-4">
+      <div class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-200">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+      </div>
+      <span class="text-sm font-bold text-slate-400">/</span>
+      <span class="text-sm font-bold text-slate-900">Assessments</span>
+    </div>
+    <div class="flex items-center gap-4">
+       <div class="h-8 w-8 rounded-full bg-slate-200 border border-slate-300"></div>
+    </div>
+  </nav>
+
+  <main class="max-w-[1200px] mx-auto p-6 lg:p-10 space-y-8">
+
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div class="space-y-1">
+        <h2 class="text-3xl font-black tracking-tight text-slate-900">Assessments</h2>
+        <p class="text-slate-500 font-medium">Schedule and manage all institutional assessments</p>
+      </div>
+      <button class="px-6 py-3 bg-blue-600 text-white rounded-xl text-sm font-black shadow-xl shadow-blue-200 hover:bg-blue-700 hover:-translate-y-0.5 transition-all flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
+        Add Scheduled Assessment
+      </button>
+    </div>
+
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total</p>
+        <p class="text-2xl font-black text-slate-900">6</p>
+      </div>
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-blue-500">
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-blue-600">Upcoming</p>
+        <p class="text-2xl font-black text-slate-900">4</p>
+      </div>
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-green-500">
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-green-600">Completed</p>
+        <p class="text-2xl font-black text-slate-900">1</p>
+      </div>
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Students</p>
+        <p class="text-2xl font-black text-slate-900">243</p>
+      </div>
+    </section>
+
+    <div class="space-y-4">
+
+      <div class="bg-white p-6 rounded-[1.5rem] border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-200 transition-all group">
+        <div class="flex flex-col lg:flex-row justify-between gap-6">
+          <div class="flex gap-5">
+            <div class="h-14 w-14 bg-slate-50 rounded-2xl flex flex-col items-center justify-center border border-slate-100 shrink-0">
+               <span class="text-[10px] font-black text-slate-400 uppercase">Apr</span>
+               <span class="text-xl font-black text-slate-900 leading-none">20</span>
+            </div>
+            <div class="space-y-1">
+              <div class="flex items-center gap-3">
+                <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-black rounded uppercase tracking-wider border border-blue-100">Scheduled</span>
+                <h3 class="text-lg font-black text-slate-800 group-hover:text-blue-600 transition-colors">Mathematics Final Exam</h3>
+              </div>
+              <p class="text-sm font-bold text-slate-500">Mathematics • Grade 10</p>
+              <p class="text-sm text-slate-400 max-w-xl">Final examination covering all topics from the semester</p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center lg:justify-end gap-6 border-t lg:border-t-0 pt-4 lg:pt-0">
+            <div class="flex items-center gap-2 text-slate-500">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span class="text-sm font-bold">120min</span>
+            </div>
+            <div class="flex items-center gap-2 text-slate-500">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 6a3 3 0 11-6 0 3 3 0 016 0zM9 20H4v-2a3 3 0 015.356-1.857M15 13H9m4 0H9m6 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span class="text-sm font-bold">45 Students</span>
+            </div>
+            <button class="p-2 text-slate-300 hover:text-slate-600 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-[1.5rem] border border-slate-200 shadow-sm hover:shadow-md transition-all group">
+        <div class="flex flex-col lg:flex-row justify-between gap-6">
+          <div class="flex gap-5">
+            <div class="h-14 w-14 bg-slate-50 rounded-2xl flex flex-col items-center justify-center border border-slate-100 shrink-0">
+               <span class="text-[10px] font-black text-slate-400 uppercase">Apr</span>
+               <span class="text-xl font-black text-slate-900 leading-none">22</span>
+            </div>
+            <div class="space-y-1">
+              <div class="flex items-center gap-3">
+                <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-black rounded uppercase tracking-wider border border-blue-100">Scheduled</span>
+                <h3 class="text-lg font-black text-slate-800">Physics Midterm</h3>
+              </div>
+              <p class="text-sm font-bold text-slate-500">Physics • Grade 11</p>
+              <p class="text-sm text-slate-400 max-w-xl">Midterm covering mechanics and thermodynamics</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center lg:justify-end gap-6">
+            <div class="flex items-center gap-2 text-slate-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span class="text-sm font-bold">90min</span></div>
+            <div class="flex items-center gap-2 text-slate-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 6a3 3 0 11-6 0 3 3 0 016 0zM9 20H4v-2a3 3 0 015.356-1.857M15 13H9m4 0H9m6 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span class="text-sm font-bold">38 Students</span></div>
+            <button class="p-2 text-slate-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-[1.5rem] border-2 border-amber-200 shadow-lg shadow-amber-100/50 transition-all group">
+        <div class="flex flex-col lg:flex-row justify-between gap-6">
+          <div class="flex gap-5">
+            <div class="h-14 w-14 bg-amber-50 rounded-2xl flex flex-col items-center justify-center border border-amber-100 shrink-0">
+               <span class="text-[10px] font-black text-amber-600 uppercase">Apr</span>
+               <span class="text-xl font-black text-amber-700 leading-none">18</span>
+            </div>
+            <div class="space-y-1">
+              <div class="flex items-center gap-3">
+                <span class="px-2 py-0.5 bg-amber-500 text-white text-[10px] font-black rounded uppercase tracking-wider animate-pulse">Ongoing</span>
+                <h3 class="text-lg font-black text-slate-800">English Literature Essay</h3>
+              </div>
+              <p class="text-sm font-bold text-slate-500">English • Grade 9</p>
+              <p class="text-sm text-slate-400 max-w-xl">Essay writing on Shakespeare</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center lg:justify-end gap-6">
+            <div class="flex items-center gap-2 text-amber-600"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span class="text-sm font-bold">60min</span></div>
+            <div class="flex items-center gap-2 text-slate-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 6a3 3 0 11-6 0 3 3 0 016 0zM9 20H4v-2a3 3 0 015.356-1.857M15 13H9m4 0H9m6 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span class="text-sm font-bold">52 Students</span></div>
+            <button class="px-4 py-2 bg-amber-500 text-white text-xs font-black rounded-lg hover:bg-amber-600 transition-colors">Monitor</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 p-6 rounded-[1.5rem] border border-slate-200 opacity-75 grayscale hover:grayscale-0 transition-all group">
+        <div class="flex flex-col lg:flex-row justify-between gap-6">
+          <div class="flex gap-5">
+            <div class="h-14 w-14 bg-white rounded-2xl flex flex-col items-center justify-center border border-slate-100 shrink-0">
+               <span class="text-[10px] font-black text-slate-400 uppercase">Apr</span>
+               <span class="text-xl font-black text-slate-400 leading-none">15</span>
+            </div>
+            <div class="space-y-1">
+              <div class="flex items-center gap-3">
+                <span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-black rounded uppercase tracking-wider">Completed</span>
+                <h3 class="text-lg font-black text-slate-500 line-through">Biology Quiz</h3>
+              </div>
+              <p class="text-sm font-bold text-slate-400">Biology • Grade 10</p>
+              <p class="text-sm text-slate-400 max-w-xl">Cell biology quiz</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center lg:justify-end gap-6">
+            <div class="flex items-center gap-2 text-slate-400 font-bold text-xs uppercase">Grades Released</div>
+            <button class="px-4 py-2 bg-white border border-slate-200 text-slate-600 text-xs font-black rounded-lg hover:bg-slate-100">Review</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>

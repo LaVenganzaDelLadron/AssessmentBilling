@@ -1,0 +1,50 @@
+<header class="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md">
+  <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Main Navigation">
+    <div class="flex h-20 items-center justify-between">
+
+      <div class="flex items-center gap-3">
+        <div class="relative flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-900 shadow-indigo-200 shadow-lg">
+          <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-lg font-bold leading-tight tracking-tight text-slate-900">AssessmentBilling</span>
+          <span class="text-[10px] font-semibold uppercase tracking-widest text-indigo-600">Institutional Portal</span>
+        </div>
+      </div>
+
+      <ul class="hidden items-center gap-10 md:flex">
+        <li>
+          <a routerLink="/" class="group relative py-2 text-sm font-medium text-slate-600 transition-colors hover:text-indigo-600">
+            Home
+            <span class="absolute inset-x-0 -bottom-1 h-0.5 scale-x-0 bg-indigo-600 transition-transform group-hover:scale-x-100"></span>
+          </a>
+        </li>
+        <li>
+          <a href="#features" class="group relative py-2 text-sm font-medium text-slate-600 transition-colors hover:text-indigo-600">
+            Academic Features
+            <span class="absolute inset-x-0 -bottom-1 h-0.5 scale-x-0 bg-indigo-600 transition-transform group-hover:scale-x-100"></span>
+          </a>
+        </li>
+        <li>
+          <a href="#about" class="group relative py-2 text-sm font-medium text-slate-600 transition-colors hover:text-indigo-600">
+            About System
+            <span class="absolute inset-x-0 -bottom-1 h-0.5 scale-x-0 bg-indigo-600 transition-transform group-hover:scale-x-100"></span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="flex items-center gap-3">
+        <a routerLink="/login" class="hidden rounded-lg px-5 py-2.5 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-100 sm:block">
+          Login
+        </a>
+        <a routerLink="/signup" class="flex items-center gap-2 rounded-lg bg-indigo-900 px-6 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:bg-indigo-800 hover:shadow-indigo-200 active:scale-95">
+          <span>Signup</span>
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        </a>
+      </div>
+
+    </div>
+  </nav>
+</header>
