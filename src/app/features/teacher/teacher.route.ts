@@ -17,6 +17,11 @@ export const teacherRoutes: Routes = [
           import('./pages/dashboard/dashboard').then(m => m.Dashboard)
       },
       {
+        path: 'profile',
+        loadComponent: () =>
+          import('./pages/profile/profile').then(m => m.Profile)
+      },
+      {
         path: 'subjects',
         loadComponent: () =>
           import('./pages/subjects/subjects').then(m => m.Subjects)

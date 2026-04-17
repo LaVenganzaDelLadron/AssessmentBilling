@@ -1,0 +1,77 @@
+<div *ngIf="isOpen" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+    <h2 class="text-2xl font-bold text-slate-900 mb-4">Update Fee Structure</h2>
+
+    <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="successMessage" class="mb-4 p-3 bg-green-50 border border-green-200 rounded text-green-700 text-sm">
+      {{ successMessage }}
+    </div>
+
+    <form (ngSubmit)="submit()" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Program ID *</label>
+        <input
+          type="number"
+          [(ngModel)]="form.program_id"
+          name="programId"
+          placeholder="Enter program ID"
+          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Fee Type *</label>
+        <select
+          [(ngModel)]="form.fee_type"
+          name="feeType"
+          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900"
+        >
+          <option value="">-- Select Fee Type --</option>
+          <option *ngFor="let type of feeTypes" [value]="type">{{ type }}</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Amount *</label>
+        <input
+          type="number"
+          [(ngModel)]="form.amount"
+          name="amount"
+          placeholder="0.00"
+          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Per Unit</label>
+        <input
+          type="checkbox"
+          [(ngModel)]="form.per_unit"
+          name="perUnit"
+          class="w-4 h-4 text-blue-600"
+        />
+        <span class="text-xs text-slate-600 ml-2">Check if amount is per unit</span>
+      </div>
+
+      <div class="flex gap-2 pt-4">
+        <button
+          type="submit"
+          [disabled]="isLoading"
+          class="flex-1 bg-blue-600 text-white font-medium py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+        >
+          {{ isLoading ? 'Updating...' : 'Update Fee' }}
+        </button>
+        <button
+          type="button"
+          (click)="close()"
+          class="flex-1 bg-slate-300 text-slate-900 font-medium py-2 rounded-lg hover:bg-slate-400"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

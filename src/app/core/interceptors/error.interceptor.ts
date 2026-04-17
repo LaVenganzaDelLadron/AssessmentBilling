@@ -7,9 +7,13 @@ import {
   HttpRequest
 } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
+import { Router } from '@angular/router';
+import { AuthService } from '../../features/auth/services/auth.service';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
+  constructor(private authService: AuthService, private router: Router) {}
+
   intercept(
     request: HttpRequest<unknown>,
     next: HttpHandler
@@ -17,8 +21,9 @@ export class ErrorInterceptor implements HttpInterceptor {
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('role');
+          // Unauthorized - clear auth state and redirect to login
+          this.authService.logout();
+          this.router.navigate(['/login']);
         }
 
         return throwError(() => error);
