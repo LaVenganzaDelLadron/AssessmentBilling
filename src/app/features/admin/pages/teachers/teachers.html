@@ -1,0 +1,130 @@
+<div class="min-h-screen bg-[#F8FAFC] bg-[radial-gradient(circle_at_bottom_right,_var(--tw-gradient-stops))] from-slate-200/50 via-[#F8FAFC] to-emerald-50/30 font-sans text-slate-900 selection:bg-emerald-100 antialiased pb-20">
+
+  <nav class="h-20 bg-white/70 backdrop-blur-xl border-b border-white/40 px-12 flex items-center justify-between sticky top-0 z-50">
+    <div class="flex items-center gap-4">
+      <div class="h-10 w-10 bg-emerald-600 rounded-[1.25rem] flex items-center justify-center shadow-lg shadow-emerald-200">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Human Resources</span>
+        <h1 class="text-xl font-black tracking-tight text-slate-800">Faculty <span class="text-emerald-600">Roster</span></h1>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+       <div class="h-11 w-11 rounded-[1.25rem] bg-slate-900 border-2 border-white shadow-xl overflow-hidden">
+         <img src="https://ui-avatars.com/api/?name=Admin&background=10b981&color=fff" alt="Admin">
+       </div>
+    </div>
+  </nav>
+
+  <main class="max-w-[1400px] mx-auto p-8 lg:p-12 space-y-10">
+
+    <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-8">
+      <div class="space-y-2">
+        <h2 class="text-4xl font-black tracking-tighter text-slate-900">Academic <span class="text-emerald-600/40">Personnel</span></h2>
+        <p class="text-slate-500 font-medium">Manage faculty profiles, departmental assignments, and employment status.</p>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="relative group">
+          <input type="text" placeholder="Search by name or ID..." class="pl-12 pr-6 py-4 bg-white/70 backdrop-blur-md border border-white rounded-[1.25rem] text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-200 transition-all w-full md:w-80 shadow-xl shadow-slate-200/40">
+          <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+        <button class="px-8 py-4 bg-emerald-600 text-white rounded-[1.25rem] text-sm font-black shadow-2xl shadow-emerald-200 hover:bg-slate-900 hover:-translate-y-1 transition-all flex items-center gap-3">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
+          Add Teacher
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+
+      <div class="bg-white/70 backdrop-blur-md rounded-[1.25rem] border border-white shadow-xl shadow-slate-200/40 group hover:scale-[1.02] transition-all duration-500 overflow-hidden">
+        <div class="h-2 bg-emerald-500"></div>
+        <div class="p-8">
+          <div class="flex justify-between items-start mb-6">
+            <div class="h-20 w-20 rounded-[1.25rem] bg-slate-100 border-2 border-white shadow-sm flex items-center justify-center text-2xl font-black text-emerald-600">
+               JD
+            </div>
+            <span class="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black rounded-lg border border-emerald-100 flex items-center gap-2">
+              <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              ACTIVE
+            </span>
+          </div>
+
+          <div class="space-y-1">
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Teacher ID: TCH-2026-001</p>
+            <h3 class="text-2xl font-black text-slate-800">Johnathan D. Doe</h3>
+            <p class="text-sm font-bold text-emerald-600/70">Department of Computer Studies</p>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-slate-100 flex justify-between items-center">
+             <div class="text-[10px] font-bold text-slate-400">
+               Member Since: 2024
+             </div>
+             <div class="flex gap-2">
+                <button class="p-3 bg-slate-50 text-slate-400 rounded-xl hover:bg-emerald-600 hover:text-white transition-all">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                </button>
+             </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white/40 backdrop-blur-md rounded-[1.25rem] border border-white shadow-lg shadow-slate-200/40 grayscale group hover:grayscale-0 transition-all duration-500 overflow-hidden">
+        <div class="h-2 bg-slate-300"></div>
+        <div class="p-8">
+          <div class="flex justify-between items-start mb-6">
+            <div class="h-20 w-20 rounded-[1.25rem] bg-slate-50 border-2 border-white shadow-sm flex items-center justify-center text-2xl font-black text-slate-300">
+               MA
+            </div>
+            <span class="px-3 py-1 bg-slate-100 text-slate-400 text-[10px] font-black rounded-lg border border-slate-200">
+              INACTIVE
+            </span>
+          </div>
+
+          <div class="space-y-1">
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Teacher ID: TCH-2026-088</p>
+            <h3 class="text-2xl font-black text-slate-800">Maria S. Anderson</h3>
+            <p class="text-sm font-bold text-slate-400">Department of Mathematics</p>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-slate-100 flex justify-between items-center">
+             <div class="text-[10px] font-bold text-slate-300">
+               On Leave
+             </div>
+             <button class="px-5 py-2 bg-slate-900 text-white text-[10px] font-black rounded-xl hover:bg-emerald-600 transition-all uppercase tracking-widest shadow-lg shadow-slate-200">Reactivate</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="bg-white/60 backdrop-blur-md rounded-[1.25rem] border border-white p-10 shadow-2xl shadow-slate-200/40 flex flex-col md:flex-row items-center justify-between gap-8">
+      <div class="flex gap-16">
+        <div>
+          <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Total Faculty</p>
+          <div class="flex items-baseline gap-2">
+            <span class="text-4xl font-black text-slate-900">42</span>
+            <span class="text-xs font-bold text-emerald-600">+2 New</span>
+          </div>
+        </div>
+        <div>
+          <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Active Ratio</p>
+          <div class="flex items-baseline gap-2">
+            <span class="text-4xl font-black text-slate-900">92%</span>
+            <div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                <div class="h-full bg-emerald-500 w-[92%]"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+         <button class="px-6 py-3 bg-white border border-slate-200 text-[11px] font-black text-slate-500 rounded-xl hover:text-emerald-600 hover:border-emerald-600 transition-all uppercase tracking-widest shadow-sm">Export Directory</button>
+         <button class="px-6 py-3 bg-white border border-slate-200 text-[11px] font-black text-slate-500 rounded-xl hover:text-emerald-600 hover:border-emerald-600 transition-all uppercase tracking-widest shadow-sm">Audit user_id Links</button>
+      </div>
+    </div>
+
+  </main>
+</div>

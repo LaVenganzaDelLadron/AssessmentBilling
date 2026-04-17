@@ -50,6 +50,46 @@ export const adminRoutes: Routes = [
         path: 'settings',
         loadComponent: () =>
           import('./pages/settings/settings').then(m => m.Settings)
+      },
+      {
+        path: 'academic-terms',
+        loadComponent: () =>
+          import('./pages/academic-terms/academic-terms').then(m => m.AcademicTerms)
+      },
+      {
+        path: 'programs',
+        loadComponent: () =>
+          import('./pages/programs/programs').then(m => m.Programs)
+      },
+      {
+        path: 'fee-structures',
+        loadComponent: () =>
+          import('./pages/fee-structures/fee-structures').then(m => m.FeeStructures)
+      },
+      {
+        path: 'teachers',
+        loadComponent: () =>
+          import('./pages/teachers/teachers').then(m => m.Teachers)
+      },
+      {
+        path: 'subjects',
+        loadComponent: () =>
+          import('./pages/subjects/subjects').then(m => m.Subjects)
+      },
+      {
+        path: 'official-receipts',
+        loadComponent: () =>
+          import('./pages/official-receipts/official-receipts').then(m => m.OfficialReceipts)
+      },
+      {
+        path: 'refunds',
+        loadComponent: () =>
+          import('./pages/refunds/refunds').then(m => m.Refunds)
+      },
+      {
+        path: 'audit-logs',
+        loadComponent: () =>
+          import('./pages/audit-logs/audit-logs').then(m => m.AuditLogs)
       }
     ]
   }

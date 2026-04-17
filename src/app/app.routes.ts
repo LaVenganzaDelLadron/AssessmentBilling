@@ -27,5 +27,17 @@ export const routes: Routes = [
       import('./features/admin/admin.route').then(m => m.adminRoutes)
   },
 
+  {
+    path: 'teacher',
+    loadChildren: () =>
+      import('./features/teacher/teacher.route').then(m => m.teacherRoutes)
+  },
+
+  {
+    path: 'student',
+    loadChildren: () =>
+      import('./features/student/student.route').then(m => m.studentRoutes)
+  },
+
   { path: '**', redirectTo: '' }
 ];
