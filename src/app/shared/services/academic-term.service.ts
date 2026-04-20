@@ -23,22 +23,22 @@ export class AcademicTermService {
   constructor(private http: HttpClient) {}
 
   getAcademicTerms(): Observable<AcademicTerm[]> {
-    return this.http.get<AcademicTerm[]>(`${this.apiUrl}/academic-terms`);
+    return this.http.get<AcademicTerm[]>(`${this.apiUrl}/admin/academic-terms`);
   }
 
   getAcademicTerm(id: number): Observable<AcademicTerm> {
-    return this.http.get<AcademicTerm>(`${this.apiUrl}/academic-terms/${id}`);
+    return this.http.get<AcademicTerm>(`${this.apiUrl}/admin/academic-terms/${id}`);
   }
 
   createAcademicTerm(data: AcademicTerm): Observable<AcademicTerm> {
-    return this.http.post<AcademicTerm>(`${this.apiUrl}/academic-terms`, data);
+    return this.http.post<AcademicTerm>(`${this.apiUrl}/admin/academic-terms`, data);
   }
 
   updateAcademicTerm(id: number, data: AcademicTerm): Observable<AcademicTerm> {
-    return this.http.put<AcademicTerm>(`${this.apiUrl}/academic-terms/${id}`, data);
+    return this.http.put<AcademicTerm>(`${this.apiUrl}/admin/academic-terms/${id}`, data);
   }
 
   deleteAcademicTerm(id: number): Observable<{ message: string }> {
-    return this.http.delete<{ message: string }>(`${this.apiUrl}/academic-terms/${id}`);
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/admin/academic-terms/${id}`);
   }
 }

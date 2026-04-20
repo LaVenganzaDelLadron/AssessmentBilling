@@ -90,6 +90,26 @@ export const adminRoutes: Routes = [
         path: 'audit-logs',
         loadComponent: () =>
           import('./pages/audit-logs/audit-logs').then(m => m.AuditLogs)
+      },
+      {
+        path: 'assessment-breakdown',
+        loadComponent: () =>
+          import('./pages/assessment-breakdown/assessment-breakdown').then(m => m.AssessmentBreakdownPage)
+      },
+      {
+        path: 'invoice-lines',
+        loadComponent: () =>
+          import('./pages/invoice-lines/invoice-lines').then(m => m.InvoiceLines)
+      },
+      {
+        path: 'payment-allocations',
+        loadComponent: () =>
+          import('./pages/payment-allocations/payment-allocations').then(m => m.PaymentAllocations)
+      },
+      {
+        path: 'payment-methods',
+        loadComponent: () =>
+          import('./pages/payment-methods/payment-methods').then(m => m.PaymentMethods)
       }
     ]
   }

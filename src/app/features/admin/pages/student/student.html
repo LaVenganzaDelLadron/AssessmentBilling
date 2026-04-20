@@ -1,8 +1,8 @@
-<div class="min-h-screen bg-[#F8FAFC] font-sans text-slate-900 selection:bg-indigo-100 antialiased">
+<div class="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-slate-100 antialiased">
 
 
 
-  <main class="max-w-[1440px] mx-auto p-8 lg:p-12 space-y-10">
+  <main class="max-w-[1400px] mx-auto px-6 py-10 space-y-10 lg:px-8">
 
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-8">
       <div class="space-y-2">
@@ -18,7 +18,7 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-width="2.5"/></svg>
             Export List
         </button>
-        <button class="px-8 py-4 bg-slate-900 text-white rounded-2xl text-sm font-black shadow-2xl shadow-slate-300 hover:bg-indigo-600 hover:-translate-y-1 active:scale-95 transition-all flex items-center gap-3">
+        <button (click)="openAddModal()" class="px-8 py-4 bg-slate-900 text-white rounded-2xl text-sm font-black shadow-2xl shadow-slate-300 hover:bg-indigo-600 hover:-translate-y-1 active:scale-95 transition-all flex items-center gap-3">
           <div class="bg-white/20 p-1 rounded-md">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
           </div>
@@ -185,6 +185,12 @@
           <button class="p-3 bg-white border border-slate-200 text-slate-400 rounded-2xl hover:text-indigo-600 shadow-sm transition-all"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5"/></svg></button>
         </div>
       </div>
+    </div>
+
+    <div class="hidden">
+      <app-add-student-modal (refresh)="loadStudents()"></app-add-student-modal>
+      <app-update-student-modal (refresh)="loadStudents()"></app-update-student-modal>
+      <app-delete-student-modal (refresh)="loadStudents()"></app-delete-student-modal>
     </div>
   </main>
 </div>

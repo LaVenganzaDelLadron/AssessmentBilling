@@ -1,0 +1,102 @@
+<div *ngIf="isOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 rounded-2xl">
+  <div class="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold text-gray-800">Add Assessment</h2>
+      <button (click)="close()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
+    </div>
+
+    <form (ngSubmit)="submit()" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Subject ID</label>
+        <input
+          [(ngModel)]="subject_id"
+          name="subject_id"
+          type="number"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Enter subject ID"
+          required
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Academic Term ID</label>
+        <input
+          [(ngModel)]="academic_term_id"
+          name="academic_term_id"
+          type="number"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Enter academic term ID"
+          required
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Assessment Name</label>
+        <input
+          [(ngModel)]="assessment_name"
+          name="assessment_name"
+          type="text"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Enter assessment name"
+          required
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Assessment Date</label>
+        <input
+          [(ngModel)]="assessment_date"
+          name="assessment_date"
+          type="date"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Total Marks</label>
+        <input
+          [(ngModel)]="total_marks"
+          name="total_marks"
+          type="number"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Enter total marks"
+          required
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+        <input
+          [(ngModel)]="status"
+          name="status"
+          type="text"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Enter status"
+          required
+        />
+      </div>
+
+      <div *ngIf="errorMessage" class="p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+        {{ errorMessage }}
+      </div>
+
+      <div class="flex justify-end gap-3 mt-6">
+        <button
+          type="button"
+          (click)="close()"
+          class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          [disabled]="isLoading"
+          class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition disabled:opacity-50"
+        >
+          {{ isLoading ? 'Adding...' : 'Add Assessment' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
