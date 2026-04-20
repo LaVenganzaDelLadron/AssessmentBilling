@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PaymentMethodsService, PaymentMethod } from '../../../../shared/services/payment-methods.service';
+import { PaymentMethod } from '../../models/payment-method.model';
+import { PaymentMethodsService } from '../../services/payment-methods.service';
 import { AddPaymentMethodsModalComponent } from '../../modals/payment-methods/add-payment-methods/add-payment-methods.modal';
 import { UpdatePaymentMethodsModalComponent } from '../../modals/payment-methods/update-payment-methods/update-payment-methods.modal';
 import { DeletePaymentMethodsModalComponent } from '../../modals/payment-methods/delete-payment-methods/delete-payment-methods.modal';
@@ -17,7 +18,7 @@ import { DeletePaymentMethodsModalComponent } from '../../modals/payment-methods
     DeletePaymentMethodsModalComponent
   ],
   templateUrl: './payment-methods.html',
-  styleUrl: './payment-methods.css',
+  styleUrl: './payment-methods.css'
 })
 export class PaymentMethods implements OnInit {
   @ViewChild(AddPaymentMethodsModalComponent) addModal!: AddPaymentMethodsModalComponent;
@@ -31,44 +32,74 @@ export class PaymentMethods implements OnInit {
 
   constructor(private methodsService: PaymentMethodsService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadMethods();
   }
 
-  loadMethods() {
+  loadMethods(): void {
     this.isLoading = true;
+    this.errorMessage = '';
+
     this.methodsService.list().subscribe({
-      next: (data: any) => {
-        this.methods = Array.isArray(data) ? data : data.data || [];
+      next: (response) => {
+        this.methods = Array.isArray(response) ? response : response.data ?? [];
         this.isLoading = false;
       },
-      error: (error: any) => {
-        this.errorMessage = 'Failed to load payment methods';
+      error: (error) => {
         this.isLoading = false;
+
+        if (error?.status === 404) {
+          this.methods = [];
+          return;
+        }
+
+        this.errorMessage =
+          this.getErrorMessage(error) || 'Failed to load payment methods';
         console.error('Error:', error);
       }
     });
   }
 
-  getFilteredMethods() {
-    if (!this.searchQuery) return this.methods;
+  getFilteredMethods(): PaymentMethod[] {
+    if (!this.searchQuery) {
+      return this.methods;
+    }
+
     const query = this.searchQuery.toLowerCase();
-    return this.methods.filter(m => JSON.stringify(m).toLowerCase().includes(query));
+
+    return this.methods.filter(method => method.name.toLowerCase().includes(query));
   }
 
-  openAddModal() {
+  openAddModal(): void {
     this.addModal.open();
   }
 
-  openUpdateModal(method: PaymentMethod) {
+  openUpdateModal(method: PaymentMethod): void {
     this.updateModal.open(method);
   }
 
-  openDeleteModal(method: PaymentMethod) {
+  openDeleteModal(method: PaymentMethod): void {
     this.deleteModal.open(method);
   }
 
-  getStatusBadge(status: boolean) {
-    return status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+  private getErrorMessage(error: unknown): string | null {
+    const apiError = error as {
+      error?: {
+        message?: string;
+        errors?: Record<string, string[]>;
+      };
+    };
+
+    const validationErrors = apiError?.error?.errors;
+
+    if (validationErrors) {
+      for (const messages of Object.values(validationErrors)) {
+        if (Array.isArray(messages) && typeof messages[0] === 'string') {
+          return messages[0];
+        }
+      }
+    }
+
+    return apiError?.error?.message ?? null;
   }
 }

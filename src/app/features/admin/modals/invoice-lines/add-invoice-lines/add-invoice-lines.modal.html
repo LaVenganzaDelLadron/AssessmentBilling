@@ -1,5 +1,5 @@
 <div *ngIf="isOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 rounded-2xl">
-  <div class="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
+  <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full mx-4 p-6">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold text-gray-800">Add Invoice Line</h2>
       <button (click)="close()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
@@ -9,9 +9,10 @@
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Invoice ID</label>
         <input
-          [(ngModel)]="invoice_id"
-          name="invoice_id"
+          [(ngModel)]="form.invoice_id"
+          name="form_invoice_id"
           type="number"
+          min="1"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Enter invoice ID"
           required
@@ -19,10 +20,36 @@
       </div>
 
       <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Line Type</label>
+        <select
+          [(ngModel)]="form.line_type"
+          name="form_line_type"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        >
+          <option *ngFor="let lineType of lineTypes" [ngValue]="lineType">
+            {{ getLineTypeLabel(lineType) }}
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Subject ID (Optional)</label>
+        <input
+          [(ngModel)]="form.subject_id"
+          name="form_subject_id"
+          type="number"
+          min="1"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Enter subject ID if applicable"
+        />
+      </div>
+
+      <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
         <textarea
-          [(ngModel)]="description"
-          name="description"
+          [(ngModel)]="form.description"
+          name="form_description"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Enter description"
           rows="3"
@@ -33,9 +60,11 @@
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
         <input
-          [(ngModel)]="quantity"
-          name="quantity"
+          [(ngModel)]="form.quantity"
+          name="form_quantity"
           type="number"
+          step="0.01"
+          min="0.01"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Enter quantity"
           required
@@ -45,13 +74,26 @@
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Unit Price</label>
         <input
-          [(ngModel)]="unit_price"
-          name="unit_price"
+          [(ngModel)]="form.unit_price"
+          name="form_unit_price"
           type="number"
           step="0.01"
+          min="0"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Enter unit price"
           required
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+        <input
+          [ngModel]="computedAmount"
+          name="form_amount_preview"
+          type="number"
+          step="0.01"
+          readonly
+          class="w-full px-3 py-2 border border-gray-200 bg-gray-50 text-gray-700 rounded-lg"
         />
       </div>
 

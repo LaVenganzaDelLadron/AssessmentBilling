@@ -1,31 +1,31 @@
-import { Component, ViewChild, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { InvoiceLinesService } from '../../../../../shared/services/invoice-lines.service';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { InvoiceLine } from '../../../models/invoice-line.model';
+import { InvoiceLinesService } from '../../../services/invoice-lines.service';
 
 @Component({
   selector: 'app-delete-invoice-lines-modal',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './delete-invoice-lines.modal.html',
-  styleUrl: './delete-invoice-lines.modal.css'
+  templateUrl: './delete-invoice-lines.modal.html'
 })
-export class DeleteInvoiceLinesModalComponent implements OnInit {
-  @ViewChild('modal') modal: any;
+export class DeleteInvoiceLinesModalComponent {
   @Output() refresh = new EventEmitter<void>();
 
   isOpen = false;
   isLoading = false;
   errorMessage = '';
+  successMessage = '';
 
-  currentEntity: any = null;
+  selectedLine: InvoiceLine | null = null;
 
   constructor(private invoiceLinesService: InvoiceLinesService) {}
 
-  ngOnInit(): void {}
-
-  open(entity: any): void {
-    this.currentEntity = entity;
+  open(entity: InvoiceLine): void {
+    this.selectedLine = entity;
     this.isOpen = true;
+    this.errorMessage = '';
+    this.successMessage = '';
   }
 
   close(): void {
@@ -37,21 +37,49 @@ export class DeleteInvoiceLinesModalComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.invoiceLinesService.delete(this.currentEntity.id).subscribe({
+    if (!this.selectedLine?.id) {
+      this.isLoading = false;
+      return;
+    }
+
+    this.invoiceLinesService.delete(this.selectedLine.id).subscribe({
       next: () => {
         this.isLoading = false;
         this.close();
         this.refresh.emit();
       },
-      error: (error: any) => {
+      error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error?.message || 'Failed to delete invoice line';
+        this.errorMessage = this.getErrorMessage(error) || 'Failed to delete invoice line';
+        console.error('Error:', error);
       }
     });
   }
 
   private resetForm(): void {
     this.errorMessage = '';
-    this.currentEntity = null;
+    this.successMessage = '';
+    this.selectedLine = null;
+  }
+
+  private getErrorMessage(error: unknown): string | null {
+    const apiError = error as {
+      error?: {
+        message?: string;
+        errors?: Record<string, string[]>;
+      };
+    };
+
+    const validationErrors = apiError?.error?.errors;
+
+    if (validationErrors) {
+      for (const messages of Object.values(validationErrors)) {
+        if (Array.isArray(messages) && typeof messages[0] === 'string') {
+          return messages[0];
+        }
+      }
+    }
+
+    return apiError?.error?.message ?? null;
   }
 }

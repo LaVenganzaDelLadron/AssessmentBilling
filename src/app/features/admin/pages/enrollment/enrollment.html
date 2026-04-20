@@ -13,14 +13,13 @@
 
   <div class="max-w-7xl mx-auto px-6 py-8">
     <div class="mb-8">
-      <input [(ngModel)]="searchQuery" type="text" placeholder="Search by student or subject ID..." class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-all" />
+      <input [(ngModel)]="searchQuery" type="text" placeholder="Search by student, subject, term, or status..." class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-all" />
     </div>
 
     <div class="mb-8 flex gap-4">
       <button (click)="statusFilter = ''" [class.opacity-100]="statusFilter === ''" class="px-4 py-2 bg-indigo-600/30 text-indigo-200 rounded-lg text-sm font-semibold opacity-50 transition-all">All</button>
       <button (click)="statusFilter = 'enrolled'" [class.opacity-100]="statusFilter === 'enrolled'" class="px-4 py-2 bg-emerald-600/30 text-emerald-200 rounded-lg text-sm font-semibold opacity-50 transition-all">Enrolled</button>
       <button (click)="statusFilter = 'dropped'" [class.opacity-100]="statusFilter === 'dropped'" class="px-4 py-2 bg-red-600/30 text-red-200 rounded-lg text-sm font-semibold opacity-50 transition-all">Dropped</button>
-      <button (click)="statusFilter = 'completed'" [class.opacity-100]="statusFilter === 'completed'" class="px-4 py-2 bg-blue-600/30 text-blue-200 rounded-lg text-sm font-semibold opacity-50 transition-all">Completed</button>
     </div>
 
     <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200">{{ errorMessage }}</div>
@@ -34,6 +33,7 @@
             <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Student ID</th>
             <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Subject ID</th>
             <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Academic Term</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Semester</th>
             <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Status</th>
             <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Actions</th>
           </tr>
@@ -43,6 +43,7 @@
             <td class="px-6 py-4 text-sm text-white font-medium">{{ enrollment.student_id }}</td>
             <td class="px-6 py-4 text-sm text-slate-300">{{ enrollment.subject_id }}</td>
             <td class="px-6 py-4 text-sm text-slate-300">{{ enrollment.academic_term_id }}</td>
+            <td class="px-6 py-4 text-sm text-slate-300">{{ getTermLabel(enrollment) }}</td>
             <td class="px-6 py-4"><span [ngClass]="getStatusColor(enrollment.status)" class="px-3 py-1 rounded-full text-xs font-semibold">{{ enrollment.status }}</span></td>
             <td class="px-6 py-4 space-x-2">
               <button (click)="openUpdateModal(enrollment)" class="px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 text-xs rounded font-semibold transition-all">Edit</button>
@@ -50,14 +51,14 @@
             </td>
           </tr>
           <tr *ngIf="getFilteredEnrollments().length === 0">
-            <td colspan="5" class="px-6 py-8 text-center text-slate-400"><p>No enrollments found</p></td>
+            <td colspan="6" class="px-6 py-8 text-center text-slate-400"><p>{{ searchQuery || statusFilter ? 'No enrollments matched your filters' : 'No enrollments found' }}</p></td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <app-add-enrollment-modal></app-add-enrollment-modal>
-  <app-update-enrollment-modal></app-update-enrollment-modal>
-  <app-delete-enrollment-modal></app-delete-enrollment-modal>
+  <app-add-enrollment-modal (refresh)="loadEnrollments()"></app-add-enrollment-modal>
+  <app-update-enrollment-modal (refresh)="loadEnrollments()"></app-update-enrollment-modal>
+  <app-delete-enrollment-modal (refresh)="loadEnrollments()"></app-delete-enrollment-modal>
 </div>

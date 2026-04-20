@@ -11,7 +11,7 @@
 
   <!-- Search -->
   <div class="mb-6">
-    <input [(ngModel)]="searchQuery" placeholder="Search breakdowns..."
+    <input [(ngModel)]="searchQuery" placeholder="Search description, source, or assessment..."
       class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
   </div>
 
@@ -33,24 +33,37 @@
     <table class="w-full">
       <thead>
         <tr class="bg-slate-50 border-b border-slate-200">
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">ID</th>
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Breakdown Component</th>
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Percentage</th>
+          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Assessment</th>
+          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Source</th>
+          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Description</th>
+          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Units</th>
+          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Rate</th>
+          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Amount</th>
           <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Actions</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100">
         <tr *ngFor="let breakdown of getFilteredBreakdowns()" class="hover:bg-slate-50 transition-colors">
-          <td class="px-6 py-4 text-sm font-semibold text-slate-900">{{ breakdown.id }}</td>
-          <td class="px-6 py-4 text-sm text-slate-700">{{ breakdown.breakdown_name || '-' }}</td>
-          <td class="px-6 py-4 text-sm text-slate-700">{{ breakdown.percentage || 0 }}%</td>
+          <td class="px-6 py-4 text-sm font-semibold text-slate-900">#{{ breakdown.assessment_id }}</td>
+          <td class="px-6 py-4 text-sm text-slate-700">
+            <div class="flex flex-col">
+              <span class="font-semibold text-slate-800">{{ breakdown.source_type | titlecase }}</span>
+              <span class="text-xs text-slate-500">{{ getSourceDetails(breakdown) }}</span>
+            </div>
+          </td>
+          <td class="px-6 py-4 text-sm text-slate-700">{{ breakdown.description || '-' }}</td>
+          <td class="px-6 py-4 text-sm text-slate-700">{{ formatNumericValue(breakdown.units) }}</td>
+          <td class="px-6 py-4 text-sm text-slate-700">{{ formatNumericValue(breakdown.rate) }}</td>
+          <td class="px-6 py-4 text-sm font-semibold text-slate-900">{{ formatAmount(breakdown.amount) }}</td>
           <td class="px-6 py-4 text-sm space-x-2">
             <button (click)="openUpdateModal(breakdown)" class="text-blue-600 font-bold hover:underline">Edit</button>
             <button (click)="openDeleteModal(breakdown)" class="text-red-600 font-bold hover:underline">Delete</button>
           </td>
         </tr>
         <tr *ngIf="getFilteredBreakdowns().length === 0">
-          <td colspan="4" class="px-6 py-8 text-center text-slate-500 italic">No assessment breakdowns found</td>
+          <td colspan="7" class="px-6 py-8 text-center text-slate-500 italic">
+            {{ searchQuery ? 'No assessment breakdowns matched your search' : 'No assessment breakdowns found' }}
+          </td>
         </tr>
       </tbody>
     </table>

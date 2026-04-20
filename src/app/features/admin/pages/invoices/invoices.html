@@ -19,7 +19,8 @@
     <div class="mb-8 flex gap-4">
       <button (click)="statusFilter = ''" [class.opacity-100]="statusFilter === ''" class="px-4 py-2 bg-indigo-600/30 text-indigo-200 rounded-lg text-sm font-semibold opacity-50 transition-all">All</button>
       <button (click)="statusFilter = 'paid'" [class.opacity-100]="statusFilter === 'paid'" class="px-4 py-2 bg-emerald-600/30 text-emerald-200 rounded-lg text-sm font-semibold opacity-50 transition-all">Paid</button>
-      <button (click)="statusFilter = 'pending'" [class.opacity-100]="statusFilter === 'pending'" class="px-4 py-2 bg-yellow-600/30 text-yellow-200 rounded-lg text-sm font-semibold opacity-50 transition-all">Pending</button>
+      <button (click)="statusFilter = 'partial'" [class.opacity-100]="statusFilter === 'partial'" class="px-4 py-2 bg-amber-600/30 text-amber-200 rounded-lg text-sm font-semibold opacity-50 transition-all">Partial</button>
+      <button (click)="statusFilter = 'unpaid'" [class.opacity-100]="statusFilter === 'unpaid'" class="px-4 py-2 bg-yellow-600/30 text-yellow-200 rounded-lg text-sm font-semibold opacity-50 transition-all">Unpaid</button>
       <button (click)="statusFilter = 'overdue'" [class.opacity-100]="statusFilter === 'overdue'" class="px-4 py-2 bg-red-600/30 text-red-200 rounded-lg text-sm font-semibold opacity-50 transition-all">Overdue</button>
     </div>
 
@@ -28,11 +29,13 @@
     <div *ngIf="isLoading" class="flex justify-center items-center py-12"><div class="text-white">Loading...</div></div>
 
     <div *ngIf="!isLoading" class="bg-white/10 backdrop-blur-md border border-white/10 rounded-lg overflow-hidden">
-      <table class="w-full">
+      <div class="overflow-x-auto">
+      <table class="w-full min-w-[980px]">
         <thead>
           <tr class="bg-white/5 border-b border-white/10">
             <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Invoice #</th>
             <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Student ID</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Assessment ID</th>
             <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Total</th>
             <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Balance</th>
             <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Due Date</th>
@@ -44,8 +47,9 @@
           <tr *ngFor="let invoice of getFilteredInvoices()" class="hover:bg-white/5 transition-all">
             <td class="px-6 py-4 text-sm text-white font-medium">{{ invoice.invoice_number }}</td>
             <td class="px-6 py-4 text-sm text-slate-300">{{ invoice.student_id }}</td>
-            <td class="px-6 py-4 text-sm text-slate-300">${{ invoice.total_amount.toFixed(2) }}</td>
-            <td class="px-6 py-4 text-sm text-slate-300">${{ invoice.balance.toFixed(2) }}</td>
+            <td class="px-6 py-4 text-sm text-slate-300">{{ invoice.assessment_id }}</td>
+            <td class="px-6 py-4 text-sm text-slate-300">${{ formatAmount(invoice.total_amount) }}</td>
+            <td class="px-6 py-4 text-sm text-slate-300">${{ formatAmount(invoice.balance) }}</td>
             <td class="px-6 py-4 text-sm text-slate-300">{{ invoice.due_date | date: 'MMM dd, yyyy' }}</td>
             <td class="px-6 py-4"><span [ngClass]="getStatusColor(invoice.status)" class="px-3 py-1 rounded-full text-xs font-semibold">{{ invoice.status }}</span></td>
             <td class="px-6 py-4 space-x-2">
@@ -54,14 +58,15 @@
             </td>
           </tr>
           <tr *ngIf="getFilteredInvoices().length === 0">
-            <td colspan="7" class="px-6 py-8 text-center text-slate-400"><p>No invoices found</p></td>
+            <td colspan="8" class="px-6 py-8 text-center text-slate-400"><p>No invoices found</p></td>
           </tr>
         </tbody>
       </table>
+      </div>
     </div>
   </div>
 
-  <app-add-invoice-modal></app-add-invoice-modal>
-  <app-update-invoice-modal></app-update-invoice-modal>
-  <app-delete-invoice-modal></app-delete-invoice-modal>
+  <app-add-invoice-modal (refresh)="loadInvoices()"></app-add-invoice-modal>
+  <app-update-invoice-modal (refresh)="loadInvoices()"></app-update-invoice-modal>
+  <app-delete-invoice-modal (refresh)="loadInvoices()"></app-delete-invoice-modal>
 </div>

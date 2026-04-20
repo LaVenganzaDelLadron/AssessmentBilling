@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuditLogsService, AuditLog } from '../../../../shared/services/audit-logs.service';
+import { AuditLog } from '../../models/audit-log.model';
+import { AuditLogsService } from '../../services/audit-logs.service';
 
 @Component({
   selector: 'app-audit-logs',
@@ -15,7 +16,7 @@ export class AuditLogs implements OnInit {
   isLoading = false;
   errorMessage = '';
   searchQuery = '';
-  filterType = '';
+  actionFilter = '';
 
   constructor(private auditService: AuditLogsService) {}
 
@@ -25,37 +26,152 @@ export class AuditLogs implements OnInit {
 
   loadLogs() {
     this.isLoading = true;
+    this.errorMessage = '';
+
     this.auditService.list().subscribe({
-      next: (data: any) => {
-        this.logs = Array.isArray(data) ? data : data.data || [];
+      next: (response) => {
+        this.logs = Array.isArray(response) ? response : response.data ?? [];
         this.isLoading = false;
       },
-      error: (error: any) => {
-        this.errorMessage = 'Failed to load audit logs';
+      error: (error) => {
         this.isLoading = false;
+
+        if (error?.status === 404) {
+          this.logs = [];
+          return;
+        }
+
+        this.errorMessage = this.getErrorMessage(error) || 'Failed to load audit logs';
       }
     });
   }
 
-  getFilteredLogs() {
+  getFilteredLogs(): AuditLog[] {
     let filtered = this.logs;
+
     if (this.searchQuery) {
       const q = this.searchQuery.toLowerCase();
-      filtered = filtered.filter(l => JSON.stringify(l).toLowerCase().includes(q));
+      filtered = filtered.filter(log => this.matchesSearch(log, q));
     }
-    if (this.filterType) {
-      filtered = filtered.filter(l => l.action === this.filterType);
+
+    if (this.actionFilter) {
+      filtered = filtered.filter(log => this.normalizeAction(log.action) === this.actionFilter);
     }
+
     return filtered;
   }
 
-  getActionBadge(action: string) {
+  getActionBadge(action: string): string {
     const base = 'px-3 py-1 rounded-full text-xs font-bold';
-    switch(action) {
+
+    switch(this.normalizeAction(action)) {
       case 'create': return `${base} bg-green-100 text-green-800`;
       case 'update': return `${base} bg-blue-100 text-blue-800`;
       case 'delete': return `${base} bg-red-100 text-red-800`;
       default: return `${base} bg-slate-100 text-slate-800`;
     }
+  }
+
+  getActionIconClasses(action: string): string {
+    switch (this.normalizeAction(action)) {
+      case 'create':
+        return 'bg-emerald-50 text-emerald-600';
+      case 'update':
+        return 'bg-amber-50 text-amber-600';
+      case 'delete':
+        return 'bg-rose-50 text-rose-600';
+      default:
+        return 'bg-slate-100 text-slate-600';
+    }
+  }
+
+  getActionOptions(): string[] {
+    const actions = new Set(
+      this.logs
+        .map(log => this.normalizeAction(log.action))
+        .filter(action => action.length > 0)
+    );
+
+    return ['all', ...Array.from(actions)];
+  }
+
+  setActionFilter(action: string): void {
+    this.actionFilter = action === 'all' ? '' : action;
+  }
+
+  isSelectedAction(action: string): boolean {
+    return action === 'all' ? !this.actionFilter : this.actionFilter === action;
+  }
+
+  getActionButtonClasses(action: string): string {
+    const base =
+      'px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all';
+
+    if (this.isSelectedAction(action)) {
+      return `${base} bg-indigo-50 text-indigo-600 border-indigo-100`;
+    }
+
+    return `${base} bg-white text-slate-400 border-slate-100 hover:border-indigo-200`;
+  }
+
+  getUserLabel(log: AuditLog): string {
+    return log.user_id ? `User #${log.user_id}` : 'System';
+  }
+
+  getUserInitials(log: AuditLog): string {
+    return log.user_id ? `U${String(log.user_id).slice(-1)}` : 'SY';
+  }
+
+  getEntityLabel(log: AuditLog): string {
+    return `${log.entity_type} (#${log.entity_id})`;
+  }
+
+  getActionDisplay(action: string): string {
+    const normalized = this.normalizeAction(action);
+    return normalized ? normalized.toUpperCase() : 'EVENT';
+  }
+
+  trackByLogId(_: number, log: AuditLog): number {
+    return log.id;
+  }
+
+  private matchesSearch(log: AuditLog, query: string): boolean {
+    return [
+      String(log.id),
+      this.getUserLabel(log),
+      log.action,
+      log.entity_type,
+      log.entity_id,
+      log.ip_address ?? '',
+      log.created_at ?? ''
+    ]
+      .join(' ')
+      .toLowerCase()
+      .includes(query);
+  }
+
+  private normalizeAction(action: string): string {
+    return action.trim().toLowerCase();
+  }
+
+  private getErrorMessage(error: unknown): string | null {
+    const apiError = error as {
+      error?: {
+        message?: string;
+        errors?: Record<string, string[]>;
+      };
+    };
+
+    const validationErrors = apiError?.error?.errors;
+
+    if (validationErrors) {
+      for (const messages of Object.values(validationErrors)) {
+        if (Array.isArray(messages) && typeof messages[0] === 'string') {
+          return messages[0];
+        }
+      }
+    }
+
+    return apiError?.error?.message ?? null;
   }
 }

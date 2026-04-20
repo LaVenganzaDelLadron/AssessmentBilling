@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AdminDataService, Invoice } from '../../../../../shared/services/admin-data.service';
+import { Invoice } from '../../../models/invoice.model';
+import { InvoicesService } from '../../../services/invoices.service';
 
 @Component({
   selector: 'app-delete-invoice-modal',
@@ -9,13 +10,15 @@ import { AdminDataService, Invoice } from '../../../../../shared/services/admin-
   templateUrl: './delete-invoice.modal.html',
 })
 export class DeleteInvoiceModalComponent {
+  @Output() refresh = new EventEmitter<void>();
+
   isOpen = false;
   isLoading = false;
   errorMessage = '';
   successMessage = '';
   selectedInvoice: Invoice | null = null;
 
-  constructor(private adminDataService: AdminDataService) {}
+  constructor(private invoicesService: InvoicesService) {}
 
   open(invoice: Invoice): void {
     this.selectedInvoice = invoice;
@@ -37,20 +40,38 @@ export class DeleteInvoiceModalComponent {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.adminDataService.deleteInvoice(this.selectedInvoice.id).subscribe({
+    this.invoicesService.delete(this.selectedInvoice.id).subscribe({
       next: () => {
         this.isLoading = false;
-        this.successMessage = 'Invoice deleted successfully!';
-        setTimeout(() => {
-          this.close();
-          window.location.reload();
-        }, 1500);
+        this.refresh.emit();
+        this.close();
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error.error?.message || 'Failed to delete invoice';
+        this.errorMessage = this.getErrorMessage(error) || 'Failed to delete invoice';
         console.error('Error:', error);
       }
     });
+  }
+
+  private getErrorMessage(error: unknown): string | null {
+    const apiError = error as {
+      error?: {
+        message?: string;
+        errors?: Record<string, string[]>;
+      };
+    };
+
+    const validationErrors = apiError?.error?.errors;
+
+    if (validationErrors) {
+      for (const messages of Object.values(validationErrors)) {
+        if (Array.isArray(messages) && typeof messages[0] === 'string') {
+          return messages[0];
+        }
+      }
+    }
+
+    return apiError?.error?.message ?? null;
   }
 }

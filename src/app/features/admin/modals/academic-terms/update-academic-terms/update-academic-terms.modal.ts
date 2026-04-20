@@ -1,7 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AcademicTermService, AcademicTerm } from '../../../../../shared/services/academic-term.service';
+import {
+  AcademicTerm,
+  UpdateAcademicTermPayload
+} from '../../../models/academic-term.model';
+import { AcademicTermsService } from '../../../services/academic-terms.service';
 
 @Component({
   selector: 'app-update-academic-terms-modal',
@@ -10,27 +14,29 @@ import { AcademicTermService, AcademicTerm } from '../../../../../shared/service
   templateUrl: './update-academic-terms.modal.html',
 })
 export class UpdateAcademicTermsModalComponent {
+  @Output() refresh = new EventEmitter<void>();
+
   isOpen = false;
   isLoading = false;
   errorMessage = '';
   successMessage = '';
   selectedId: number | null = null;
 
-  form: AcademicTerm = {
-    school_year: '',
-    semester: '',
-    start_date: '',
-    end_date: '',
-    is_active: true
-  };
+  form: UpdateAcademicTermPayload = this.createEmptyForm();
 
   semesters = ['1st Semester', '2nd Semester', 'Summer'];
 
-  constructor(private academicTermService: AcademicTermService) {}
+  constructor(private academicTermsService: AcademicTermsService) {}
 
   open(term: AcademicTerm): void {
     this.selectedId = term.id || null;
-    this.form = { ...term };
+    this.form = {
+      school_year: term.school_year,
+      semester: term.semester,
+      start_date: this.normalizeDate(term.start_date),
+      end_date: this.normalizeDate(term.end_date),
+      is_active: term.is_active
+    };
     this.isOpen = true;
     this.errorMessage = '';
     this.successMessage = '';
@@ -42,13 +48,7 @@ export class UpdateAcademicTermsModalComponent {
   }
 
   resetForm(): void {
-    this.form = {
-      school_year: '',
-      semester: '',
-      start_date: '',
-      end_date: '',
-      is_active: true
-    };
+    this.form = this.createEmptyForm();
     this.selectedId = null;
     this.errorMessage = '';
     this.successMessage = '';
@@ -61,18 +61,15 @@ export class UpdateAcademicTermsModalComponent {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.academicTermService.updateAcademicTerm(this.selectedId, this.form).subscribe({
-      next: (response) => {
+    this.academicTermsService.update(this.selectedId, this.form).subscribe({
+      next: () => {
         this.isLoading = false;
-        this.successMessage = 'Academic term updated successfully!';
-        setTimeout(() => {
-          this.close();
-          window.location.reload();
-        }, 1500);
+        this.refresh.emit();
+        this.close();
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error.error?.message || 'Failed to update academic term';
+        this.errorMessage = this.getErrorMessage(error) || 'Failed to update academic term';
         console.error('Error updating academic term:', error);
       }
     });
@@ -95,10 +92,45 @@ export class UpdateAcademicTermsModalComponent {
       this.errorMessage = 'End date is required';
       return false;
     }
-    if (new Date(this.form.start_date) >= new Date(this.form.end_date)) {
-      this.errorMessage = 'End date must be after start date';
+    if (new Date(this.form.start_date) > new Date(this.form.end_date)) {
+      this.errorMessage = 'End date must be after or equal to start date';
       return false;
     }
     return true;
+  }
+
+  private createEmptyForm(): UpdateAcademicTermPayload {
+    return {
+      school_year: '',
+      semester: '',
+      start_date: '',
+      end_date: '',
+      is_active: true
+    };
+  }
+
+  private normalizeDate(date: string): string {
+    return date.includes('T') ? date.split('T')[0] : date;
+  }
+
+  private getErrorMessage(error: unknown): string | null {
+    const apiError = error as {
+      error?: {
+        message?: string;
+        errors?: Record<string, string[]>;
+      };
+    };
+
+    const validationErrors = apiError?.error?.errors;
+
+    if (validationErrors) {
+      for (const messages of Object.values(validationErrors)) {
+        if (Array.isArray(messages) && typeof messages[0] === 'string') {
+          return messages[0];
+        }
+      }
+    }
+
+    return apiError?.error?.message ?? null;
   }
 }

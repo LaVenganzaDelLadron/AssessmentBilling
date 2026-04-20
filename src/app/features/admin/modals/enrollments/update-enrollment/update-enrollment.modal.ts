@@ -1,7 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AdminDataService, Enrollment } from '../../../../../shared/services/admin-data.service';
+import {
+  Enrollment,
+  EnrollmentStatus,
+  UpdateEnrollmentPayload
+} from '../../../models/enrollment.model';
+import { EnrollmentsService } from '../../../services/enrollments.service';
+
+interface EnrollmentForm {
+  student_id: number | null;
+  subject_id: number | null;
+  academic_term_id: number | null;
+  semester: string;
+  school_year: string;
+  status: EnrollmentStatus;
+}
 
 @Component({
   selector: 'app-update-enrollment-modal',
@@ -10,26 +24,31 @@ import { AdminDataService, Enrollment } from '../../../../../shared/services/adm
   templateUrl: './update-enrollment.modal.html',
 })
 export class UpdateEnrollmentModalComponent {
+  @Output() refresh = new EventEmitter<void>();
+
   isOpen = false;
   isLoading = false;
   errorMessage = '';
   successMessage = '';
   selectedId: number | null = null;
 
-  form: Enrollment = {
-    student_id: 0,
-    subject_id: 0,
-    academic_term_id: 0,
-    status: 'enrolled'
-  };
+  form: EnrollmentForm = this.createEmptyForm();
 
-  statuses = ['enrolled', 'dropped', 'completed', 'pending'];
+  statuses: EnrollmentStatus[] = ['enrolled', 'dropped'];
+  semesters = ['1st Semester', '2nd Semester', 'Summer'];
 
-  constructor(private adminDataService: AdminDataService) {}
+  constructor(private enrollmentsService: EnrollmentsService) {}
 
   open(enrollment: Enrollment): void {
     this.selectedId = enrollment.id || null;
-    this.form = { ...enrollment };
+    this.form = {
+      student_id: enrollment.student_id,
+      subject_id: enrollment.subject_id,
+      academic_term_id: enrollment.academic_term_id,
+      semester: enrollment.semester,
+      school_year: enrollment.school_year,
+      status: enrollment.status
+    };
     this.isOpen = true;
     this.errorMessage = '';
     this.successMessage = '';
@@ -41,12 +60,7 @@ export class UpdateEnrollmentModalComponent {
   }
 
   resetForm(): void {
-    this.form = {
-      student_id: 0,
-      subject_id: 0,
-      academic_term_id: 0,
-      status: 'enrolled'
-    };
+    this.form = this.createEmptyForm();
     this.selectedId = null;
     this.errorMessage = '';
     this.successMessage = '';
@@ -59,18 +73,15 @@ export class UpdateEnrollmentModalComponent {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.adminDataService.updateEnrollment(this.selectedId, this.form).subscribe({
+    this.enrollmentsService.update(this.selectedId, this.toPayload()).subscribe({
       next: () => {
         this.isLoading = false;
-        this.successMessage = 'Enrollment updated successfully!';
-        setTimeout(() => {
-          this.close();
-          window.location.reload();
-        }, 1500);
+        this.refresh.emit();
+        this.close();
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error.error?.message || 'Failed to update enrollment';
+        this.errorMessage = this.getErrorMessage(error) || 'Failed to update enrollment';
         console.error('Error:', error);
       }
     });
@@ -89,10 +100,69 @@ export class UpdateEnrollmentModalComponent {
       this.errorMessage = 'Academic term is required';
       return false;
     }
+    if (!this.form.semester.trim()) {
+      this.errorMessage = 'Semester is required';
+      return false;
+    }
+    if (!this.form.school_year.trim()) {
+      this.errorMessage = 'School year is required';
+      return false;
+    }
+    if (this.form.semester.trim().length > 20) {
+      this.errorMessage = 'Semester may not be greater than 20 characters';
+      return false;
+    }
+    if (this.form.school_year.trim().length > 9) {
+      this.errorMessage = 'School year may not be greater than 9 characters';
+      return false;
+    }
     if (!this.form.status) {
       this.errorMessage = 'Status is required';
       return false;
     }
     return true;
+  }
+
+  private createEmptyForm(): EnrollmentForm {
+    return {
+      student_id: null,
+      subject_id: null,
+      academic_term_id: null,
+      semester: '',
+      school_year: '',
+      status: 'enrolled'
+    };
+  }
+
+  private toPayload(): UpdateEnrollmentPayload {
+    return {
+      student_id: this.form.student_id ?? 0,
+      subject_id: this.form.subject_id ?? 0,
+      academic_term_id: this.form.academic_term_id ?? 0,
+      semester: this.form.semester.trim(),
+      school_year: this.form.school_year.trim(),
+      status: this.form.status
+    };
+  }
+
+  private getErrorMessage(error: unknown): string | null {
+    const apiError = error as {
+      error?: {
+        message?: string;
+        errors?: Record<string, string[]>;
+      };
+    };
+
+    const validationErrors = apiError?.error?.errors;
+
+    if (validationErrors) {
+      for (const messages of Object.values(validationErrors)) {
+        if (Array.isArray(messages) && typeof messages[0] === 'string') {
+          return messages[0];
+        }
+      }
+    }
+
+    return apiError?.error?.message ?? null;
   }
 }

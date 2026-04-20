@@ -9,8 +9,8 @@
       <p class="text-gray-600">
         Are you sure you want to delete this official receipt? This action cannot be undone.
       </p>
-      <p *ngIf="currentEntity" class="mt-2 text-gray-700 font-medium">
-        {{ currentEntity.receipt_number }}
+      <p *ngIf="selectedReceipt" class="mt-2 text-gray-700 font-medium">
+        {{ selectedReceipt.or_number }}
       </p>
     </div>
 

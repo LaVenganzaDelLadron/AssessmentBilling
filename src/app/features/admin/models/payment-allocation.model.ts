@@ -3,15 +3,14 @@ import { AdminNumericValue, BaseAdminModel } from './admin-api.model';
 export interface PaymentAllocation extends BaseAdminModel {
   payment_id: number;
   invoice_id: number;
-  amount_allocated?: AdminNumericValue;
-  amount?: AdminNumericValue;
-  [key: string]: unknown;
+  amount_applied: AdminNumericValue;
 }
 
-export type CreatePaymentAllocationPayload = Omit<
-  PaymentAllocation,
-  'id' | 'created_at' | 'updated_at'
->;
+export interface CreatePaymentAllocationPayload {
+  payment_id: number;
+  invoice_id: number;
+  amount_applied: AdminNumericValue;
+}
 
 export type UpdatePaymentAllocationPayload =
   Partial<CreatePaymentAllocationPayload>;

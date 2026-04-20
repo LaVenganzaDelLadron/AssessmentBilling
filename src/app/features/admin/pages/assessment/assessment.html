@@ -11,13 +11,12 @@
 
   <!-- Search & Filter -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-    <input [(ngModel)]="searchQuery" placeholder="Search assessments..."
+    <input [(ngModel)]="searchQuery" placeholder="Search student, term, or status..."
       class="px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
     <select [(ngModel)]="statusFilter" class="px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
       <option value="">All Status</option>
       <option value="draft">Draft</option>
-      <option value="published">Published</option>
-      <option value="closed">Closed</option>
+      <option value="finalized">Finalized</option>
     </select>
   </div>
 
@@ -39,21 +38,32 @@
     <table class="w-full">
       <thead>
         <tr class="bg-slate-50 border-b border-slate-200">
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Title</th>
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Subject</th>
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Total Marks</th>
+          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Student</th>
+          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Term</th>
+          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Units</th>
+          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Gross</th>
+          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Discount</th>
+          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Net</th>
           <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Status</th>
           <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Actions</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100">
         <tr *ngFor="let assessment of getFilteredAssessments()" class="hover:bg-slate-50 transition-colors">
-          <td class="px-6 py-4 text-sm font-semibold text-slate-900">{{ assessment.assessment_name || 'Untitled' }}</td>
-          <td class="px-6 py-4 text-sm text-slate-700">{{ assessment.subject_id || '-' }}</td>
-          <td class="px-6 py-4 text-sm text-slate-700">{{ assessment.total_marks }}</td>
+          <td class="px-6 py-4 text-sm font-semibold text-slate-900">#{{ assessment.student_id }}</td>
+          <td class="px-6 py-4 text-sm text-slate-700">
+            <div class="flex flex-col">
+              <span class="font-semibold text-slate-800">{{ getTermLabel(assessment) }}</span>
+              <span class="text-xs text-slate-500">Term ID: {{ assessment.academic_term_id }}</span>
+            </div>
+          </td>
+          <td class="px-6 py-4 text-sm text-slate-700">{{ formatNumericValue(assessment.total_units) }}</td>
+          <td class="px-6 py-4 text-sm text-slate-700">{{ formatAmount(assessment.total_amount) }}</td>
+          <td class="px-6 py-4 text-sm text-slate-700">{{ formatAmount(assessment.discount) }}</td>
+          <td class="px-6 py-4 text-sm font-semibold text-slate-900">{{ formatAmount(assessment.net_amount) }}</td>
           <td class="px-6 py-4 text-sm">
-            <span [ngClass]="'px-3 py-1 rounded-full text-xs font-bold ' + getStatusBadge(assessment.status || 'published')">
-              {{ assessment.status || 'Published' }}
+            <span [ngClass]="getStatusBadge(assessment.status)">
+              {{ assessment.status | titlecase }}
             </span>
           </td>
           <td class="px-6 py-4 text-sm space-x-2">
@@ -62,7 +72,9 @@
           </td>
         </tr>
         <tr *ngIf="getFilteredAssessments().length === 0">
-          <td colspan="5" class="px-6 py-8 text-center text-slate-500 italic">No assessments found</td>
+          <td colspan="8" class="px-6 py-8 text-center text-slate-500 italic">
+            {{ searchQuery || statusFilter ? 'No assessments matched your filters' : 'No assessments found' }}
+          </td>
         </tr>
       </tbody>
     </table>

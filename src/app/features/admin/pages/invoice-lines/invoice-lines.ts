@@ -1,7 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { InvoiceLinesService, InvoiceLine } from '../../../../shared/services/invoice-lines.service';
+import { AdminNumericValue } from '../../models/admin-api.model';
+import { InvoiceLine } from '../../models/invoice-line.model';
+import { InvoiceLinesService } from '../../services/invoice-lines.service';
 import { AddInvoiceLinesModalComponent } from '../../modals/invoice-lines/add-invoice-lines/add-invoice-lines.modal';
 import { UpdateInvoiceLinesModalComponent } from '../../modals/invoice-lines/update-invoice-lines/update-invoice-lines.modal';
 import { DeleteInvoiceLinesModalComponent } from '../../modals/invoice-lines/delete-invoice-lines/delete-invoice-lines.modal';
@@ -37,23 +39,41 @@ export class InvoiceLines implements OnInit {
 
   loadLines() {
     this.isLoading = true;
+    this.errorMessage = '';
+
     this.invoiceLinesService.list().subscribe({
-      next: (data: any) => {
-        this.lines = Array.isArray(data) ? data : data.data || [];
+      next: (response) => {
+        this.lines = Array.isArray(response) ? response : response.data ?? [];
         this.isLoading = false;
       },
-      error: (error: any) => {
-        this.errorMessage = 'Failed to load invoice lines';
+      error: (error) => {
         this.isLoading = false;
+
+        if (error?.status === 404) {
+          this.lines = [];
+          return;
+        }
+
+        this.errorMessage = this.getErrorMessage(error) || 'Failed to load invoice lines';
         console.error('Error:', error);
       }
     });
   }
 
-  getFilteredLines() {
+  getFilteredLines(): InvoiceLine[] {
     if (!this.searchQuery) return this.lines;
+
     const query = this.searchQuery.toLowerCase();
-    return this.lines.filter(l => JSON.stringify(l).toLowerCase().includes(query));
+
+    return this.lines.filter(line =>
+      this.getInvoiceLabel(line).toLowerCase().includes(query) ||
+      this.getLineTypeLabel(line.line_type).toLowerCase().includes(query) ||
+      this.getSubjectLabel(line).toLowerCase().includes(query) ||
+      line.description.toLowerCase().includes(query) ||
+      String(line.quantity ?? '').toLowerCase().includes(query) ||
+      String(line.unit_price).toLowerCase().includes(query) ||
+      String(line.amount).toLowerCase().includes(query)
+    );
   }
 
   openAddModal() {
@@ -68,7 +88,61 @@ export class InvoiceLines implements OnInit {
     this.deleteModal.open(line);
   }
 
-  formatCurrency(value: number) {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value || 0);
+  getInvoiceLabel(line: InvoiceLine): string {
+    return line.invoice?.invoice_number?.trim() || `#${line.invoice_id}`;
+  }
+
+  getSubjectLabel(line: InvoiceLine): string {
+    if (!line.subject_id) {
+      return 'None';
+    }
+
+    return (
+      line.subject?.subject_code?.trim() ||
+      line.subject?.code?.trim() ||
+      line.subject?.name?.trim() ||
+      `#${line.subject_id}`
+    );
+  }
+
+  getLineTypeLabel(type: InvoiceLine['line_type']): string {
+    return type
+      .split('_')
+      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
+  }
+
+  formatAmount(value: AdminNumericValue | null): string {
+    const numericValue = Number(value);
+
+    if (Number.isNaN(numericValue)) {
+      return String(value ?? '');
+    }
+
+    return new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(numericValue);
+  }
+
+  private getErrorMessage(error: unknown): string | null {
+    const apiError = error as {
+      error?: {
+        message?: string;
+        errors?: Record<string, string[]>;
+      };
+    };
+
+    const validationErrors = apiError?.error?.errors;
+
+    if (validationErrors) {
+      for (const messages of Object.values(validationErrors)) {
+        if (Array.isArray(messages) && typeof messages[0] === 'string') {
+          return messages[0];
+        }
+      }
+    }
+
+    return apiError?.error?.message ?? null;
   }
 }

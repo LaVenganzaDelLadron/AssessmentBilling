@@ -4,6 +4,6 @@ export interface AuditLog extends BaseAdminModel {
   user_id: number | null;
   action: string;
   entity_type: string;
-  entity_id: number;
+  entity_id: string;
   ip_address: string | null;
 }

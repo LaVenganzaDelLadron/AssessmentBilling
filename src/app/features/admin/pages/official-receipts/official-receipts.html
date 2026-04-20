@@ -1,126 +1,63 @@
-<div class="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-slate-100 antialiased">
-
-  <nav class="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-xl px-6 py-4 shadow-sm lg:px-12">
-    <div class="flex items-center gap-4">
-      <div class="h-10 w-10 bg-slate-900 rounded-[1.25rem] flex items-center justify-center shadow-lg shadow-slate-200">
-        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-      </div>
-      <div class="flex flex-col">
-        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Treasury Archives</span>
-        <h1 class="text-xl font-black tracking-tight text-slate-800">Official <span class="text-blue-600">Receipts</span></h1>
-      </div>
+<div class="p-8">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-slate-900">Official Receipts</h1>
+      <p class="text-slate-500 text-sm mt-1">Manage payment receipts and issuance records.</p>
     </div>
-    <div class="flex items-center gap-4">
-       <button class="p-3 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-blue-600 transition-all shadow-sm">
-         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-       </button>
-       <div class="h-11 w-11 rounded-[1.25rem] bg-blue-600 border-2 border-white shadow-xl flex items-center justify-center text-white font-bold">OR</div>
+    <button (click)="openAddModal()" class="px-4 py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all">
+      + Add Official Receipt
+    </button>
+  </div>
+
+  <div class="mb-6">
+    <input
+      [(ngModel)]="searchQuery"
+      placeholder="Search by OR number, payment ID, or issuer..."
+      class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+  </div>
+
+  <div *ngIf="isLoading" class="flex justify-center py-12">
+    <div class="text-center">
+      <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-3"></div>
+      <p class="text-slate-600">Loading official receipts...</p>
     </div>
-  </nav>
+  </div>
 
-  <main class="max-w-[1400px] mx-auto px-6 py-10 space-y-10 lg:px-8">
+  <div *ngIf="errorMessage && !isLoading" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+    <p class="text-red-700 font-semibold">{{ errorMessage }}</p>
+  </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-end">
-      <div class="lg:col-span-2 space-y-2">
-        <h2 class="text-4xl font-black tracking-tighter text-slate-900">Document <span class="text-slate-400 font-light italic">Registry</span></h2>
-        <p class="text-slate-500 font-medium text-lg">System-generated receipts and historical issuance records.</p>
-      </div>
-      <div class="flex justify-end">
-        <div class="bg-white/70 backdrop-blur-md px-8 py-4 rounded-[1.25rem] border border-white shadow-xl flex items-center gap-6">
-          <div>
-            <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Next OR Sequence</p>
-            <p class="text-xl font-black text-blue-600 font-mono">OR-2026-9482</p>
-          </div>
-          <button class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-          </button>
-        </div>
-      </div>
-    </div>
+  <div *ngIf="!isLoading" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <table class="w-full">
+      <thead>
+        <tr class="bg-slate-50 border-b border-slate-200">
+          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">OR Number</th>
+          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Payment ID</th>
+          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Issued By</th>
+          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Issued At</th>
+          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        <tr *ngFor="let receipt of getFilteredReceipts()" class="hover:bg-slate-50 transition-colors">
+          <td class="px-6 py-4 text-sm font-semibold text-slate-900">{{ receipt.or_number }}</td>
+          <td class="px-6 py-4 text-sm text-slate-700">{{ receipt.payment_id }}</td>
+          <td class="px-6 py-4 text-sm text-slate-700">{{ receipt.issued_by }}</td>
+          <td class="px-6 py-4 text-sm text-slate-700">{{ receipt.issued_at | date: 'MMM dd, yyyy' }}</td>
+          <td class="px-6 py-4 text-sm space-x-2">
+            <button (click)="openUpdateModal(receipt)" class="text-blue-600 font-bold hover:underline">Edit</button>
+            <button (click)="openDeleteModal(receipt)" class="text-red-600 font-bold hover:underline">Delete</button>
+          </td>
+        </tr>
+        <tr *ngIf="getFilteredReceipts().length === 0">
+          <td colspan="5" class="px-6 py-8 text-center text-slate-500 italic">No official receipts found</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-    <div class="bg-white/50 backdrop-blur-md p-2 rounded-[1.5rem] border border-white/60 shadow-2xl shadow-slate-200/50 flex flex-col md:flex-row gap-2">
-      <input type="text" placeholder="Search by OR Number or Payment ID..." class="flex-1 px-8 py-4 bg-transparent outline-none font-bold text-slate-700 placeholder:text-slate-300">
-      <button class="px-8 py-4 bg-slate-900 text-white rounded-[1.25rem] text-sm font-black transition-all hover:bg-blue-600">Apply Filter</button>
-    </div>
-
-    <div class="bg-white/70 backdrop-blur-md rounded-[1.25rem] border border-white shadow-2xl shadow-slate-200/60 overflow-hidden">
-      <table class="w-full text-left">
-        <thead>
-          <tr class="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-black bg-slate-50/50">
-            <th class="px-10 py-6">OR Reference</th>
-            <th class="px-10 py-6">Linked Payment</th>
-            <th class="px-10 py-6">Issued By</th>
-            <th class="px-10 py-6">Issuance Date</th>
-            <th class="px-10 py-6 text-right">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-100">
-
-          <tr class="hover:bg-blue-50/30 transition-all group">
-            <td class="px-10 py-6">
-              <div class="flex flex-col">
-                <span class="font-mono font-black text-slate-800 text-lg tracking-tighter">#2026-0001-OR</span>
-                <span class="text-[9px] font-bold text-blue-500 uppercase">Authenticated</span>
-              </div>
-            </td>
-            <td class="px-10 py-6">
-              <div class="flex items-center gap-3">
-                <div class="h-8 w-8 bg-slate-100 rounded-lg flex items-center justify-center text-[10px] font-black text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all">ID</div>
-                <span class="text-sm font-bold text-slate-600">PMT-88920</span>
-              </div>
-            </td>
-            <td class="px-10 py-6">
-              <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-[8px] font-black text-blue-600">CS</div>
-                <span class="text-sm font-black text-slate-700 uppercase tracking-tight">C. Santiago</span>
-              </div>
-            </td>
-            <td class="px-10 py-6">
-              <div class="flex flex-col">
-                <span class="text-sm font-bold text-slate-600">Oct 24, 2026</span>
-                <span class="text-[10px] font-medium text-slate-400 uppercase tracking-tighter">04:14 PM</span>
-              </div>
-            </td>
-            <td class="px-10 py-6 text-right">
-              <div class="flex justify-end gap-2">
-                <button class="h-10 px-4 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all">Preview</button>
-                <button class="h-10 w-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                </button>
-              </div>
-            </td>
-          </tr>
-
-        </tbody>
-      </table>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div class="bg-slate-900 rounded-[1.25rem] p-8 text-white flex items-center gap-8 shadow-2xl shadow-slate-300">
-        <div class="h-16 w-16 bg-white/10 rounded-[1.25rem] flex items-center justify-center backdrop-blur-md border border-white/10">
-           <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-        </div>
-        <div>
-          <h4 class="text-lg font-black tracking-tight">Immutability Lock</h4>
-          <p class="text-slate-400 text-sm leading-relaxed">Receipts are non-editable once issued. For corrections, a <b>void transaction</b> must be initiated in the payments module.</p>
-        </div>
-      </div>
-
-      <div class="bg-blue-600 rounded-[1.25rem] p-8 text-white shadow-2xl shadow-blue-200 relative overflow-hidden group">
-        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-all duration-700"></div>
-        <div class="relative z-10 flex flex-col justify-between h-full">
-           <p class="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Total Value Issued Today</p>
-           <div class="mt-4">
-             <span class="text-4xl font-black tracking-tighter">$42,105.00</span>
-             <p class="text-xs font-bold opacity-60">across 32 issued ORs</p>
-           </div>
-        </div>
-      </div>
-    </div>
-    <div class="hidden">
-      <app-add-official-receipts-modal (refresh)="loadReceipts()"></app-add-official-receipts-modal>
-      <app-update-official-receipts-modal (refresh)="loadReceipts()"></app-update-official-receipts-modal>
-      <app-delete-official-receipts-modal (refresh)="loadReceipts()"></app-delete-official-receipts-modal>
-    </div>
-  </main>
+  <app-add-official-receipts-modal (refresh)="loadReceipts()"></app-add-official-receipts-modal>
+  <app-update-official-receipts-modal (refresh)="loadReceipts()"></app-update-official-receipts-modal>
+  <app-delete-official-receipts-modal (refresh)="loadReceipts()"></app-delete-official-receipts-modal>
 </div>

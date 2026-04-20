@@ -1,7 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AdminDataService, Enrollment } from '../../../../../shared/services/admin-data.service';
+import {
+  CreateEnrollmentPayload,
+  EnrollmentStatus
+} from '../../../models/enrollment.model';
+import { EnrollmentsService } from '../../../services/enrollments.service';
+
+interface EnrollmentForm {
+  student_id: number | null;
+  subject_id: number | null;
+  academic_term_id: number | null;
+  semester: string;
+  school_year: string;
+  status: EnrollmentStatus;
+}
 
 @Component({
   selector: 'app-add-enrollment-modal',
@@ -10,21 +23,19 @@ import { AdminDataService, Enrollment } from '../../../../../shared/services/adm
   templateUrl: './add-enrollment.modal.html',
 })
 export class AddEnrollmentModalComponent {
+  @Output() refresh = new EventEmitter<void>();
+
   isOpen = false;
   isLoading = false;
   errorMessage = '';
   successMessage = '';
 
-  form: Enrollment = {
-    student_id: 0,
-    subject_id: 0,
-    academic_term_id: 0,
-    status: 'enrolled'
-  };
+  form: EnrollmentForm = this.createEmptyForm();
 
-  statuses = ['enrolled', 'dropped', 'completed', 'pending'];
+  statuses: EnrollmentStatus[] = ['enrolled', 'dropped'];
+  semesters = ['1st Semester', '2nd Semester', 'Summer'];
 
-  constructor(private adminDataService: AdminDataService) {}
+  constructor(private enrollmentsService: EnrollmentsService) {}
 
   open(): void {
     this.isOpen = true;
@@ -37,12 +48,7 @@ export class AddEnrollmentModalComponent {
   }
 
   resetForm(): void {
-    this.form = {
-      student_id: 0,
-      subject_id: 0,
-      academic_term_id: 0,
-      status: 'enrolled'
-    };
+    this.form = this.createEmptyForm();
     this.errorMessage = '';
     this.successMessage = '';
   }
@@ -53,18 +59,15 @@ export class AddEnrollmentModalComponent {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.adminDataService.createEnrollment(this.form).subscribe({
+    this.enrollmentsService.create(this.toPayload()).subscribe({
       next: () => {
         this.isLoading = false;
-        this.successMessage = 'Enrollment added successfully!';
-        setTimeout(() => {
-          this.close();
-          window.location.reload();
-        }, 1500);
+        this.refresh.emit();
+        this.close();
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error.error?.message || 'Failed to add enrollment';
+        this.errorMessage = this.getErrorMessage(error) || 'Failed to add enrollment';
         console.error('Error:', error);
       }
     });
@@ -83,10 +86,69 @@ export class AddEnrollmentModalComponent {
       this.errorMessage = 'Academic term is required';
       return false;
     }
+    if (!this.form.semester.trim()) {
+      this.errorMessage = 'Semester is required';
+      return false;
+    }
+    if (!this.form.school_year.trim()) {
+      this.errorMessage = 'School year is required';
+      return false;
+    }
+    if (this.form.semester.trim().length > 20) {
+      this.errorMessage = 'Semester may not be greater than 20 characters';
+      return false;
+    }
+    if (this.form.school_year.trim().length > 9) {
+      this.errorMessage = 'School year may not be greater than 9 characters';
+      return false;
+    }
     if (!this.form.status) {
       this.errorMessage = 'Status is required';
       return false;
     }
     return true;
+  }
+
+  private createEmptyForm(): EnrollmentForm {
+    return {
+      student_id: null,
+      subject_id: null,
+      academic_term_id: null,
+      semester: '',
+      school_year: '',
+      status: 'enrolled'
+    };
+  }
+
+  private toPayload(): CreateEnrollmentPayload {
+    return {
+      student_id: this.form.student_id ?? 0,
+      subject_id: this.form.subject_id ?? 0,
+      academic_term_id: this.form.academic_term_id ?? 0,
+      semester: this.form.semester.trim(),
+      school_year: this.form.school_year.trim(),
+      status: this.form.status
+    };
+  }
+
+  private getErrorMessage(error: unknown): string | null {
+    const apiError = error as {
+      error?: {
+        message?: string;
+        errors?: Record<string, string[]>;
+      };
+    };
+
+    const validationErrors = apiError?.error?.errors;
+
+    if (validationErrors) {
+      for (const messages of Object.values(validationErrors)) {
+        if (Array.isArray(messages) && typeof messages[0] === 'string') {
+          return messages[0];
+        }
+      }
+    }
+
+    return apiError?.error?.message ?? null;
   }
 }

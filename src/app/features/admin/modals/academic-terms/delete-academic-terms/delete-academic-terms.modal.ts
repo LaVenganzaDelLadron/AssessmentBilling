@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AcademicTermService, AcademicTerm } from '../../../../../shared/services/academic-term.service';
+import { AcademicTerm } from '../../../models/academic-term.model';
+import { AcademicTermsService } from '../../../services/academic-terms.service';
 
 @Component({
   selector: 'app-delete-academic-terms-modal',
@@ -9,13 +10,15 @@ import { AcademicTermService, AcademicTerm } from '../../../../../shared/service
   templateUrl: './delete-academic-terms.modal.html',
 })
 export class DeleteAcademicTermsModalComponent {
+  @Output() refresh = new EventEmitter<void>();
+
   isOpen = false;
   isLoading = false;
   errorMessage = '';
   successMessage = '';
   selectedTerm: AcademicTerm | null = null;
 
-  constructor(private academicTermService: AcademicTermService) {}
+  constructor(private academicTermsService: AcademicTermsService) {}
 
   open(term: AcademicTerm): void {
     this.selectedTerm = term;
@@ -37,20 +40,38 @@ export class DeleteAcademicTermsModalComponent {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.academicTermService.deleteAcademicTerm(this.selectedTerm.id).subscribe({
-      next: (response) => {
+    this.academicTermsService.delete(this.selectedTerm.id).subscribe({
+      next: () => {
         this.isLoading = false;
-        this.successMessage = 'Academic term deleted successfully!';
-        setTimeout(() => {
-          this.close();
-          window.location.reload();
-        }, 1500);
+        this.refresh.emit();
+        this.close();
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error.error?.message || 'Failed to delete academic term';
+        this.errorMessage = this.getErrorMessage(error) || 'Failed to delete academic term';
         console.error('Error deleting academic term:', error);
       }
     });
+  }
+
+  private getErrorMessage(error: unknown): string | null {
+    const apiError = error as {
+      error?: {
+        message?: string;
+        errors?: Record<string, string[]>;
+      };
+    };
+
+    const validationErrors = apiError?.error?.errors;
+
+    if (validationErrors) {
+      for (const messages of Object.values(validationErrors)) {
+        if (Array.isArray(messages) && typeof messages[0] === 'string') {
+          return messages[0];
+        }
+      }
+    }
+
+    return apiError?.error?.message ?? null;
   }
 }

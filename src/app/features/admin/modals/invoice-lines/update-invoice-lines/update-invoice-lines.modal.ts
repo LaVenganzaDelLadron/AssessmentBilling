@@ -1,41 +1,53 @@
-import { Component, ViewChild, Output, EventEmitter, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { InvoiceLinesService, InvoiceLine } from '../../../../../shared/services/invoice-lines.service';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import {
+  InvoiceLine,
+  InvoiceLineType,
+  UpdateInvoiceLinePayload
+} from '../../../models/invoice-line.model';
+import { InvoiceLinesService } from '../../../services/invoice-lines.service';
 
 @Component({
   selector: 'app-update-invoice-lines-modal',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './update-invoice-lines.modal.html',
-  styleUrl: './update-invoice-lines.modal.css'
+  templateUrl: './update-invoice-lines.modal.html'
 })
-export class UpdateInvoiceLinesModalComponent implements OnInit {
-  @ViewChild('modal') modal: any;
+export class UpdateInvoiceLinesModalComponent {
   @Output() refresh = new EventEmitter<void>();
 
   isOpen = false;
   isLoading = false;
   errorMessage = '';
+  successMessage = '';
+  selectedId: number | null = null;
 
-  currentEntity: any = null;
-
-  invoice_id: number = 0;
-  description = '';
-  quantity: number = 0;
-  unit_price: number = 0;
+  form: UpdateInvoiceLinePayload = this.createEmptyForm();
+  readonly lineTypes: InvoiceLineType[] = [
+    'tuition',
+    'lab_fee',
+    'misc_fee',
+    'discount',
+    'other'
+  ];
 
   constructor(private invoiceLinesService: InvoiceLinesService) {}
 
-  ngOnInit(): void {}
-
-  open(entity: any): void {
-    this.currentEntity = entity;
-    this.invoice_id = entity.invoice_id;
-    this.description = entity.description;
-    this.quantity = entity.quantity;
-    this.unit_price = entity.unit_price;
+  open(entity: InvoiceLine): void {
+    this.selectedId = entity.id || null;
+    this.form = {
+      invoice_id: entity.invoice_id,
+      line_type: entity.line_type,
+      subject_id: entity.subject_id,
+      description: entity.description,
+      quantity: entity.quantity ?? 1,
+      unit_price: Number(entity.unit_price),
+      amount: Number(entity.amount)
+    };
     this.isOpen = true;
+    this.errorMessage = '';
+    this.successMessage = '';
   }
 
   close(): void {
@@ -43,52 +55,142 @@ export class UpdateInvoiceLinesModalComponent implements OnInit {
     this.resetForm();
   }
 
+  get computedAmount(): number {
+    return this.calculateAmount(this.form.quantity ?? null, this.form.unit_price ?? null);
+  }
+
+  getLineTypeLabel(type: InvoiceLineType): string {
+    return type
+      .split('_')
+      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
+  }
+
   validate(): boolean {
-    if (
-      !this.invoice_id ||
-      !this.description ||
-      !this.quantity ||
-      !this.unit_price
-    ) {
-      this.errorMessage = 'All fields are required';
+    if (!this.form.invoice_id) {
+      this.errorMessage = 'Invoice is required';
       return false;
     }
+    if (!this.form.line_type) {
+      this.errorMessage = 'Line type is required';
+      return false;
+    }
+    if (!this.form.description?.trim()) {
+      this.errorMessage = 'Description is required';
+      return false;
+    }
+    if (this.form.description.trim().length > 255) {
+      this.errorMessage = 'Description may not be greater than 255 characters';
+      return false;
+    }
+    if (Number(this.form.quantity) < 0.01) {
+      this.errorMessage = 'Quantity must be at least 0.01';
+      return false;
+    }
+    if (Number(this.form.unit_price) < 0) {
+      this.errorMessage = 'Unit price must be 0 or more';
+      return false;
+    }
+    const normalizedSubjectId = this.normalizeOptionalNumber(this.form.subject_id);
+    if (normalizedSubjectId !== null && normalizedSubjectId <= 0) {
+      this.errorMessage = 'Subject ID must be a valid number';
+      return false;
+    }
+
     return true;
   }
 
   submit(): void {
     if (!this.validate()) return;
+    if (!this.selectedId) return;
 
     this.isLoading = true;
     this.errorMessage = '';
 
-    const data: InvoiceLine = {
-      invoice_id: this.invoice_id || 0,
-      description: this.description,
-      quantity: this.quantity || 0,
-      unit_price: this.unit_price || 0,
-      line_total: (this.quantity || 0) * (this.unit_price || 0)
-    };
+    const payload = this.buildPayload();
 
-    this.invoiceLinesService.update(this.currentEntity.id, data).subscribe({
+    this.invoiceLinesService.update(this.selectedId, payload).subscribe({
       next: () => {
         this.isLoading = false;
         this.close();
         this.refresh.emit();
       },
-      error: (error: any) => {
+      error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error?.message || 'Failed to update invoice line';
+        this.errorMessage = this.getErrorMessage(error) || 'Failed to update invoice line';
+        console.error('Error:', error);
       }
     });
   }
 
   private resetForm(): void {
-    this.invoice_id = 0;
-    this.description = '';
-    this.quantity = 0;
-    this.unit_price = 0;
+    this.form = this.createEmptyForm();
+    this.selectedId = null;
     this.errorMessage = '';
-    this.currentEntity = null;
+    this.successMessage = '';
+  }
+
+  private createEmptyForm(): UpdateInvoiceLinePayload {
+    return {
+      invoice_id: 0,
+      line_type: 'tuition',
+      subject_id: null,
+      description: '',
+      quantity: 1,
+      unit_price: 0,
+      amount: 0
+    };
+  }
+
+  private buildPayload(): UpdateInvoiceLinePayload {
+    return {
+      invoice_id: Number(this.form.invoice_id),
+      line_type: this.form.line_type,
+      subject_id: this.normalizeOptionalNumber(this.form.subject_id),
+      description: this.form.description?.trim(),
+      quantity: Number(this.form.quantity),
+      unit_price: Number(this.form.unit_price),
+      amount: this.computedAmount
+    };
+  }
+
+  private calculateAmount(quantity: number | string | null, unitPrice: number | string | null): number {
+    const numericQuantity = Number(quantity);
+    const numericUnitPrice = Number(unitPrice);
+
+    if (Number.isNaN(numericQuantity) || Number.isNaN(numericUnitPrice)) {
+      return 0;
+    }
+
+    return Number((numericQuantity * numericUnitPrice).toFixed(2));
+  }
+
+  private normalizeOptionalNumber(value: unknown): number | null {
+    if (value === null || value === undefined || String(value).trim() === '') {
+      return null;
+    }
+
+    return Number(value);
+  }
+
+  private getErrorMessage(error: unknown): string | null {
+    const apiError = error as {
+      error?: {
+        message?: string;
+        errors?: Record<string, string[]>;
+      };
+    };
+
+    const validationErrors = apiError?.error?.errors;
+
+    if (validationErrors) {
+      for (const messages of Object.values(validationErrors)) {
+        if (Array.isArray(messages) && typeof messages[0] === 'string') {
+          return messages[0];
+        }
+      }
+    }
+
+    return apiError?.error?.message ?? null;
   }
 }

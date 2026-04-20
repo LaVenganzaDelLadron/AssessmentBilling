@@ -1,6 +1,7 @@
 import { Component, ViewChild, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AssessmentsService } from '../../../../../shared/services/assessments.service';
+import { Assessment as AssessmentModel } from '../../../models/assessment.model';
+import { AssessmentsService } from '../../../services/assessments.service';
 
 @Component({
   selector: 'app-delete-assessments-modal',
@@ -17,15 +18,16 @@ export class DeleteAssessmentsModalComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
 
-  currentEntity: any = null;
+  currentEntity: AssessmentModel | null = null;
 
   constructor(private assessmentsService: AssessmentsService) {}
 
   ngOnInit(): void {}
 
-  open(entity: any): void {
+  open(entity: AssessmentModel): void {
     this.currentEntity = entity;
     this.isOpen = true;
+    this.errorMessage = '';
   }
 
   close(): void {
@@ -34,6 +36,10 @@ export class DeleteAssessmentsModalComponent implements OnInit {
   }
 
   submit(): void {
+    if (!this.currentEntity?.id) {
+      return;
+    }
+
     this.isLoading = true;
     this.errorMessage = '';
 
@@ -43,9 +49,9 @@ export class DeleteAssessmentsModalComponent implements OnInit {
         this.close();
         this.refresh.emit();
       },
-      error: (error: any) => {
+      error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error?.message || 'Failed to delete assessment';
+        this.errorMessage = this.getErrorMessage(error) || 'Failed to delete assessment';
       }
     });
   }
@@ -53,5 +59,26 @@ export class DeleteAssessmentsModalComponent implements OnInit {
   private resetForm(): void {
     this.errorMessage = '';
     this.currentEntity = null;
+  }
+
+  private getErrorMessage(error: unknown): string | null {
+    const apiError = error as {
+      error?: {
+        message?: string;
+        errors?: Record<string, string[]>;
+      };
+    };
+
+    const validationErrors = apiError?.error?.errors;
+
+    if (validationErrors) {
+      for (const messages of Object.values(validationErrors)) {
+        if (Array.isArray(messages) && typeof messages[0] === 'string') {
+          return messages[0];
+        }
+      }
+    }
+
+    return apiError?.error?.message ?? null;
   }
 }

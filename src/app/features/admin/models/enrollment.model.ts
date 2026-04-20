@@ -6,6 +6,8 @@ export interface Enrollment extends BaseAdminModel {
   student_id: number;
   subject_id: number;
   academic_term_id: number;
+  semester: string;
+  school_year: string;
   status: EnrollmentStatus;
 }
 

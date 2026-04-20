@@ -10,11 +10,21 @@ export interface Teacher extends BaseAdminModel {
   last_name: string;
   department: string | null;
   status: TeacherStatus;
+  user?: {
+    id: number;
+    name?: string | null;
+    email?: string | null;
+  } | null;
 }
 
-export type CreateTeacherPayload = Omit<
-  Teacher,
-  'id' | 'created_at' | 'updated_at'
->;
+export interface CreateTeacherPayload {
+  user_id: number;
+  teacher_id: string;
+  first_name: string;
+  middle_name: string | null;
+  last_name: string;
+  department: string | null;
+  status: TeacherStatus;
+}
 
 export type UpdateTeacherPayload = Partial<CreateTeacherPayload>;

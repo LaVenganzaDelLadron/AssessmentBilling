@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AdminDataService, FeeStructure } from '../../../../../shared/services/admin-data.service';
+import { FeeStructure } from '../../../models/fee-structure.model';
+import { FeeStructuresService } from '../../../services/fee-structures.service';
 
 @Component({
   selector: 'app-delete-fee-structure-modal',
@@ -9,13 +10,15 @@ import { AdminDataService, FeeStructure } from '../../../../../shared/services/a
   templateUrl: './delete-fee-structure.modal.html',
 })
 export class DeleteFeeStructureModalComponent {
+  @Output() refresh = new EventEmitter<void>();
+
   isOpen = false;
   isLoading = false;
   errorMessage = '';
   successMessage = '';
   selectedFee: FeeStructure | null = null;
 
-  constructor(private adminDataService: AdminDataService) {}
+  constructor(private feeStructuresService: FeeStructuresService) {}
 
   open(fee: FeeStructure): void {
     this.selectedFee = fee;
@@ -37,20 +40,38 @@ export class DeleteFeeStructureModalComponent {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.adminDataService.deleteFeeStructure(this.selectedFee.id).subscribe({
+    this.feeStructuresService.delete(this.selectedFee.id).subscribe({
       next: () => {
         this.isLoading = false;
-        this.successMessage = 'Fee structure deleted successfully!';
-        setTimeout(() => {
-          this.close();
-          window.location.reload();
-        }, 1500);
+        this.refresh.emit();
+        this.close();
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error.error?.message || 'Failed to delete fee structure';
+        this.errorMessage = this.getErrorMessage(error) || 'Failed to delete fee structure';
         console.error('Error:', error);
       }
     });
+  }
+
+  private getErrorMessage(error: unknown): string | null {
+    const apiError = error as {
+      error?: {
+        message?: string;
+        errors?: Record<string, string[]>;
+      };
+    };
+
+    const validationErrors = apiError?.error?.errors;
+
+    if (validationErrors) {
+      for (const messages of Object.values(validationErrors)) {
+        if (Array.isArray(messages) && typeof messages[0] === 'string') {
+          return messages[0];
+        }
+      }
+    }
+
+    return apiError?.error?.message ?? null;
   }
 }

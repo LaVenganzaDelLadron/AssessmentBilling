@@ -9,9 +9,10 @@
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Payment ID</label>
         <input
-          [(ngModel)]="payment_id"
+          [(ngModel)]="form.payment_id"
           name="payment_id"
           type="number"
+          min="1"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Enter payment ID"
           required
@@ -21,9 +22,10 @@
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Invoice ID</label>
         <input
-          [(ngModel)]="invoice_id"
+          [(ngModel)]="form.invoice_id"
           name="invoice_id"
           type="number"
+          min="1"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Enter invoice ID"
           required
@@ -31,14 +33,15 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Allocated Amount</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Amount Applied</label>
         <input
-          [(ngModel)]="allocated_amount"
-          name="allocated_amount"
+          [(ngModel)]="form.amount_applied"
+          name="amount_applied"
           type="number"
           step="0.01"
+          min="0.01"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Enter allocated amount"
+          placeholder="Enter amount applied"
           required
         />
       </div>

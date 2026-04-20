@@ -11,7 +11,7 @@
 
   <!-- Search -->
   <div class="mb-6">
-    <input [(ngModel)]="searchQuery" placeholder="Search line items..."
+    <input [(ngModel)]="searchQuery" placeholder="Search by invoice, type, subject, or amount..."
       class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
   </div>
 
@@ -30,32 +30,40 @@
 
   <!-- Table -->
   <div *ngIf="!isLoading" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-    <table class="w-full">
-      <thead>
-        <tr class="bg-slate-50 border-b border-slate-200">
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Invoice ID</th>
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Description</th>
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Quantity</th>
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Amount</th>
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Actions</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-slate-100">
-        <tr *ngFor="let line of getFilteredLines()" class="hover:bg-slate-50 transition-colors">
-          <td class="px-6 py-4 text-sm font-semibold text-slate-900">{{ line.invoice_id }}</td>
-          <td class="px-6 py-4 text-sm text-slate-700">{{ line.description || '-' }}</td>
-          <td class="px-6 py-4 text-sm text-slate-700">{{ line.quantity || 1 }}</td>
-          <td class="px-6 py-4 text-sm font-semibold text-slate-900">{{ formatCurrency(line.line_total) }}</td>
-          <td class="px-6 py-4 text-sm space-x-2">
-            <button (click)="openUpdateModal(line)" class="text-blue-600 font-bold hover:underline">Edit</button>
-            <button (click)="openDeleteModal(line)" class="text-red-600 font-bold hover:underline">Delete</button>
-          </td>
-        </tr>
-        <tr *ngIf="getFilteredLines().length === 0">
-          <td colspan="5" class="px-6 py-8 text-center text-slate-500 italic">No invoice lines found</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[980px]">
+        <thead>
+          <tr class="bg-slate-50 border-b border-slate-200">
+            <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Invoice</th>
+            <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Line Type</th>
+            <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Subject</th>
+            <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Description</th>
+            <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Quantity</th>
+            <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Unit Price</th>
+            <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Amount</th>
+            <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <tr *ngFor="let line of getFilteredLines()" class="hover:bg-slate-50 transition-colors">
+            <td class="px-6 py-4 text-sm font-semibold text-slate-900">{{ getInvoiceLabel(line) }}</td>
+            <td class="px-6 py-4 text-sm text-slate-700">{{ getLineTypeLabel(line.line_type) }}</td>
+            <td class="px-6 py-4 text-sm text-slate-700">{{ getSubjectLabel(line) }}</td>
+            <td class="px-6 py-4 text-sm text-slate-700">{{ line.description || '-' }}</td>
+            <td class="px-6 py-4 text-sm text-slate-700">{{ line.quantity ?? '-' }}</td>
+            <td class="px-6 py-4 text-sm text-slate-700">{{ formatAmount(line.unit_price) }}</td>
+            <td class="px-6 py-4 text-sm font-semibold text-slate-900">{{ formatAmount(line.amount) }}</td>
+            <td class="px-6 py-4 text-sm space-x-2">
+              <button (click)="openUpdateModal(line)" class="text-blue-600 font-bold hover:underline">Edit</button>
+              <button (click)="openDeleteModal(line)" class="text-red-600 font-bold hover:underline">Delete</button>
+            </td>
+          </tr>
+          <tr *ngIf="getFilteredLines().length === 0">
+            <td colspan="8" class="px-6 py-8 text-center text-slate-500 italic">No invoice lines found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 

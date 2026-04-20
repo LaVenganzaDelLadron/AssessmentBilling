@@ -7,9 +7,11 @@ export interface OfficialReceipt extends BaseAdminModel {
   issued_at: AdminDateTimeString;
 }
 
-export type CreateOfficialReceiptPayload = Omit<
-  OfficialReceipt,
-  'id' | 'created_at' | 'updated_at'
->;
+export interface CreateOfficialReceiptPayload {
+  payment_id: number;
+  or_number: string;
+  issued_by: string;
+  issued_at: string;
+}
 
 export type UpdateOfficialReceiptPayload = Partial<CreateOfficialReceiptPayload>;

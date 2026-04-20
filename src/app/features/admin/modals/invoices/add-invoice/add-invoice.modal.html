@@ -50,6 +50,30 @@
           type="number"
           [(ngModel)]="form.total_amount"
           name="totalAmount"
+          step="0.01"
+          min="0"
+          placeholder="0.00"
+          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900"
+        />
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-1">
+          <label class="block text-sm font-medium text-slate-700">Balance *</label>
+          <button
+            type="button"
+            (click)="setBalanceToTotalAmount()"
+            class="text-xs font-medium text-blue-600 hover:text-blue-700"
+          >
+            Use total amount
+          </button>
+        </div>
+        <input
+          type="number"
+          [(ngModel)]="form.balance"
+          name="balance"
+          step="0.01"
+          min="0"
           placeholder="0.00"
           class="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900"
         />

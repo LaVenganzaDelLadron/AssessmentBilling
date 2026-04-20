@@ -67,7 +67,7 @@
               <td class="px-8 py-6">
                 <div class="flex flex-col">
                   <span class="text-sm text-slate-700 font-semibold">{{ term.start_date | date: 'MMM d' }} — {{ term.end_date | date: 'MMM d, yyyy' }}</span>
-                  <span class="text-[10px] text-slate-400 font-bold mt-0.5 uppercase tracking-tighter">18 Weeks Duration</span>
+                  <span class="text-[10px] text-slate-400 font-bold mt-0.5 uppercase tracking-tighter">{{ getDurationLabel(term) }}</span>
                 </div>
               </td>
               <td class="px-8 py-6">
@@ -104,13 +104,15 @@
         <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
           <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
         </div>
-        <h3 class="text-lg font-bold text-slate-900">No terms found</h3>
-        <p class="text-slate-500 max-w-xs text-sm">We couldn't find any results for "{{ searchQuery }}".</p>
+        <h3 class="text-lg font-bold text-slate-900">{{ searchQuery ? 'No terms found' : 'No academic terms yet' }}</h3>
+        <p class="text-slate-500 max-w-xs text-sm">
+          {{ searchQuery ? ('We could not find any results for "' + searchQuery + '".') : 'Create your first academic term to get started.' }}
+        </p>
       </div>
     </div>
   </main>
 
-  <app-add-academic-terms-modal></app-add-academic-terms-modal>
-  <app-update-academic-terms-modal></app-update-academic-terms-modal>
-  <app-delete-academic-terms-modal></app-delete-academic-terms-modal>
+  <app-add-academic-terms-modal (refresh)="loadTerms()"></app-add-academic-terms-modal>
+  <app-update-academic-terms-modal (refresh)="loadTerms()"></app-update-academic-terms-modal>
+  <app-delete-academic-terms-modal (refresh)="loadTerms()"></app-delete-academic-terms-modal>
 </div>

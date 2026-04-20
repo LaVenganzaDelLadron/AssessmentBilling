@@ -7,15 +7,23 @@ export interface Student extends BaseAdminModel {
   first_name: string;
   middle_name: string | null;
   last_name: string;
+  email: string;
   program_id: number;
   year_level: number;
   status: StudentStatus;
   user_id: number | null;
 }
 
-export type CreateStudentPayload = Omit<
-  Student,
-  'id' | 'created_at' | 'updated_at'
->;
+export interface CreateStudentPayload {
+  student_no: string;
+  first_name: string;
+  middle_name: string | null;
+  last_name: string;
+  email: string;
+  program_id: number;
+  year_level: number;
+  status: StudentStatus;
+  user_id: number | null;
+}
 
 export type UpdateStudentPayload = Partial<CreateStudentPayload>;
