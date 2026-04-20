@@ -12,8 +12,9 @@
   </div>
 
   <div class="max-w-7xl mx-auto px-6 py-8">
-    <div class="mb-8">
-      <input [(ngModel)]="searchQuery" type="text" placeholder="Search by reference number..." class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-all" />
+<div class="flex gap-3 mb-8">
+      <input [(ngModel)]="searchQuery" type="text" placeholder="Search by reference number..." class="flex-1 px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-all" />
+      <button (click)="refreshPayments()" class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all shadow-lg flex-shrink-0">↻ Refresh</button>
     </div>
 
     <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200">{{ errorMessage }}</div>
@@ -50,8 +51,12 @@
               <button (click)="openDeleteModal(payment)" class="px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-200 text-xs rounded font-semibold transition-all">Delete</button>
             </td>
           </tr>
-          <tr *ngIf="getFilteredPayments().length === 0">
-            <td colspan="8" class="px-6 py-8 text-center text-slate-400"><p>No payments found</p></td>
+<tr *ngIf="getFilteredPayments().length === 0">
+            <td colspan="8" class="px-6 py-8 text-center text-slate-400">
+              <p class="mb-6 text-lg">No payments found</p>
+              <button (click)="generateSamplePayments()" class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-all shadow-lg mx-auto block mb-2">Load Sample Data</button>
+              <p class="text-xs">Click above to populate test data, or use "Record Payment" to add real ones</p>
+            </td>
           </tr>
         </tbody>
       </table>

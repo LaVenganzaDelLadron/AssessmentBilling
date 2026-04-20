@@ -80,6 +80,10 @@ export class Invoices implements OnInit {
     this.deleteModal.open(invoice);
   }
 
+  trackByInvoiceId(index: number, invoice: Invoice): string | number {
+    return invoice && invoice.id !== undefined ? invoice.id : index;
+  }
+
   getFilteredInvoices(): Invoice[] {
     console.log('[Invoices] getFilteredInvoices - searchQuery:', this.searchQuery, 'invoices:', this.invoices);
     // TEMP: Bypass filtering for debug

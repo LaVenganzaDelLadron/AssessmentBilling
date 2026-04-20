@@ -12,17 +12,15 @@ export class FeeStructuresService extends AdminCrudService<
   CreateFeeStructurePayload,
   UpdateFeeStructurePayload
 > {
-  private _cachedFees: FeeStructure[] | null = null;
-
   constructor() {
     super('fee-structures');
   }
 
   setCachedFees(fees: FeeStructure[]): void {
-    this._cachedFees = fees;
+    this.setCachedValue('mapped-list', fees);
   }
 
   getCachedFees(): FeeStructure[] | null {
-    return this._cachedFees;
+    return this.getCachedValue<FeeStructure[]>('mapped-list');
   }
 }

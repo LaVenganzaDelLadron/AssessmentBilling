@@ -31,9 +31,13 @@ export class Subjects implements OnInit {
   }
   // Program department lookup removed
 
-  loadSubjects() {
+  loadSubjects(forceRefresh = false) {
     this.errorMessage = '';
-    this.subjectService.list().subscribe({
+    const request$ = forceRefresh
+      ? this.subjectService.refreshList()
+      : this.subjectService.list();
+
+    request$.subscribe({
       next: (response: any) => {
         console.log('[Subjects] API response:', response);
         let mapped: Subject[] = [];
@@ -66,6 +70,10 @@ export class Subjects implements OnInit {
         this.errorMessage = this.getErrorMessage(error) || 'Failed to load subjects';
       }
     });
+  }
+
+  refreshSubjects() {
+    this.loadSubjects(true);
   }
 
   getFilteredSubjects(): Subject[] {

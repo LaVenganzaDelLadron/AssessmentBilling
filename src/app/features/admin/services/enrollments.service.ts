@@ -12,17 +12,15 @@ export class EnrollmentsService extends AdminCrudService<
   CreateEnrollmentPayload,
   UpdateEnrollmentPayload
 > {
-  private _cachedEnrollments: Enrollment[] | null = null;
-
   constructor() {
     super('enrollments');
   }
 
   setCachedEnrollments(enrollments: Enrollment[]): void {
-    this._cachedEnrollments = enrollments;
+    this.setCachedValue('mapped-list', enrollments);
   }
 
   getCachedEnrollments(): Enrollment[] | null {
-    return this._cachedEnrollments;
+    return this.getCachedValue<Enrollment[]>('mapped-list');
   }
 }

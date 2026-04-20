@@ -38,6 +38,36 @@ export class Payment implements OnInit {
     6: 'Other'
   };
 
+  mockPayments: PaymentModel[] = [
+    {
+      id: 1,
+      reference_number: 'PAY-2024-001',
+      invoice_id: 1001,
+      amount_paid: 150.50,
+      payment_method_id: 1,
+      paid_at: '2024-10-01T14:30:00Z',
+      updated_at: '2024-10-01T14:35:00Z'
+    },
+    {
+      id: 2,
+      reference_number: 'PAY-2024-002',
+      invoice_id: 1002,
+      amount_paid: 250.00,
+      payment_method_id: 2,
+      paid_at: '2024-10-02T09:15:00Z',
+      updated_at: '2024-10-02T09:20:00Z'
+    },
+    {
+      id: 3,
+      reference_number: 'PAY-2024-003',
+      invoice_id: 1001,
+      amount_paid: 99.99,
+      payment_method_id: 5,
+      paid_at: '2024-10-03T16:45:00Z',
+      updated_at: '2024-10-03T16:50:00Z'
+    }
+  ];
+
   constructor(private adminDataService: AdminDataService) {}
 
   ngOnInit() {
@@ -92,8 +122,11 @@ export class Payment implements OnInit {
     );
   }
 
-  getPaymentMethod(id: number) {
-    return this.paymentMethods[id] || 'Unknown';
+  getPaymentMethod(method: string | number) {
+    if (typeof method === 'string') {
+      return method;
+    }
+    return this.paymentMethods[method as number] || 'Unknown';
   }
 
   formatAmount(value: number | string | null | undefined): string {
@@ -104,5 +137,14 @@ export class Payment implements OnInit {
     }
 
     return numericValue.toFixed(2);
+  }
+
+  refreshPayments() {
+    this.loadPayments();
+  }
+
+  generateSamplePayments() {
+    this.payments = [...this.mockPayments];
+    this.errorMessage = '';
   }
 }

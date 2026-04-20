@@ -12,17 +12,15 @@ export class PaymentAllocationsService extends AdminCrudService<
   CreatePaymentAllocationPayload,
   UpdatePaymentAllocationPayload
 > {
-  private _cachedAllocations: PaymentAllocation[] | null = null;
-
   constructor() {
     super('payment-allocation');
   }
 
   setCachedAllocations(allocations: PaymentAllocation[]): void {
-    this._cachedAllocations = allocations;
+    this.setCachedValue('mapped-list', allocations);
   }
 
   getCachedAllocations(): PaymentAllocation[] | null {
-    return this._cachedAllocations;
+    return this.getCachedValue<PaymentAllocation[]>('mapped-list');
   }
 }

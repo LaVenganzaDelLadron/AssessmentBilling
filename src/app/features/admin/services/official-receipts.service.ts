@@ -12,17 +12,15 @@ export class OfficialReceiptsService extends AdminCrudService<
   CreateOfficialReceiptPayload,
   UpdateOfficialReceiptPayload
 > {
-  private _cachedReceipts: OfficialReceipt[] | null = null;
-
   constructor() {
     super('official-receipts');
   }
 
   setCachedReceipts(receipts: OfficialReceipt[]): void {
-    this._cachedReceipts = receipts;
+    this.setCachedValue('mapped-list', receipts);
   }
 
   getCachedReceipts(): OfficialReceipt[] | null {
-    return this._cachedReceipts;
+    return this.getCachedValue<OfficialReceipt[]>('mapped-list');
   }
 }

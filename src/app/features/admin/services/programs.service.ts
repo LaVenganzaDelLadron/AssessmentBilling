@@ -12,17 +12,15 @@ export class ProgramsService extends AdminCrudService<
   CreateProgramPayload,
   UpdateProgramPayload
 > {
-  private _cachedPrograms: Program[] | null = null;
-
   constructor() {
     super('programs');
   }
 
   setCachedPrograms(programs: Program[]): void {
-    this._cachedPrograms = programs;
+    this.setCachedValue('mapped-list', programs);
   }
 
   getCachedPrograms(): Program[] | null {
-    return this._cachedPrograms;
+    return this.getCachedValue<Program[]>('mapped-list');
   }
 }
