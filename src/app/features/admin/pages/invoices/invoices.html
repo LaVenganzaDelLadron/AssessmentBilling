@@ -1,68 +1,30 @@
-<div class="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-slate-100 antialiased">
-  <div class="bg-white/10 backdrop-blur-md border-b border-white/10 sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-6 py-6">
-      <div class="flex justify-between items-center">
-        <div>
-          <h1 class="text-3xl font-black text-white tracking-tight">Invoices</h1>
-          <p class="text-sm text-slate-400 mt-1">Manage student invoices</p>
-        </div>
-        <button (click)="openAddModal()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-all shadow-lg hover:-translate-y-0.5">+ Create Invoice</button>
-      </div>
+<div class="p-8">
+  <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-slate-900">Invoices</h1>
+      <p class="text-slate-500 text-sm mt-1">Listing data from <span class="font-semibold">GET /api/admin/invoices</span>.</p>
     </div>
+    <input
+      [(ngModel)]="searchQuery"
+      type="text"
+      placeholder="Search by invoice number, student, status, or ID..."
+      class="w-full md:w-96 px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500"
+    />
   </div>
 
-  <div class="max-w-7xl mx-auto px-6 py-8">
-    <div class="mb-8">
-      <input [(ngModel)]="searchQuery" type="text" placeholder="Search by invoice number..." class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-all" />
+  <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+    <p class="text-red-700 font-semibold">{{ errorMessage }}</p>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <app-invoices-card
+        *ngFor="let invoice of getFilteredInvoices(); trackBy: trackByInvoiceId"
+        [invoice]="invoice"
+      ></app-invoices-card>
     </div>
-
-    <div class="mb-8 flex gap-4">
-      <button (click)="statusFilter = ''" [class.opacity-100]="statusFilter === ''" class="px-4 py-2 bg-indigo-600/30 text-indigo-200 rounded-lg text-sm font-semibold opacity-50 transition-all">All</button>
-      <button (click)="statusFilter = 'paid'" [class.opacity-100]="statusFilter === 'paid'" class="px-4 py-2 bg-emerald-600/30 text-emerald-200 rounded-lg text-sm font-semibold opacity-50 transition-all">Paid</button>
-      <button (click)="statusFilter = 'partial'" [class.opacity-100]="statusFilter === 'partial'" class="px-4 py-2 bg-amber-600/30 text-amber-200 rounded-lg text-sm font-semibold opacity-50 transition-all">Partial</button>
-      <button (click)="statusFilter = 'unpaid'" [class.opacity-100]="statusFilter === 'unpaid'" class="px-4 py-2 bg-yellow-600/30 text-yellow-200 rounded-lg text-sm font-semibold opacity-50 transition-all">Unpaid</button>
-      <button (click)="statusFilter = 'overdue'" [class.opacity-100]="statusFilter === 'overdue'" class="px-4 py-2 bg-red-600/30 text-red-200 rounded-lg text-sm font-semibold opacity-50 transition-all">Overdue</button>
-    </div>
-
-    <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200">{{ errorMessage }}</div>
-
-    <div *ngIf="isLoading" class="flex justify-center items-center py-12"><div class="text-white">Loading...</div></div>
-
-    <div *ngIf="!isLoading" class="bg-white/10 backdrop-blur-md border border-white/10 rounded-lg overflow-hidden">
-      <div class="overflow-x-auto">
-      <table class="w-full min-w-[980px]">
-        <thead>
-          <tr class="bg-white/5 border-b border-white/10">
-            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Invoice #</th>
-            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Student ID</th>
-            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Assessment ID</th>
-            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Total</th>
-            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Balance</th>
-            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Due Date</th>
-            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Status</th>
-            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-white/10">
-          <tr *ngFor="let invoice of getFilteredInvoices()" class="hover:bg-white/5 transition-all">
-            <td class="px-6 py-4 text-sm text-white font-medium">{{ invoice.invoice_number }}</td>
-            <td class="px-6 py-4 text-sm text-slate-300">{{ invoice.student_id }}</td>
-            <td class="px-6 py-4 text-sm text-slate-300">{{ invoice.assessment_id }}</td>
-            <td class="px-6 py-4 text-sm text-slate-300">${{ formatAmount(invoice.total_amount) }}</td>
-            <td class="px-6 py-4 text-sm text-slate-300">${{ formatAmount(invoice.balance) }}</td>
-            <td class="px-6 py-4 text-sm text-slate-300">{{ invoice.due_date | date: 'MMM dd, yyyy' }}</td>
-            <td class="px-6 py-4"><span [ngClass]="getStatusColor(invoice.status)" class="px-3 py-1 rounded-full text-xs font-semibold">{{ invoice.status }}</span></td>
-            <td class="px-6 py-4 space-x-2">
-              <button (click)="openUpdateModal(invoice)" class="px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 text-xs rounded font-semibold transition-all">Edit</button>
-              <button (click)="openDeleteModal(invoice)" class="px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-200 text-xs rounded font-semibold transition-all">Delete</button>
-            </td>
-          </tr>
-          <tr *ngIf="getFilteredInvoices().length === 0">
-            <td colspan="8" class="px-6 py-8 text-center text-slate-400"><p>No invoices found</p></td>
-          </tr>
-        </tbody>
-      </table>
-      </div>
+    <div *ngIf="getFilteredInvoices().length === 0" class="px-6 py-8 text-center text-slate-500 italic">
+      {{ searchQuery ? 'No invoices matched your search' : 'No invoices found' }}
     </div>
   </div>
 

@@ -5,7 +5,7 @@ export type AssessmentBreakdownSourceType = 'subject' | 'fee' | 'discount';
 export interface AssessmentBreakdown extends BaseAdminModel {
   assessment_id: number;
   source_type: AssessmentBreakdownSourceType;
-  source_id: string | null;
+  source_id: string | number | null;
   description: string;
   units: AdminNumericValue | null;
   rate: AdminNumericValue | null;

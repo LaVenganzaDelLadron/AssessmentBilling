@@ -26,36 +26,50 @@ export class AcademicTerms implements OnInit {
   @ViewChild(DeleteAcademicTermsModalComponent) deleteModal!: DeleteAcademicTermsModalComponent;
 
   terms: AcademicTerm[] = [];
-  isLoading = false;
+  // isLoading removed
   errorMessage = '';
   searchQuery = '';
 
   constructor(private academicTermsService: AcademicTermsService) {}
 
   ngOnInit() {
-    this.loadTerms();
+    const cached = this.academicTermsService.getCachedTerms();
+    if (cached && cached.length > 0) {
+      this.terms = cached;
+    } else {
+      this.loadTerms();
+    }
   }
 
   loadTerms() {
-    this.isLoading = true;
     this.errorMessage = '';
-
     this.academicTermsService.list().subscribe({
-      next: (response) => {
-        this.terms = Array.isArray(response) ? response : response.data ?? [];
-        this.isLoading = false;
+      next: (response: any) => {
+        console.log('[AcademicTerms] API response:', response);
+        let mapped: AcademicTerm[] = [];
+        let data = Array.isArray(response) ? response : response.data ?? [];
+        if (Array.isArray(data)) {
+          mapped = data.map((item: any) => ({
+            id: item.id ?? item.term_id ?? null,
+            school_year: item.school_year ?? '',
+            semester: item.semester ?? '',
+            start_date: item.start_date ?? null,
+            end_date: item.end_date ?? null,
+            is_active: !!item.is_active,
+            created_at: item.created_at ?? null,
+            updated_at: item.updated_at ?? null
+          }));
+        }
+        this.terms = mapped;
+        this.academicTermsService.setCachedTerms(mapped);
       },
       error: (error) => {
-        this.isLoading = false;
-
+        console.error('[AcademicTerms] API error:', error);
         if (error?.status === 404) {
           this.terms = [];
           return;
         }
-
-        this.errorMessage =
-          this.getErrorMessage(error) || 'Failed to load academic terms';
-        console.error('Error loading terms:', error);
+        this.errorMessage = this.getErrorMessage(error) || 'Failed to load academic terms';
       }
     });
   }

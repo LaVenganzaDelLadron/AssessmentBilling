@@ -1,9 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { CommonModule, TitleCasePipe } from '@angular/common';
+import { Assessment } from '../../models/assessment.model';
 
 @Component({
   selector: 'app-assessment-card',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, TitleCasePipe],
   templateUrl: './assessment-card.html',
   styleUrl: './assessment-card.css',
 })
-export class AssessmentCard {}
+export class AssessmentCard {
+  @Input() assessment!: Assessment;
+}

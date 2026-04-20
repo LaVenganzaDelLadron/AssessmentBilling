@@ -1,60 +1,31 @@
 <div class="p-8">
-  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+  <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
     <div>
       <h1 class="text-3xl font-bold text-slate-900">Official Receipts</h1>
-      <p class="text-slate-500 text-sm mt-1">Manage payment receipts and issuance records.</p>
+      <p class="text-slate-500 text-sm mt-1">Listing data from <span class="font-semibold">GET /api/admin/official-receipts</span>.</p>
     </div>
-    <button (click)="openAddModal()" class="px-4 py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all">
-      + Add Official Receipt
-    </button>
-  </div>
-
-  <div class="mb-6">
     <input
       [(ngModel)]="searchQuery"
+      type="text"
       placeholder="Search by OR number, payment ID, or issuer..."
-      class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-    >
+      class="w-full md:w-96 px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
   </div>
 
-  <div *ngIf="isLoading" class="flex justify-center py-12">
-    <div class="text-center">
-      <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-3"></div>
-      <p class="text-slate-600">Loading official receipts...</p>
-    </div>
-  </div>
-
-  <div *ngIf="errorMessage && !isLoading" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+  <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
     <p class="text-red-700 font-semibold">{{ errorMessage }}</p>
   </div>
 
-  <div *ngIf="!isLoading" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-    <table class="w-full">
-      <thead>
-        <tr class="bg-slate-50 border-b border-slate-200">
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">OR Number</th>
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Payment ID</th>
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Issued By</th>
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Issued At</th>
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Actions</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-slate-100">
-        <tr *ngFor="let receipt of getFilteredReceipts()" class="hover:bg-slate-50 transition-colors">
-          <td class="px-6 py-4 text-sm font-semibold text-slate-900">{{ receipt.or_number }}</td>
-          <td class="px-6 py-4 text-sm text-slate-700">{{ receipt.payment_id }}</td>
-          <td class="px-6 py-4 text-sm text-slate-700">{{ receipt.issued_by }}</td>
-          <td class="px-6 py-4 text-sm text-slate-700">{{ receipt.issued_at | date: 'MMM dd, yyyy' }}</td>
-          <td class="px-6 py-4 text-sm space-x-2">
-            <button (click)="openUpdateModal(receipt)" class="text-blue-600 font-bold hover:underline">Edit</button>
-            <button (click)="openDeleteModal(receipt)" class="text-red-600 font-bold hover:underline">Delete</button>
-          </td>
-        </tr>
-        <tr *ngIf="getFilteredReceipts().length === 0">
-          <td colspan="5" class="px-6 py-8 text-center text-slate-500 italic">No official receipts found</td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <app-receipt-card
+        *ngFor="let receipt of getFilteredReceipts()"
+        [receipt]="receipt"
+      ></app-receipt-card>
+    </div>
+    <div *ngIf="getFilteredReceipts().length === 0" class="px-6 py-8 text-center text-slate-500 italic">
+      {{ searchQuery ? 'No official receipts matched your search' : 'No official receipts found' }}
+    </div>
   </div>
 
   <app-add-official-receipts-modal (refresh)="loadReceipts()"></app-add-official-receipts-modal>

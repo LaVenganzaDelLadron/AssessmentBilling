@@ -1,118 +1,110 @@
-<div class="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-slate-100 antialiased">
+<div class="min-h-screen bg-[#f8fafc] font-sans text-slate-900 antialiased selection:bg-indigo-100">
 
-  <header class="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-xl shadow-sm">
-    <div class="max-w-7xl mx-auto flex h-24 flex-col justify-center px-6 md:flex-row md:items-center md:justify-between lg:px-8">
-      <div class="space-y-2">
-        <p class="text-xs uppercase tracking-[0.35em] text-slate-400 font-semibold">Academic terms</p>
-        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Academic Terms</h1>
-        <p class="text-sm text-slate-500 max-w-2xl">Institutional calendar and term schedule management.</p>
+  <header class="sticky top-0 z-40 border-b border-slate-200/60 bg-white/80 backdrop-blur-md">
+    <div class="max-w-[1600px] mx-auto flex h-20 items-center justify-between px-6 lg:px-12">
+      <div class="flex flex-col">
+        <nav class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
+          <span>System</span>
+          <svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" /></svg>
+          <span class="text-indigo-500">Academic Calendar</span>
+        </nav>
+        <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">Academic Terms</h1>
       </div>
 
-      <button
-        (click)="openAddModal()"
-        class="mt-4 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-100 transition hover:bg-indigo-700 active:scale-95 md:mt-0"
-      >
-        <span>New Term</span>
-      </button>
+      <div class="flex items-center gap-4">
+        <button (click)="openAddModal()" class="group relative flex items-center gap-2 overflow-hidden rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white transition-all hover:bg-indigo-600 active:scale-95">
+          <svg class="w-4 h-4 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
+          <span>Create Term</span>
+        </button>
+      </div>
     </div>
   </header>
 
-  <main class="max-w-[1400px] mx-auto px-6 py-10 space-y-10 lg:px-8">
-    <div class="mb-8">
-      <div class="relative group max-w-md">
-        <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-          <svg class="w-5 h-5 text-slate-400 group-focus-within:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+  <main class="max-w-[1600px] mx-auto px-6 py-8 lg:px-12">
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm flex items-center gap-4">
+        <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></div>
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Term</p>
+          <p class="text-lg font-black text-slate-800">2023-2024 / 1st Sem</p>
         </div>
+      </div>
+      </div>
+
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+      <div class="relative w-full max-w-md group">
         <input
           [(ngModel)]="searchQuery"
           type="text"
-          placeholder="Search school year..."
-          class="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm"
+          placeholder="Filter school years..."
+          class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 transition-all outline-none"
         />
+        <svg class="absolute left-4 top-3.5 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+      </div>
+
+      <div class="flex gap-2">
+        <button class="px-4 py-2 text-xs font-bold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Export PDF</button>
+        <button class="px-4 py-2 text-xs font-bold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Bulk Actions</button>
       </div>
     </div>
 
-    <div *ngIf="errorMessage" class="mb-6">
-      <div class="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600">
-        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>
-        <span class="text-sm font-semibold">{{ errorMessage }}</span>
-      </div>
-    </div>
-
-    <div class="bg-white border border-slate-200 rounded-[2rem] shadow-xl shadow-slate-200/50 overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-slate-50/50 border-b border-slate-100">
-              <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">School Year</th>
-              <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Semester</th>
-              <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Duration</th>
-              <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
-              <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            <tr *ngFor="let term of getFilteredTerms()" class="group hover:bg-slate-50/80 transition-all">
-              <td class="px-8 py-6">
-                <span class="text-slate-900 font-bold group-hover:text-indigo-600 transition-colors">{{ term.school_year }}</span>
-              </td>
-              <td class="px-8 py-6">
-                <div class="flex items-center gap-2">
-                  <div class="w-1.5 h-1.5 rounded-full bg-indigo-400"></div>
-                  <span class="text-slate-600 font-medium">{{ term.semester }}</span>
+    <div class="bg-white border border-slate-200/60 rounded-[1.5rem] shadow-sm overflow-hidden">
+      <table class="w-full text-left border-separate border-spacing-0">
+        <thead>
+          <tr class="bg-slate-50/50">
+            <th class="px-8 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-100">School Year</th>
+            <th class="px-8 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-100">Semester</th>
+            <th class="px-8 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-100">Timeline</th>
+            <th class="px-8 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-100 text-center">Status</th>
+            <th class="px-8 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-100 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <tr *ngFor="let term of getFilteredTerms()" class="group transition-all hover:bg-indigo-50/30">
+            <td class="px-8 py-5">
+              <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 font-bold text-xs group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                  {{ term.school_year.split('-')[0].substring(2) }}
                 </div>
-              </td>
-              <td class="px-8 py-6">
-                <div class="flex flex-col">
-                  <span class="text-sm text-slate-700 font-semibold">{{ term.start_date | date: 'MMM d' }} — {{ term.end_date | date: 'MMM d, yyyy' }}</span>
-                  <span class="text-[10px] text-slate-400 font-bold mt-0.5 uppercase tracking-tighter">{{ getDurationLabel(term) }}</span>
+                <span class="text-slate-900 font-bold">{{ term.school_year }}</span>
+              </div>
+            </td>
+            <td class="px-8 py-5 text-sm font-medium text-slate-600">{{ term.semester }}</td>
+            <td class="px-8 py-5">
+              <div class="flex flex-col gap-1.5 min-w-[200px]">
+                <div class="flex justify-between text-[10px] font-bold uppercase tracking-tighter text-slate-400">
+                  <span>{{ term.start_date | date: 'MMM d, y' }}</span>
+                  <span>{{ term.end_date | date: 'MMM d, y' }}</span>
                 </div>
-              </td>
-              <td class="px-8 py-6">
-                <span
-                  [ngClass]="term.is_active ? 'bg-emerald-50 text-emerald-700 ring-emerald-100' : 'bg-slate-100 text-slate-600 ring-slate-200'"
-                  class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-black ring-1 ring-inset uppercase"
-                >
-                  <span [ngClass]="term.is_active ? 'bg-emerald-500' : 'bg-slate-400'" class="w-1.5 h-1.5 rounded-full"></span>
-                  {{ term.is_active ? 'Active' : 'Inactive' }}
-                </span>
-              </td>
-              <td class="px-8 py-6">
-                <div class="flex justify-end gap-2">
-                  <button
-                    (click)="openUpdateModal(term)"
-                    class="p-2 hover:bg-indigo-50 text-indigo-600 rounded-lg transition-all"
-                  >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                  </button>
-                  <button
-                    (click)="openDeleteModal(term)"
-                    class="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-all"
-                  >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                  </button>
+                <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                   <div [style.width]="term.is_active ? '65%' : '100%'"
+                        [ngClass]="term.is_active ? 'bg-indigo-500' : 'bg-slate-300'"
+                        class="h-full rounded-full transition-all duration-1000"></div>
                 </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div *ngIf="getFilteredTerms().length === 0" class="flex flex-col items-center justify-center py-24 text-center">
-        <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-          <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
-        </div>
-        <h3 class="text-lg font-bold text-slate-900">{{ searchQuery ? 'No terms found' : 'No academic terms yet' }}</h3>
-        <p class="text-slate-500 max-w-xs text-sm">
-          {{ searchQuery ? ('We could not find any results for "' + searchQuery + '".') : 'Create your first academic term to get started.' }}
-        </p>
-      </div>
+              </div>
+            </td>
+            <td class="px-8 py-5 text-center">
+              <span *ngIf="term.is_active" class="inline-flex items-center px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase ring-1 ring-emerald-200/50">
+                ● Current Active
+              </span>
+              <span *ngIf="!term.is_active" class="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-50 text-slate-400 text-[10px] font-bold uppercase">
+                Archived
+              </span>
+            </td>
+            <td class="px-8 py-5 text-right">
+              <div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button (click)="openUpdateModal(term)" class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-white rounded-lg shadow-sm border border-transparent hover:border-slate-200 transition-all">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                </button>
+                <button (click)="openDeleteModal(term)" class="p-2 text-slate-400 hover:text-red-600 hover:bg-white rounded-lg shadow-sm border border-transparent hover:border-slate-200 transition-all">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </main>
-
-  <app-add-academic-terms-modal (refresh)="loadTerms()"></app-add-academic-terms-modal>
-  <app-update-academic-terms-modal (refresh)="loadTerms()"></app-update-academic-terms-modal>
-  <app-delete-academic-terms-modal (refresh)="loadTerms()"></app-delete-academic-terms-modal>
 </div>

@@ -1,9 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { OfficialReceipt } from '../../models/official-receipt.model';
 
 @Component({
   selector: 'app-receipt-card',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './receipt-card.html',
   styleUrl: './receipt-card.css',
 })
-export class ReceiptCard {}
+export class ReceiptCard {
+  @Input() receipt!: OfficialReceipt;
+}

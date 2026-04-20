@@ -12,7 +12,17 @@ export class PaymentsService extends AdminCrudService<
   CreatePaymentPayload,
   UpdatePaymentPayload
 > {
+  private _cachedPayments: Payment[] | null = null;
+
   constructor() {
     super('payments');
+  }
+
+  setCachedPayments(payments: Payment[]): void {
+    this._cachedPayments = payments;
+  }
+
+  getCachedPayments(): Payment[] | null {
+    return this._cachedPayments;
   }
 }

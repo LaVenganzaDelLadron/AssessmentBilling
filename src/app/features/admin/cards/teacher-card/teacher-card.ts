@@ -1,9 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
+import { Teacher } from '../../models/teacher.model';
 
 @Component({
   selector: 'app-teacher-card',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, DatePipe],
   templateUrl: './teacher-card.html',
   styleUrl: './teacher-card.css',
 })
-export class TeacherCard {}
+export class TeacherCard {
+  @Input() teacher!: Teacher;
+}

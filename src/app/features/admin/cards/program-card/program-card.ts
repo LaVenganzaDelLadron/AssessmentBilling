@@ -1,9 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-program-card',
-  imports: [],
+  standalone: true,
+  imports: [DatePipe],
   templateUrl: './program-card.html',
   styleUrl: './program-card.css',
 })
-export class ProgramCard {}
+export class ProgramCard {
+  @Input() program: any;
+}

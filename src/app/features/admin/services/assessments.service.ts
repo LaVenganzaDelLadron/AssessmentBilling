@@ -12,7 +12,17 @@ export class AssessmentsService extends AdminCrudService<
   CreateAssessmentPayload,
   UpdateAssessmentPayload
 > {
+  private _cachedAssessments: Assessment[] | null = null;
+
   constructor() {
     super('assessments');
+  }
+
+  setCachedAssessments(assessments: Assessment[]): void {
+    this._cachedAssessments = assessments;
+  }
+
+  getCachedAssessments(): Assessment[] | null {
+    return this._cachedAssessments;
   }
 }

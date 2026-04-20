@@ -27,36 +27,51 @@ export class AssessmentBreakdownPage implements OnInit {
   @ViewChild(DeleteAssessmentBreakdownModalComponent) deleteModal!: DeleteAssessmentBreakdownModalComponent;
 
   breakdowns: AssessmentBreakdown[] = [];
-  isLoading = false;
+  // isLoading removed
   errorMessage = '';
   searchQuery = '';
 
   constructor(private breakdownService: AssessmentBreakdownService) {}
 
   ngOnInit() {
-    this.loadBreakdowns();
+    const cached = this.breakdownService.getCachedBreakdowns();
+    if (cached && cached.length > 0) {
+      this.breakdowns = cached;
+    } else {
+      this.loadBreakdowns();
+    }
   }
 
   loadBreakdowns() {
-    this.isLoading = true;
     this.errorMessage = '';
-
     this.breakdownService.list().subscribe({
-      next: (response) => {
-        this.breakdowns = Array.isArray(response) ? response : response.data ?? [];
-        this.isLoading = false;
+      next: (response: any) => {
+        let mapped: AssessmentBreakdown[] = [];
+        let data = Array.isArray(response) ? response : response.data ?? [];
+        if (Array.isArray(data)) {
+          mapped = data.map((item: any) => ({
+            id: item.id ?? item.breakdown_id ?? null,
+            assessment_id: item.assessment_id ?? null,
+            source_type: item.source_type ?? '',
+            source_id: item.source_id ?? null,
+            description: item.description ?? '',
+            units: item.units ?? null,
+            rate: item.rate ?? null,
+            amount: item.amount ?? 0,
+            created_at: item.created_at ?? null,
+            updated_at: item.updated_at ?? null
+          }));
+        }
+        this.breakdowns = mapped;
+        this.breakdownService.setCachedBreakdowns(mapped);
       },
       error: (error) => {
-        this.isLoading = false;
-
+        console.error('[AssessmentBreakdown] API error:', error);
         if (error?.status === 404) {
           this.breakdowns = [];
           return;
         }
-
-        this.errorMessage =
-          this.getErrorMessage(error) || 'Failed to load assessment breakdowns';
-        console.error('Error:', error);
+        this.errorMessage = this.getErrorMessage(error) || 'Failed to load assessment breakdowns';
       }
     });
   }
@@ -112,7 +127,11 @@ export class AssessmentBreakdownPage implements OnInit {
   }
 
   getSourceDetails(breakdown: AssessmentBreakdown): string {
-    return breakdown.source_id?.trim() || 'No source ID';
+    if (breakdown.source_id === null || breakdown.source_id === undefined || breakdown.source_id === '') {
+      return 'No source ID';
+    }
+
+    return String(breakdown.source_id);
   }
 
   private getErrorMessage(error: unknown): string | null {

@@ -13,7 +13,7 @@ import { AuditLogsService } from '../../services/audit-logs.service';
 })
 export class AuditLogs implements OnInit {
   logs: AuditLog[] = [];
-  isLoading = false;
+  // isLoading removed
   errorMessage = '';
   searchQuery = '';
   actionFilter = '';
@@ -21,27 +21,41 @@ export class AuditLogs implements OnInit {
   constructor(private auditService: AuditLogsService) {}
 
   ngOnInit() {
-    this.loadLogs();
+    const cached = this.auditService.getCachedLogs?.();
+    if (cached && cached.length > 0) {
+      this.logs = cached;
+    } else {
+      this.loadLogs();
+    }
   }
 
   loadLogs() {
-    this.isLoading = true;
     this.errorMessage = '';
-
     this.auditService.list().subscribe({
-      next: (response) => {
-        this.logs = Array.isArray(response) ? response : response.data ?? [];
-        this.isLoading = false;
+      next: (response: any) => {
+        let mapped: AuditLog[] = [];
+        let data = Array.isArray(response) ? response : response.data ?? [];
+        if (Array.isArray(data)) {
+          mapped = data.map((item: any) => ({
+            id: item.id ?? item.audit_log_id ?? null,
+            user_id: item.user_id ?? null,
+            action: item.action ?? '',
+            entity_type: item.entity_type ?? '',
+            entity_id: item.entity_id ?? '',
+            ip_address: item.ip_address ?? null,
+            created_at: item.created_at ?? null,
+            updated_at: item.updated_at ?? null
+          }));
+        }
+        this.logs = mapped;
+        this.auditService.setCachedLogs?.(mapped);
       },
       error: (error) => {
-        this.isLoading = false;
-
         if (error?.status === 404) {
           this.logs = [];
           return;
         }
-
-        this.errorMessage = this.getErrorMessage(error) || 'Failed to load audit logs';
+        this.errorMessage = this.getErrorMessage?.(error) || 'Failed to load audit logs';
       }
     });
   }

@@ -20,37 +20,17 @@
     <!-- Error Message -->
     <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200">{{ errorMessage }}</div>
 
-    <!-- Loading State -->
-    <div *ngIf="isLoading" class="flex justify-center items-center py-12"><div class="text-white">Loading...</div></div>
-
-    <!-- Table -->
-    <div *ngIf="!isLoading" class="bg-white/10 backdrop-blur-md border border-white/10 rounded-lg overflow-hidden">
-      <table class="w-full">
-        <thead>
-          <tr class="bg-white/5 border-b border-white/10">
-            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Payment ID</th>
-            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Amount</th>
-            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Reason</th>
-            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Status</th>
-            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-200">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-white/10">
-          <tr *ngFor="let refund of getFilteredRefunds()" class="hover:bg-white/5 transition-all">
-            <td class="px-6 py-4 text-sm text-white font-medium">{{ refund.payment_id }}</td>
-            <td class="px-6 py-4 text-sm text-slate-300">${{ refund.amount.toFixed(2) }}</td>
-            <td class="px-6 py-4 text-sm text-slate-300">{{ refund.reason }}</td>
-            <td class="px-6 py-4"><span [ngClass]="getStatusColor(refund.status)" class="px-3 py-1 rounded-full text-xs font-semibold">{{ refund.status }}</span></td>
-            <td class="px-6 py-4 space-x-2">
-              <button (click)="openUpdateModal(refund)" class="px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 text-xs rounded font-semibold transition-all">Edit</button>
-              <button (click)="openDeleteModal(refund)" class="px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-200 text-xs rounded font-semibold transition-all">Delete</button>
-            </td>
-          </tr>
-          <tr *ngIf="getFilteredRefunds().length === 0">
-            <td colspan="5" class="px-6 py-8 text-center text-slate-400"><p>No refunds found</p></td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Card Grid -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <app-refund-card
+          *ngFor="let refund of getFilteredRefunds()"
+          [refund]="refund"
+        ></app-refund-card>
+      </div>
+      <div *ngIf="getFilteredRefunds().length === 0" class="px-6 py-8 text-center text-slate-500 italic">
+        No refunds found
+      </div>
     </div>
   </div>
 

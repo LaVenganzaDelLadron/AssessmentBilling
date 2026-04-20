@@ -12,7 +12,17 @@ export class StudentsService extends AdminCrudService<
   CreateStudentPayload,
   UpdateStudentPayload
 > {
+  private _cachedStudents: Student[] | null = null;
+
   constructor() {
     super('students');
+  }
+
+  setCachedStudents(students: Student[]): void {
+    this._cachedStudents = students;
+  }
+
+  getCachedStudents(): Student[] | null {
+    return this._cachedStudents;
   }
 }

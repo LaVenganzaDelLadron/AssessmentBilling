@@ -12,7 +12,17 @@ export class RefundsService extends AdminCrudService<
   CreateRefundPayload,
   UpdateRefundPayload
 > {
+  private _cachedRefunds: Refund[] | null = null;
+
   constructor() {
     super('refunds');
+  }
+
+  setCachedRefunds(refunds: Refund[]): void {
+    this._cachedRefunds = refunds;
+  }
+
+  getCachedRefunds(): Refund[] | null {
+    return this._cachedRefunds;
   }
 }

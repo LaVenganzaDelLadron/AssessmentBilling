@@ -17,7 +17,11 @@ export class AddPaymentMethodsModalComponent {
   isLoading = false;
   errorMessage = '';
 
-  form: CreatePaymentMethodPayload = { name: '' };
+  form: CreatePaymentMethodPayload = {
+    name: '',
+    code: '',
+    is_active: true
+  };
 
   constructor(private paymentMethodsService: PaymentMethodsService) {}
 
@@ -38,7 +42,11 @@ export class AddPaymentMethodsModalComponent {
     this.errorMessage = '';
 
     this.paymentMethodsService
-      .create({ name: this.form.name.trim() })
+      .create({
+        name: this.form.name.trim(),
+        code: this.form.code?.trim() || null,
+        is_active: this.form.is_active ?? true
+      })
       .subscribe({
         next: () => {
           this.isLoading = false;
@@ -68,7 +76,11 @@ export class AddPaymentMethodsModalComponent {
   }
 
   private resetForm(): void {
-    this.form = { name: '' };
+    this.form = {
+      name: '',
+      code: '',
+      is_active: true
+    };
     this.errorMessage = '';
   }
 

@@ -1,1 +1,14 @@
-<p>invoices-card works!</p>
+<div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm flex flex-col gap-2">
+	<div class="flex items-center gap-2">
+		<span class="font-bold text-violet-700 text-lg">{{ invoice.invoice_number }}</span>
+		<span class="text-xs text-slate-500">({{ invoice.status || '—' }})</span>
+	</div>
+	<div class="text-slate-900 font-semibold">Student: {{ invoice.student_id }}</div>
+	<div class="flex gap-4 text-xs text-slate-600 mt-1">
+		<span>Assessment: <span class="font-bold">{{ invoice.assessment_id }}</span></span>
+		<span>Total: <span class="font-bold">{{ invoice.total_amount }}</span></span>
+		<span>Balance: <span class="font-bold">{{ invoice.balance }}</span></span>
+		<span>Due: <span class="font-bold">{{ invoice.due_date | date: 'MMM dd, yyyy' }}</span></span>
+	</div>
+	<div *ngIf="invoice.id" class="text-xs text-slate-400">ID: {{ invoice.id }}</div>
+</div>

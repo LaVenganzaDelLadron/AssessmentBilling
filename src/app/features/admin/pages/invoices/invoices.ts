@@ -7,6 +7,7 @@ import { InvoicesService } from '../../services/invoices.service';
 import { AddInvoiceModalComponent } from '../../modals/invoices/add-invoice/add-invoice.modal';
 import { UpdateInvoiceModalComponent } from '../../modals/invoices/update-invoice/update-invoice.modal';
 import { DeleteInvoiceModalComponent } from '../../modals/invoices/delete-invoice/delete-invoice.modal';
+import { InvoicesCard } from '../../cards/invoices-card/invoices-card';
 
 @Component({
   selector: 'app-invoices',
@@ -16,7 +17,8 @@ import { DeleteInvoiceModalComponent } from '../../modals/invoices/delete-invoic
     FormsModule,
     AddInvoiceModalComponent,
     UpdateInvoiceModalComponent,
-    DeleteInvoiceModalComponent
+    DeleteInvoiceModalComponent,
+    InvoicesCard
   ],
   templateUrl: './invoices.html',
   styleUrl: './invoices.css',
@@ -27,7 +29,7 @@ export class Invoices implements OnInit {
   @ViewChild(DeleteInvoiceModalComponent) deleteModal!: DeleteInvoiceModalComponent;
 
   invoices: Invoice[] = [];
-  isLoading = false;
+  // isLoading removed
   errorMessage = '';
   searchQuery = '';
   statusFilter = '';
@@ -40,24 +42,28 @@ export class Invoices implements OnInit {
   }
 
   loadInvoices() {
-    this.isLoading = true;
     this.errorMessage = '';
-
     this.invoicesService.list().subscribe({
       next: (response) => {
-        this.invoices = Array.isArray(response) ? response : response.data ?? [];
-        this.isLoading = false;
+        console.log('[Invoices] API response:', response);
+        const data = Array.isArray(response) ? response : response.data ?? [];
+        if (Array.isArray(data)) {
+          console.log('[Invoices] First invoice:', data[0]);
+          // Defensive: filter out any items missing required fields
+          this.invoices = data.filter(inv =>
+            inv && typeof inv.invoice_number === 'string' && inv.student_id !== undefined && inv.assessment_id !== undefined
+          );
+        } else {
+          this.invoices = [];
+        }
       },
       error: (error) => {
-        this.isLoading = false;
-
+        console.error('[Invoices] API error:', error);
         if (error?.status === 404) {
           this.invoices = [];
           return;
         }
-
         this.errorMessage = this.getErrorMessage(error) || 'Failed to load invoices';
-        console.error('Error:', error);
       }
     });
   }
@@ -75,27 +81,9 @@ export class Invoices implements OnInit {
   }
 
   getFilteredInvoices(): Invoice[] {
-    let filtered = this.invoices;
-
-    if (this.searchQuery) {
-      const query = this.searchQuery.toLowerCase();
-
-      filtered = filtered.filter(invoice =>
-        invoice.invoice_number.toLowerCase().includes(query) ||
-        invoice.student_id.toString().includes(query) ||
-        invoice.assessment_id.toString().includes(query) ||
-        String(invoice.total_amount).toLowerCase().includes(query) ||
-        String(invoice.balance).toLowerCase().includes(query) ||
-        invoice.due_date.toLowerCase().includes(query) ||
-        invoice.status.toLowerCase().includes(query)
-      );
-    }
-
-    if (this.statusFilter) {
-      filtered = filtered.filter(invoice => invoice.status === this.statusFilter);
-    }
-
-    return filtered;
+    console.log('[Invoices] getFilteredInvoices - searchQuery:', this.searchQuery, 'invoices:', this.invoices);
+    // TEMP: Bypass filtering for debug
+    return this.invoices;
   }
 
   getStatusColor(status: string) {

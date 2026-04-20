@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AdminNumericValue } from '../../models/admin-api.model';
 import { Assessment as AssessmentModel, AssessmentStatus } from '../../models/assessment.model';
 import { AssessmentsService } from '../../services/assessments.service';
+import { AssessmentCard } from '../../cards/assessment-card/assessment-card';
 import { UpdateAssessmentsModalComponent } from '../../modals/assessments/update-assessments/update-assessments.modal';
 import { DeleteAssessmentsModalComponent } from '../../modals/assessments/delete-assessments/delete-assessments.modal';
 import { AddAssessmentsModalComponent } from '../../modals/assessments/add-assessments/add-assessments.modal';
@@ -16,7 +17,8 @@ import { AddAssessmentsModalComponent } from '../../modals/assessments/add-asses
     FormsModule,
     AddAssessmentsModalComponent,
     UpdateAssessmentsModalComponent,
-    DeleteAssessmentsModalComponent
+    DeleteAssessmentsModalComponent,
+    AssessmentCard
   ],
   templateUrl: './assessment.html',
   styleUrl: './assessment.css',
@@ -27,7 +29,7 @@ export class Assessment implements OnInit {
   @ViewChild(DeleteAssessmentsModalComponent) deleteModal!: DeleteAssessmentsModalComponent;
 
   assessments: AssessmentModel[] = [];
-  isLoading = false;
+  // isLoading removed
   errorMessage = '';
   searchQuery = '';
   statusFilter: AssessmentStatus | '' = '';
@@ -35,28 +37,50 @@ export class Assessment implements OnInit {
   constructor(private assessmentService: AssessmentsService) {}
 
   ngOnInit() {
-    this.loadAssessments();
+    const cached = this.assessmentService.getCachedAssessments();
+    if (cached && cached.length > 0) {
+      this.assessments = cached;
+    } else {
+      this.loadAssessments();
+    }
   }
 
   loadAssessments() {
-    this.isLoading = true;
     this.errorMessage = '';
-
     this.assessmentService.list().subscribe({
-      next: (response) => {
-        this.assessments = Array.isArray(response) ? response : response.data ?? [];
-        this.isLoading = false;
+      next: (response: any) => {
+        let mapped: AssessmentModel[] = [];
+        let data = Array.isArray(response) ? response : response.data ?? [];
+        if (Array.isArray(data)) {
+          mapped = data.map((item: any) => ({
+            id: item.id ?? item.assessment_id ?? null,
+            student_id: item.student_id ?? null,
+            academic_term_id: item.academic_term_id ?? null,
+            semester: item.semester ?? '',
+            school_year: item.school_year ?? '',
+            total_units: item.total_units ?? 0,
+            tuition_fee: item.tuition_fee ?? 0,
+            misc_fee: item.misc_fee ?? 0,
+            lab_fee: item.lab_fee ?? 0,
+            other_fees: item.other_fees ?? 0,
+            total_amount: item.total_amount ?? 0,
+            discount: item.discount ?? 0,
+            net_amount: item.net_amount ?? 0,
+            status: item.status ?? 'draft',
+            created_at: item.created_at ?? null,
+            updated_at: item.updated_at ?? null
+          }));
+        }
+        this.assessments = mapped;
+        this.assessmentService.setCachedAssessments(mapped);
       },
       error: (error) => {
-        this.isLoading = false;
-
+        console.error('[Assessments] API error:', error);
         if (error?.status === 404) {
           this.assessments = [];
           return;
         }
-
         this.errorMessage = this.getErrorMessage(error) || 'Failed to load assessments';
-        console.error('Error:', error);
       }
     });
   }

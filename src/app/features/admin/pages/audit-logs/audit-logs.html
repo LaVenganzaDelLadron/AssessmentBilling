@@ -46,12 +46,7 @@
     <div class="space-y-4 relative">
       <div class="absolute left-[34px] top-0 bottom-0 w-0.5 bg-slate-100 hidden lg:block"></div>
 
-      <div *ngIf="isLoading" class="rounded-[1.25rem] border border-white bg-white/70 p-10 text-center shadow-xl shadow-slate-200/40">
-        <div class="mx-auto mb-3 h-12 w-12 animate-spin rounded-full border-4 border-indigo-100 border-t-indigo-600"></div>
-        <p class="text-sm font-bold text-slate-500">Loading audit logs...</p>
-      </div>
-
-      <div *ngIf="errorMessage && !isLoading" class="rounded-[1.25rem] border border-red-100 bg-red-50 p-4 text-sm font-semibold text-red-700">
+      <div *ngIf="errorMessage" class="rounded-[1.25rem] border border-red-100 bg-red-50 p-4 text-sm font-semibold text-red-700">
         {{ errorMessage }}
       </div>
 
@@ -104,7 +99,7 @@
         </div>
       </div>
 
-      <div *ngIf="!isLoading && !errorMessage && getFilteredLogs().length === 0" class="rounded-[1.25rem] border border-white bg-white/70 p-10 text-center shadow-xl shadow-slate-200/40">
+      <div *ngIf="!errorMessage && getFilteredLogs().length === 0" class="rounded-[1.25rem] border border-white bg-white/70 p-10 text-center shadow-xl shadow-slate-200/40">
         <h3 class="text-lg font-black text-slate-900">{{ searchQuery || actionFilter ? 'No matching audit logs' : 'No audit logs found' }}</h3>
         <p class="mt-2 text-sm font-medium text-slate-500">
           {{ searchQuery || actionFilter ? 'Try clearing your filters to see more activity.' : 'Audit events will appear here once the backend starts recording them.' }}

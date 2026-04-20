@@ -6,6 +6,7 @@ import { OfficialReceiptsService } from '../../services/official-receipts.servic
 import { AddOfficialReceiptsModalComponent } from '../../modals/official-receipts/add-official-receipts/add-official-receipts.modal';
 import { UpdateOfficialReceiptsModalComponent } from '../../modals/official-receipts/update-official-receipts/update-official-receipts.modal';
 import { DeleteOfficialReceiptsModalComponent } from '../../modals/official-receipts/delete-official-receipts/delete-official-receipts.modal';
+import { ReceiptCard } from '../../cards/receipt-card/receipt-card';
 
 @Component({
   selector: 'app-official-receipts',
@@ -15,7 +16,8 @@ import { DeleteOfficialReceiptsModalComponent } from '../../modals/official-rece
     FormsModule,
     AddOfficialReceiptsModalComponent,
     UpdateOfficialReceiptsModalComponent,
-    DeleteOfficialReceiptsModalComponent
+    DeleteOfficialReceiptsModalComponent,
+    ReceiptCard
   ],
   templateUrl: './official-receipts.html',
   styleUrl: './official-receipts.css'
@@ -26,7 +28,7 @@ export class OfficialReceipts implements OnInit {
   @ViewChild(DeleteOfficialReceiptsModalComponent) deleteModal!: DeleteOfficialReceiptsModalComponent;
 
   receipts: OfficialReceipt[] = [];
-  isLoading = false;
+  // isLoading removed
   errorMessage = '';
   searchQuery = '';
 
@@ -37,22 +39,16 @@ export class OfficialReceipts implements OnInit {
   }
 
   loadReceipts(): void {
-    this.isLoading = true;
     this.errorMessage = '';
-
     this.receiptService.list().subscribe({
       next: (response) => {
         this.receipts = Array.isArray(response) ? response : response.data ?? [];
-        this.isLoading = false;
       },
       error: (error) => {
-        this.isLoading = false;
-
         if (error?.status === 404) {
           this.receipts = [];
           return;
         }
-
         this.errorMessage =
           this.getErrorMessage(error) || 'Failed to load official receipts';
         console.error('Error:', error);

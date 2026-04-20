@@ -1,9 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AcademicTerm } from '../../models/academic-term.model';
 
 @Component({
   selector: 'app-academic-term-card',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './academic-term-card.html',
   styleUrl: './academic-term-card.css',
 })
-export class AcademicTermCard {}
+export class AcademicTermCard {
+  @Input() term!: AcademicTerm;
+}

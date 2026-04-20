@@ -7,6 +7,7 @@ import { InvoiceLinesService } from '../../services/invoice-lines.service';
 import { AddInvoiceLinesModalComponent } from '../../modals/invoice-lines/add-invoice-lines/add-invoice-lines.modal';
 import { UpdateInvoiceLinesModalComponent } from '../../modals/invoice-lines/update-invoice-lines/update-invoice-lines.modal';
 import { DeleteInvoiceLinesModalComponent } from '../../modals/invoice-lines/delete-invoice-lines/delete-invoice-lines.modal';
+import { InvoiceLineCard } from '../../cards/invoice-line-card/invoice-line-card';
 
 @Component({
   selector: 'app-invoice-lines',
@@ -16,7 +17,8 @@ import { DeleteInvoiceLinesModalComponent } from '../../modals/invoice-lines/del
     FormsModule,
     AddInvoiceLinesModalComponent,
     UpdateInvoiceLinesModalComponent,
-    DeleteInvoiceLinesModalComponent
+    DeleteInvoiceLinesModalComponent,
+    InvoiceLineCard
   ],
   templateUrl: './invoice-lines.html',
   styleUrl: './invoice-lines.css',
@@ -27,7 +29,7 @@ export class InvoiceLines implements OnInit {
   @ViewChild(DeleteInvoiceLinesModalComponent) deleteModal!: DeleteInvoiceLinesModalComponent;
 
   lines: InvoiceLine[] = [];
-  isLoading = false;
+  // isLoading removed
   errorMessage = '';
   searchQuery = '';
 
@@ -38,24 +40,20 @@ export class InvoiceLines implements OnInit {
   }
 
   loadLines() {
-    this.isLoading = true;
     this.errorMessage = '';
-
     this.invoiceLinesService.list().subscribe({
       next: (response) => {
-        this.lines = Array.isArray(response) ? response : response.data ?? [];
-        this.isLoading = false;
+        console.log('[InvoiceLines] API response:', response);
+        const data = Array.isArray(response) ? response : response.data ?? [];
+        this.lines = Array.isArray(data) ? data : [];
       },
       error: (error) => {
-        this.isLoading = false;
-
+        console.error('[InvoiceLines] API error:', error);
         if (error?.status === 404) {
           this.lines = [];
           return;
         }
-
         this.errorMessage = this.getErrorMessage(error) || 'Failed to load invoice lines';
-        console.error('Error:', error);
       }
     });
   }

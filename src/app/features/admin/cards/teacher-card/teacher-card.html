@@ -1,1 +1,12 @@
-<p>teacher-card works!</p>
+<div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm flex flex-col gap-2">
+	<div class="flex items-center gap-2">
+		<span class="font-bold text-emerald-700 text-lg">Teacher #{{ teacher.teacher_id }}</span>
+		<span class="text-xs text-slate-500">{{ teacher.status }}</span>
+	</div>
+	<div class="text-slate-900 font-semibold">{{ teacher.last_name }}, {{ teacher.first_name }} {{ teacher.middle_name }}</div>
+	<div class="flex gap-4 text-xs text-slate-600 mt-1">
+		<span>Department: <span class="font-bold">{{ teacher.department || '—' }}</span></span>
+		<span>Email: <span class="font-bold">{{ teacher.user?.email || '—' }}</span></span>
+		<span>Updated: <span class="font-bold">{{ teacher.updated_at | date: 'medium' }}</span></span>
+	</div>
+</div>

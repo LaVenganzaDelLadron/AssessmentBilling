@@ -12,7 +12,17 @@ export class TeachersService extends AdminCrudService<
   CreateTeacherPayload,
   UpdateTeacherPayload
 > {
+  private _cachedTeachers: Teacher[] | null = null;
+
   constructor() {
     super('teachers');
+  }
+
+  setCachedTeachers(teachers: Teacher[]): void {
+    this._cachedTeachers = teachers;
+  }
+
+  getCachedTeachers(): Teacher[] | null {
+    return this._cachedTeachers;
   }
 }

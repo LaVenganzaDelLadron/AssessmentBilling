@@ -12,7 +12,17 @@ export class AcademicTermsService extends AdminCrudService<
   CreateAcademicTermPayload,
   UpdateAcademicTermPayload
 > {
+  private _cachedTerms: AcademicTerm[] | null = null;
+
   constructor() {
     super('academic-terms');
+  }
+
+  setCachedTerms(terms: AcademicTerm[]): void {
+    this._cachedTerms = terms;
+  }
+
+  getCachedTerms(): AcademicTerm[] | null {
+    return this._cachedTerms;
   }
 }

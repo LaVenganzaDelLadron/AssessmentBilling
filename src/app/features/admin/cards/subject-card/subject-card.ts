@@ -1,9 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Subject } from '../../models/subject.model';
 
 @Component({
   selector: 'app-subject-card',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './subject-card.html',
   styleUrl: './subject-card.css',
 })
-export class SubjectCard {}
+export class SubjectCard {
+  @Input() subject!: Subject;
+}

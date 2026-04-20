@@ -12,7 +12,17 @@ export class AssessmentBreakdownService extends AdminCrudService<
   CreateAssessmentBreakdownPayload,
   UpdateAssessmentBreakdownPayload
 > {
+  private _cachedBreakdowns: AssessmentBreakdown[] | null = null;
+
   constructor() {
     super('assessment-breakdown');
+  }
+
+  setCachedBreakdowns(breakdowns: AssessmentBreakdown[]): void {
+    this._cachedBreakdowns = breakdowns;
+  }
+
+  getCachedBreakdowns(): AssessmentBreakdown[] | null {
+    return this._cachedBreakdowns;
   }
 }

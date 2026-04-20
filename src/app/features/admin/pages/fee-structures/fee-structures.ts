@@ -7,6 +7,7 @@ import { FeeStructuresService } from '../../services/fee-structures.service';
 import { AddFeeStructureModalComponent } from '../../modals/fee-structure/add-fee-structure/add-fee-structure.modal';
 import { UpdateFeeStructureModalComponent } from '../../modals/fee-structure/update-fee-structure/update-fee-structure.modal';
 import { DeleteFeeStructureModalComponent } from '../../modals/fee-structure/delete-fee-structure/delete-fee-structure.modal';
+import { FeeStructureCard } from '../../cards/fee-structure-card/fee-structure-card';
 
 @Component({
   selector: 'app-fee-structures',
@@ -16,7 +17,8 @@ import { DeleteFeeStructureModalComponent } from '../../modals/fee-structure/del
     FormsModule,
     AddFeeStructureModalComponent,
     UpdateFeeStructureModalComponent,
-    DeleteFeeStructureModalComponent
+    DeleteFeeStructureModalComponent,
+    FeeStructureCard
   ],
   templateUrl: './fee-structures.html',
   styleUrl: './fee-structures.css',
@@ -27,35 +29,48 @@ export class FeeStructures implements OnInit {
   @ViewChild(DeleteFeeStructureModalComponent) deleteModal!: DeleteFeeStructureModalComponent;
 
   fees: FeeStructure[] = [];
-  isLoading = false;
+  // isLoading removed
   errorMessage = '';
   searchQuery = '';
 
   constructor(private feeStructuresService: FeeStructuresService) {}
 
   ngOnInit() {
-    this.loadFees();
+    const cached = this.feeStructuresService.getCachedFees();
+    if (cached && cached.length > 0) {
+      this.fees = cached;
+    } else {
+      this.loadFees();
+    }
   }
 
   loadFees() {
-    this.isLoading = true;
     this.errorMessage = '';
-
     this.feeStructuresService.list().subscribe({
-      next: (response) => {
-        this.fees = Array.isArray(response) ? response : response.data ?? [];
-        this.isLoading = false;
+      next: (response: any) => {
+        let mapped: FeeStructure[] = [];
+        let data = Array.isArray(response) ? response : response.data ?? [];
+        if (Array.isArray(data)) {
+          mapped = data.map((item: any) => ({
+            id: item.id ?? item.fee_structure_id ?? null,
+            program_id: item.program_id ?? null,
+            fee_type: item.fee_type ?? '',
+            amount: item.amount ?? 0,
+            per_unit: !!item.per_unit,
+            created_at: item.created_at ?? null,
+            updated_at: item.updated_at ?? null
+          }));
+        }
+        this.fees = mapped;
+        this.feeStructuresService.setCachedFees(mapped);
       },
       error: (error) => {
-        this.isLoading = false;
-
+        console.error('[FeeStructures] API error:', error);
         if (error?.status === 404) {
           this.fees = [];
           return;
         }
-
         this.errorMessage = this.getErrorMessage(error) || 'Failed to load fee structures';
-        console.error('Error:', error);
       }
     });
   }

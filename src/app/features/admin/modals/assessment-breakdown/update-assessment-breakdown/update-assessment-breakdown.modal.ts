@@ -44,7 +44,7 @@ export class UpdateAssessmentBreakdownModalComponent {
     this.form = {
       assessment_id: entity.assessment_id,
       source_type: entity.source_type,
-      source_id: entity.source_id ?? '',
+      source_id: entity.source_id == null ? '' : String(entity.source_id),
       description: entity.description,
       units: this.toNumberOrNull(entity.units),
       rate: this.toNumberOrNull(entity.rate),

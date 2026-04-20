@@ -7,6 +7,7 @@ import { PaymentAllocationsService } from '../../services/payment-allocations.se
 import { AddPaymentAllocationsModalComponent } from '../../modals/payment-allocations/add-payment-allocations/add-payment-allocations.modal';
 import { UpdatePaymentAllocationsModalComponent } from '../../modals/payment-allocations/update-payment-allocations/update-payment-allocations.modal';
 import { DeletePaymentAllocationsModalComponent } from '../../modals/payment-allocations/delete-payment-allocations/delete-payment-allocations.modal';
+import { PaymentAllocationCard } from '../../cards/payment-allocation-card/payment-allocation-card';
 
 @Component({
   selector: 'app-payment-allocations',
@@ -16,7 +17,8 @@ import { DeletePaymentAllocationsModalComponent } from '../../modals/payment-all
     FormsModule,
     AddPaymentAllocationsModalComponent,
     UpdatePaymentAllocationsModalComponent,
-    DeletePaymentAllocationsModalComponent
+    DeletePaymentAllocationsModalComponent,
+    PaymentAllocationCard
   ],
   templateUrl: './payment-allocations.html',
   styleUrl: './payment-allocations.css'
@@ -27,36 +29,47 @@ export class PaymentAllocations implements OnInit {
   @ViewChild(DeletePaymentAllocationsModalComponent) deleteModal!: DeletePaymentAllocationsModalComponent;
 
   allocations: PaymentAllocation[] = [];
-  isLoading = false;
+  // isLoading removed
   errorMessage = '';
   searchQuery = '';
 
   constructor(private allocationsService: PaymentAllocationsService) {}
 
   ngOnInit(): void {
-    this.loadAllocations();
+    const cached = this.allocationsService.getCachedAllocations();
+    if (cached && cached.length > 0) {
+      this.allocations = cached;
+    } else {
+      this.loadAllocations();
+    }
   }
 
   loadAllocations(): void {
-    this.isLoading = true;
     this.errorMessage = '';
-
     this.allocationsService.list().subscribe({
-      next: (response) => {
-        this.allocations = Array.isArray(response) ? response : response.data ?? [];
-        this.isLoading = false;
+      next: (response: any) => {
+        let mapped: PaymentAllocation[] = [];
+        let data = Array.isArray(response) ? response : response.data ?? [];
+        if (Array.isArray(data)) {
+          mapped = data.map((item: any) => ({
+            id: item.id ?? item.payment_allocation_id ?? null,
+            payment_id: item.payment_id ?? null,
+            invoice_id: item.invoice_id ?? null,
+            amount_applied: item.amount_applied ?? 0,
+            created_at: item.created_at ?? null,
+            updated_at: item.updated_at ?? null
+          }));
+        }
+        this.allocations = mapped;
+        this.allocationsService.setCachedAllocations(mapped);
       },
       error: (error) => {
-        this.isLoading = false;
-
+        console.error('[PaymentAllocations] API error:', error);
         if (error?.status === 404) {
           this.allocations = [];
           return;
         }
-
-        this.errorMessage =
-          this.getErrorMessage(error) || 'Failed to load payment allocations';
-        console.error('Error:', error);
+        this.errorMessage = this.getErrorMessage(error) || 'Failed to load payment allocations';
       }
     });
   }

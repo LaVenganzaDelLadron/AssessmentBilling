@@ -1,7 +1,11 @@
 import { Component, ViewChild, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { PaymentMethodsService } from '../../../../../shared/services/payment-methods.service';
+import {
+  PaymentMethod,
+  UpdatePaymentMethodPayload
+} from '../../../models/payment-method.model';
+import { PaymentMethodsService } from '../../../services/payment-methods.service';
 
 @Component({
   selector: 'app-update-payment-methods-modal',
@@ -18,22 +22,27 @@ export class UpdatePaymentMethodsModalComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
 
-  currentEntity: any = null;
+  currentEntity: PaymentMethod | null = null;
 
-  method_name = '';
-  description = '';
-  is_active = true;
+  form: UpdatePaymentMethodPayload = {
+    name: '',
+    code: '',
+    is_active: true
+  };
 
   constructor(private paymentMethodsService: PaymentMethodsService) {}
 
   ngOnInit(): void {}
 
-  open(entity: any): void {
+  open(entity: PaymentMethod): void {
     this.currentEntity = entity;
-    this.method_name = entity.method_name;
-    this.description = entity.description;
-    this.is_active = entity.is_active;
+    this.form = {
+      name: entity.name,
+      code: entity.code ?? '',
+      is_active: entity.is_active ?? true
+    };
     this.isOpen = true;
+    this.errorMessage = '';
   }
 
   close(): void {
@@ -42,8 +51,8 @@ export class UpdatePaymentMethodsModalComponent implements OnInit {
   }
 
   validate(): boolean {
-    if (!this.method_name || !this.description) {
-      this.errorMessage = 'All fields are required';
+    if (!this.form.name?.trim()) {
+      this.errorMessage = 'Name is required';
       return false;
     }
     return true;
@@ -52,16 +61,21 @@ export class UpdatePaymentMethodsModalComponent implements OnInit {
   submit(): void {
     if (!this.validate()) return;
 
+    const currentEntity = this.currentEntity;
+
+    if (!currentEntity) {
+      this.errorMessage = 'No payment method selected';
+      return;
+    }
+
     this.isLoading = true;
     this.errorMessage = '';
 
-    const data = {
-      method_name: this.method_name,
-      description: this.description,
-      is_active: this.is_active
-    };
-
-    this.paymentMethodsService.update(this.currentEntity.id, data).subscribe({
+    this.paymentMethodsService.update(currentEntity.id, {
+      name: this.form.name?.trim(),
+      code: this.form.code?.trim() || null,
+      is_active: this.form.is_active ?? true
+    }).subscribe({
       next: () => {
         this.isLoading = false;
         this.close();
@@ -75,9 +89,11 @@ export class UpdatePaymentMethodsModalComponent implements OnInit {
   }
 
   private resetForm(): void {
-    this.method_name = '';
-    this.description = '';
-    this.is_active = true;
+    this.form = {
+      name: '',
+      code: '',
+      is_active: true
+    };
     this.errorMessage = '';
     this.currentEntity = null;
   }

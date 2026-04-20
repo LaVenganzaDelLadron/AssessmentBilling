@@ -1,0 +1,14 @@
+<div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm flex flex-col gap-2">
+  <div class="flex items-center gap-2">
+    <span class="font-bold text-violet-700 text-lg">{{ line.invoice_id }}</span>
+    <span class="text-xs text-slate-500">({{ line.line_type || '—' }})</span>
+  </div>
+  <div class="text-slate-900 font-semibold">{{ line.description || '—' }}</div>
+  <div class="flex gap-4 text-xs text-slate-600 mt-1">
+    <span>Subject: <span class="font-bold">{{ line.subject_id || '—' }}</span></span>
+    <span>Qty: <span class="font-bold">{{ line.quantity ?? '—' }}</span></span>
+    <span>Unit Price: <span class="font-bold">{{ line.unit_price }}</span></span>
+    <span>Amount: <span class="font-bold">{{ line.amount }}</span></span>
+  </div>
+  <div *ngIf="line.id" class="text-xs text-slate-400">ID: {{ line.id }}</div>
+</div>

@@ -17,42 +17,21 @@
     >
   </div>
 
-  <div *ngIf="isLoading" class="flex justify-center py-12">
-    <div class="text-center">
-      <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-3"></div>
-      <p class="text-slate-600">Loading payment allocations...</p>
-    </div>
-  </div>
-
-  <div *ngIf="errorMessage && !isLoading" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+  <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
     <p class="text-red-700 font-semibold">{{ errorMessage }}</p>
   </div>
 
-  <div *ngIf="!isLoading" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-    <table class="w-full">
-      <thead>
-        <tr class="bg-slate-50 border-b border-slate-200">
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Payment ID</th>
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Invoice ID</th>
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Amount Applied</th>
-          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Actions</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-slate-100">
-        <tr *ngFor="let allocation of getFilteredAllocations()" class="hover:bg-slate-50 transition-colors">
-          <td class="px-6 py-4 text-sm font-semibold text-slate-900">{{ allocation.payment_id }}</td>
-          <td class="px-6 py-4 text-sm text-slate-700">{{ allocation.invoice_id }}</td>
-          <td class="px-6 py-4 text-sm font-semibold text-slate-900">{{ formatAmount(allocation.amount_applied) }}</td>
-          <td class="px-6 py-4 text-sm space-x-2">
-            <button (click)="openUpdateModal(allocation)" class="text-blue-600 font-bold hover:underline">Edit</button>
-            <button (click)="openDeleteModal(allocation)" class="text-red-600 font-bold hover:underline">Delete</button>
-          </td>
-        </tr>
-        <tr *ngIf="getFilteredAllocations().length === 0">
-          <td colspan="4" class="px-6 py-8 text-center text-slate-500 italic">No payment allocations found</td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- Card Grid -->
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <app-payment-allocation-card
+        *ngFor="let allocation of getFilteredAllocations()"
+        [allocation]="allocation"
+      ></app-payment-allocation-card>
+    </div>
+    <div *ngIf="getFilteredAllocations().length === 0" class="px-6 py-8 text-center text-slate-500 italic">
+      No payment allocations found
+    </div>
   </div>
 </div>
 

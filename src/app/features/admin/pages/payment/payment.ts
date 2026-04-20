@@ -46,15 +46,18 @@ export class Payment implements OnInit {
 
   loadPayments() {
     this.isLoading = true;
+    this.errorMessage = '';
+
     this.adminDataService.getPayments().subscribe({
-      next: (data) => {
-        this.payments = data;
+      next: (response: any) => {
+        console.log('[Payments] API response:', response);
+        this.payments = Array.isArray(response) ? response : response?.data ?? [];
         this.isLoading = false;
       },
       error: (error: any) => {
+        console.error('[Payments] API error:', error);
         this.errorMessage = 'Failed to load payments';
         this.isLoading = false;
-        console.error('Error:', error);
       }
     });
   }
@@ -75,11 +78,31 @@ export class Payment implements OnInit {
     if (!this.searchQuery) return this.payments;
     const query = this.searchQuery.toLowerCase();
     return this.payments.filter(p =>
-      p.reference_number.toLowerCase().includes(query)
+      [
+        p.id ?? '',
+        p.reference_number ?? '',
+        p.invoice_id,
+        p.amount_paid,
+        this.getPaymentMethod(p.payment_method_id),
+        p.paid_at
+      ]
+        .join(' ')
+        .toLowerCase()
+        .includes(query)
     );
   }
 
   getPaymentMethod(id: number) {
     return this.paymentMethods[id] || 'Unknown';
+  }
+
+  formatAmount(value: number | string | null | undefined): string {
+    const numericValue = Number(value);
+
+    if (Number.isNaN(numericValue)) {
+      return String(value ?? '0.00');
+    }
+
+    return numericValue.toFixed(2);
   }
 }

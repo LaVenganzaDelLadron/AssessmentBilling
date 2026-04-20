@@ -1,9 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Enrollment } from '../../models/enrollment.model';
 
 @Component({
   selector: 'app-enrollment-card',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './enrollment-card.html',
   styleUrl: './enrollment-card.css',
 })
-export class EnrollmentCard {}
+export class EnrollmentCard {
+  @Input() enrollment!: Enrollment;
+}

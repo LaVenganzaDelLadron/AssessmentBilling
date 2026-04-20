@@ -6,6 +6,7 @@ import { PaymentMethodsService } from '../../services/payment-methods.service';
 import { AddPaymentMethodsModalComponent } from '../../modals/payment-methods/add-payment-methods/add-payment-methods.modal';
 import { UpdatePaymentMethodsModalComponent } from '../../modals/payment-methods/update-payment-methods/update-payment-methods.modal';
 import { DeletePaymentMethodsModalComponent } from '../../modals/payment-methods/delete-payment-methods/delete-payment-methods.modal';
+import { PaymentMethodCard } from '../../cards/payment-method-card/payment-method-card';
 
 @Component({
   selector: 'app-payment-methods',
@@ -15,7 +16,8 @@ import { DeletePaymentMethodsModalComponent } from '../../modals/payment-methods
     FormsModule,
     AddPaymentMethodsModalComponent,
     UpdatePaymentMethodsModalComponent,
-    DeletePaymentMethodsModalComponent
+    DeletePaymentMethodsModalComponent,
+    PaymentMethodCard
   ],
   templateUrl: './payment-methods.html',
   styleUrl: './payment-methods.css'
@@ -26,7 +28,7 @@ export class PaymentMethods implements OnInit {
   @ViewChild(DeletePaymentMethodsModalComponent) deleteModal!: DeletePaymentMethodsModalComponent;
 
   methods: PaymentMethod[] = [];
-  isLoading = false;
+  // isLoading removed
   errorMessage = '';
   searchQuery = '';
 
@@ -37,25 +39,21 @@ export class PaymentMethods implements OnInit {
   }
 
   loadMethods(): void {
-    this.isLoading = true;
     this.errorMessage = '';
-
     this.methodsService.list().subscribe({
       next: (response) => {
-        this.methods = Array.isArray(response) ? response : response.data ?? [];
-        this.isLoading = false;
+        console.log('[PaymentMethods] API response:', response);
+        const data = Array.isArray(response) ? response : response.data ?? [];
+        this.methods = Array.isArray(data) ? data : [];
       },
       error: (error) => {
-        this.isLoading = false;
-
+        console.error('[PaymentMethods] API error:', error);
         if (error?.status === 404) {
           this.methods = [];
           return;
         }
-
         this.errorMessage =
           this.getErrorMessage(error) || 'Failed to load payment methods';
-        console.error('Error:', error);
       }
     });
   }
@@ -67,7 +65,12 @@ export class PaymentMethods implements OnInit {
 
     const query = this.searchQuery.toLowerCase();
 
-    return this.methods.filter(method => method.name.toLowerCase().includes(query));
+    return this.methods.filter(method =>
+      [method.id, method.name, method.code ?? '', method.is_active === false ? 'inactive' : 'active']
+        .join(' ')
+        .toLowerCase()
+        .includes(query)
+    );
   }
 
   openAddModal(): void {

@@ -1,1 +1,13 @@
-<p>subject-card works!</p>
+<div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm flex flex-col gap-2">
+	<div class="flex items-center gap-2">
+		<span class="font-bold text-violet-700 text-lg">{{ subject.code }}</span>
+		<span class="text-xs text-slate-500">({{ subject.subject_code || '—' }})</span>
+	</div>
+	<div class="text-slate-900 font-semibold">{{ subject.name }}</div>
+	<div class="flex gap-4 text-xs text-slate-600 mt-1">
+		<span>Units: <span class="font-bold">{{ subject.units }}</span></span>
+		<span>Type: <span class="font-bold">{{ subject.type || '—' }}</span></span>
+		<span>Status: <span class="font-bold">{{ subject.status || '—' }}</span></span>
+	</div>
+	<div *ngIf="subject.custom_id" class="text-xs text-slate-400">Custom ID: {{ subject.custom_id }}</div>
+</div>

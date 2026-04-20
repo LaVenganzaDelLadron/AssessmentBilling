@@ -12,7 +12,17 @@ export class SubjectsService extends AdminCrudService<
   CreateSubjectPayload,
   UpdateSubjectPayload
 > {
+  private _cachedSubjects: Subject[] | null = null;
+
   constructor() {
     super('subjects');
+  }
+
+  setCachedSubjects(subjects: Subject[]): void {
+    this._cachedSubjects = subjects;
+  }
+
+  getCachedSubjects(): Subject[] | null {
+    return this._cachedSubjects;
   }
 }

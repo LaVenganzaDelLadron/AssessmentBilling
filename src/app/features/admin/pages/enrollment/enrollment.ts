@@ -9,6 +9,7 @@ import { EnrollmentsService } from '../../services/enrollments.service';
 import { AddEnrollmentModalComponent } from '../../modals/enrollments/add-enrollment/add-enrollment.modal';
 import { UpdateEnrollmentModalComponent } from '../../modals/enrollments/update-enrollment/update-enrollment.modal';
 import { DeleteEnrollmentModalComponent } from '../../modals/enrollments/delete-enrollment/delete-enrollment.modal';
+import { EnrollmentCard } from '../../cards/enrollment-card/enrollment-card';
 
 @Component({
   selector: 'app-enrollment',
@@ -18,7 +19,8 @@ import { DeleteEnrollmentModalComponent } from '../../modals/enrollments/delete-
     FormsModule,
     AddEnrollmentModalComponent,
     UpdateEnrollmentModalComponent,
-    DeleteEnrollmentModalComponent
+    DeleteEnrollmentModalComponent,
+    EnrollmentCard
   ],
   templateUrl: './enrollment.html',
   styleUrl: './enrollment.css',
@@ -29,7 +31,7 @@ export class Enrollment implements OnInit {
   @ViewChild(DeleteEnrollmentModalComponent) deleteModal!: DeleteEnrollmentModalComponent;
 
   enrollments: EnrollmentModel[] = [];
-  isLoading = false;
+  // isLoading removed
   errorMessage = '';
   searchQuery = '';
   statusFilter: EnrollmentStatus | '' = '';
@@ -37,26 +39,41 @@ export class Enrollment implements OnInit {
   constructor(private enrollmentsService: EnrollmentsService) {}
 
   ngOnInit() {
-    this.loadEnrollments();
+    const cached = this.enrollmentsService.getCachedEnrollments();
+    if (cached && cached.length > 0) {
+      this.enrollments = cached;
+    } else {
+      this.loadEnrollments();
+    }
   }
 
   loadEnrollments() {
-    this.isLoading = true;
     this.errorMessage = '';
-
     this.enrollmentsService.list().subscribe({
-      next: (response) => {
-        this.enrollments = Array.isArray(response) ? response : response.data ?? [];
-        this.isLoading = false;
+      next: (response: any) => {
+        let mapped: EnrollmentModel[] = [];
+        let data = Array.isArray(response) ? response : response.data ?? [];
+        if (Array.isArray(data)) {
+          mapped = data.map((item: any) => ({
+            id: item.id ?? item.enrollment_id ?? null,
+            student_id: item.student_id ?? null,
+            subject_id: item.subject_id ?? null,
+            academic_term_id: item.academic_term_id ?? null,
+            semester: item.semester ?? '',
+            school_year: item.school_year ?? '',
+            status: item.status ?? 'enrolled',
+            created_at: item.created_at ?? null,
+            updated_at: item.updated_at ?? null
+          }));
+        }
+        this.enrollments = mapped;
+        this.enrollmentsService.setCachedEnrollments(mapped);
       },
       error: (error) => {
-        this.isLoading = false;
-
         if (error?.status === 404) {
           this.enrollments = [];
           return;
         }
-
         this.errorMessage = this.getErrorMessage(error) || 'Failed to load enrollments';
         console.error('Error:', error);
       }

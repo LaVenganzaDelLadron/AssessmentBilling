@@ -7,11 +7,16 @@ export interface Student extends BaseAdminModel {
   first_name: string;
   middle_name: string | null;
   last_name: string;
-  email: string;
+  email?: string | null;
   program_id: number;
   year_level: number;
   status: StudentStatus;
   user_id: number | null;
+  program?: {
+    id: number;
+    name?: string | null;
+    code?: string | null;
+  } | null;
 }
 
 export interface CreateStudentPayload {
@@ -19,7 +24,7 @@ export interface CreateStudentPayload {
   first_name: string;
   middle_name: string | null;
   last_name: string;
-  email: string;
+  email?: string | null;
   program_id: number;
   year_level: number;
   status: StudentStatus;
