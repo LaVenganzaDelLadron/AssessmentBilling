@@ -1,18 +1,29 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Teacher } from '../../models/teacher.model';
 import { TeachersService } from '../../services/teachers.service';
 import { TeacherCard } from '../../cards/teacher-card/teacher-card';
+import { UpdateTeacherModalComponent } from '../../modals/teachers/update-teacher/update-teacher.modal';
+import { DeleteTeacherModalComponent } from '../../modals/teachers/delete-teacher/delete-teacher.modal';
 
 @Component({
   selector: 'app-teachers',
   standalone: true,
-  imports: [CommonModule, FormsModule, TeacherCard],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TeacherCard,
+    UpdateTeacherModalComponent,
+    DeleteTeacherModalComponent
+  ],
   templateUrl: './teachers.html',
   styleUrl: './teachers.css',
 })
 export class Teachers implements OnInit {
+  @ViewChild(UpdateTeacherModalComponent) updateModal!: UpdateTeacherModalComponent;
+  @ViewChild(DeleteTeacherModalComponent) deleteModal!: DeleteTeacherModalComponent;
+
   teachers: Teacher[] = [];
   // isLoading removed
   errorMessage = '';
@@ -93,6 +104,14 @@ export class Teachers implements OnInit {
 
   trackByTeacherId(_: number, teacher: Teacher): number {
     return teacher.id;
+  }
+
+  openUpdateModal(teacher: Teacher): void {
+    this.updateModal.open(teacher);
+  }
+
+  openDeleteModal(teacher: Teacher): void {
+    this.deleteModal.open(teacher);
   }
 
   private getErrorMessage(error: unknown): string | null {

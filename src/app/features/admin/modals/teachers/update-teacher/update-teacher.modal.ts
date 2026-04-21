@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Teacher, TeachersService } from '../../../../../shared/services/teachers.service';
+import { ProfileService, TeacherProfile } from '../../../../../shared/services/profile.service';
 
 @Component({
   selector: 'app-update-teacher-modal',
@@ -16,28 +16,39 @@ export class UpdateTeacherModalComponent {
   isOpen = false;
   isLoading = false;
   errorMessage = '';
-  currentEntity: Teacher | null = null;
+  currentEntity: TeacherProfile | null = null;
 
-  form: Partial<Teacher> = {};
+  form: TeacherProfile = {};
 
-  constructor(private service: TeachersService) {}
+  constructor(private profileService: ProfileService) {}
 
-  open(entity: Teacher) {
+  open(entity: TeacherProfile) {
     this.isOpen = true;
     this.currentEntity = entity;
-    this.form = { ...entity };
+    this.form = {
+      teacher_id: entity.teacher_id,
+      first_name: entity.first_name,
+      middle_name: entity.middle_name || '',
+      last_name: entity.last_name,
+      department: entity.department || '',
+      status: entity.status || 'active',
+      user_id: entity.user_id
+    };
     this.errorMessage = '';
   }
 
   close() {
     this.isOpen = false;
+    this.currentEntity = null;
+    this.form = {};
+    this.errorMessage = '';
   }
 
   submit() {
-    if (!this.currentEntity?.id || !this.validate()) return;
+    if (!this.currentEntity?.user_id || !this.validate()) return;
 
     this.isLoading = true;
-    this.service.update(this.currentEntity.id, this.form as Teacher).subscribe({
+    this.profileService.updateTeacherProfile(this.currentEntity.user_id, this.form).subscribe({
       next: () => {
         this.isLoading = false;
         this.refresh.emit();
@@ -45,16 +56,29 @@ export class UpdateTeacherModalComponent {
       },
       error: (error: any) => {
         this.isLoading = false;
-        this.errorMessage = error.error?.message || 'Failed to update teacher';
+        this.errorMessage = error.error?.message || 'Failed to update teacher profile';
       }
     });
   }
 
   validate(): boolean {
-    if (!this.form.employee_id) {
-      this.errorMessage = 'Employee ID is required';
+    if (!this.form.teacher_id?.trim()) {
+      this.errorMessage = 'Teacher ID is required';
+      return false;
+    }
+    if (!this.form.first_name?.trim() || !this.form.last_name?.trim()) {
+      this.errorMessage = 'Teacher first and last name are required';
+      return false;
+    }
+    if (!this.form.department?.trim()) {
+      this.errorMessage = 'Department is required';
+      return false;
+    }
+    if (!this.form.status) {
+      this.errorMessage = 'Status is required';
       return false;
     }
     return true;
   }
 }
+

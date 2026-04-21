@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FeeStructure } from '../../models/fee-structure.model';
 
@@ -11,4 +11,14 @@ import { FeeStructure } from '../../models/fee-structure.model';
 })
 export class FeeStructureCard {
   @Input() fee!: FeeStructure;
+  @Output() editRequested = new EventEmitter<FeeStructure>();
+  @Output() deleteRequested = new EventEmitter<FeeStructure>();
+
+  requestEdit(): void {
+    this.editRequested.emit(this.fee);
+  }
+
+  requestDelete(): void {
+    this.deleteRequested.emit(this.fee);
+  }
 }

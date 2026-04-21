@@ -7,6 +7,7 @@ import {
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
+import { AdminLoadingInterceptor } from './core/interceptors/admin-loading.interceptor';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { ErrorInterceptor } from './core/interceptors/error.interceptor';
 
@@ -18,6 +19,11 @@ export const appConfig: ApplicationConfig = {
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AdminLoadingInterceptor,
       multi: true
     },
     {

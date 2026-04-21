@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Teacher } from '../../models/teacher.model';
 
@@ -11,4 +11,14 @@ import { Teacher } from '../../models/teacher.model';
 })
 export class TeacherCard {
   @Input() teacher!: Teacher;
+  @Output() editRequested = new EventEmitter<Teacher>();
+  @Output() deleteRequested = new EventEmitter<Teacher>();
+
+  requestEdit(): void {
+    this.editRequested.emit(this.teacher);
+  }
+
+  requestDelete(): void {
+    this.deleteRequested.emit(this.teacher);
+  }
 }

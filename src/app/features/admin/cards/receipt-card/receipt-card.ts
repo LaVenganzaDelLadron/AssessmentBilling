@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OfficialReceipt } from '../../models/official-receipt.model';
 
@@ -11,4 +11,14 @@ import { OfficialReceipt } from '../../models/official-receipt.model';
 })
 export class ReceiptCard {
   @Input() receipt!: OfficialReceipt;
+  @Output() editRequested = new EventEmitter<OfficialReceipt>();
+  @Output() deleteRequested = new EventEmitter<OfficialReceipt>();
+
+  requestEdit(): void {
+    this.editRequested.emit(this.receipt);
+  }
+
+  requestDelete(): void {
+    this.deleteRequested.emit(this.receipt);
+  }
 }

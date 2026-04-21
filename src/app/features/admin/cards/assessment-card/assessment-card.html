@@ -4,11 +4,17 @@
 		<span class="text-xs text-slate-500">Student: {{ assessment.student_id }}</span>
 	</div>
 	<div class="text-slate-900 font-semibold">Term: {{ assessment.academic_term_id }} | {{ assessment.semester }} {{ assessment.school_year }}</div>
-	<div class="flex gap-4 text-xs text-slate-600 mt-1">
+	<div class="flex flex-wrap gap-3 text-xs text-slate-600 mt-1">
 		<span>Units: <span class="font-bold">{{ assessment.total_units }}</span></span>
 		<span>Gross: <span class="font-bold">{{ assessment.total_amount }}</span></span>
 		<span>Discount: <span class="font-bold">{{ assessment.discount }}</span></span>
 		<span>Net: <span class="font-bold">{{ assessment.net_amount }}</span></span>
 		<span>Status: <span class="font-bold">{{ assessment.status | titlecase }}</span></span>
+	</div>
+	<div class="flex-1 min-h-[120px]"></div>
+	<div class="mt-3 flex flex-col xs:flex-row gap-2 border-t border-slate-100 pt-3">
+
+		<button type="button" (click)="requestEdit()" class="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Edit</button>
+		<button type="button" (click)="requestDelete()" class="flex-1 rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50">Delete</button>
 	</div>
 </div>

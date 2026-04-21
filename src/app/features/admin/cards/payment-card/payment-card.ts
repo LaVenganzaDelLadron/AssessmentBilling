@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Payment } from '../../models/payment.model';
 
@@ -11,4 +11,14 @@ import { Payment } from '../../models/payment.model';
 })
 export class PaymentCard {
   @Input() payment!: Payment;
+  @Output() editRequested = new EventEmitter<Payment>();
+  @Output() deleteRequested = new EventEmitter<Payment>();
+
+  requestEdit(): void {
+    this.editRequested.emit(this.payment);
+  }
+
+  requestDelete(): void {
+    this.deleteRequested.emit(this.payment);
+  }
 }

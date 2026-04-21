@@ -22,10 +22,13 @@
 
     <!-- Card Grid -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+
         <app-refund-card
           *ngFor="let refund of getFilteredRefunds()"
           [refund]="refund"
+          (editRequested)="openUpdateModal($event)"
+          (deleteRequested)="openDeleteModal($event)"
         ></app-refund-card>
       </div>
       <div *ngIf="getFilteredRefunds().length === 0" class="px-6 py-8 text-center text-slate-500 italic">

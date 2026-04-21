@@ -1,15 +1,21 @@
-# Role-Based Dashboard Implementation - COMPLETE ✓
+# TODO: Make Payments UI identical to Subjects UI
 
-**All steps done:**
-- [x] Student/Teacher dashboards created (simple cards)
-- [x] Routes updated (/student/dashboard, /teacher/dashboard as defaults)
-- [x] AuthService redirects fixed (admin→dashboard, student→student-dashboard, teacher→teacher-dashboard)
-- [x] Import/syntax issues resolved (ui-card paths)
-- [x] ng serve running at localhost:4200
+## Steps:
+- [x] Step 1: Update payment-card.html to match subject-card.html structure (header, details flex 3 items, no action buttons)
 
-**Test flow:**
-1. Login as admin/student/teacher → role-specific dashboard
-2. Sidebar navigation works
-3. UI consistent/minimal Tailwind
+- [x] Step 2: Update payment-card.css if needed (copy utilities)
 
-**Next:** Professional Admin Dashboard redesign per new specs.
+- [x] Step 3: Update add-payment.modal.html to match add-subject.modal.html (header bar, form classes, buttons layout)
+
+- [x] Step 4: Update update-payment.modal.html to match update-subject.modal.html (same as step 3)
+
+- [x] Step 5: Test UI changes
+
+- [ ] Step 6: Mark complete and attempt_completion
+
+All steps completed successfully.
+
+
+
+
+

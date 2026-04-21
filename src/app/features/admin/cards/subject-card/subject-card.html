@@ -4,10 +4,11 @@
 		<span class="text-xs text-slate-500">({{ subject.subject_code || '—' }})</span>
 	</div>
 	<div class="text-slate-900 font-semibold">{{ subject.name }}</div>
-	<div class="flex gap-4 text-xs text-slate-600 mt-1">
+	<div class="flex flex-wrap gap-4 text-xs text-slate-600 mt-1">
 		<span>Units: <span class="font-bold">{{ subject.units }}</span></span>
 		<span>Type: <span class="font-bold">{{ subject.type || '—' }}</span></span>
 		<span>Status: <span class="font-bold">{{ subject.status || '—' }}</span></span>
 	</div>
+	<div class="flex-1 min-h-[120px]"></div>
 	<div *ngIf="subject.custom_id" class="text-xs text-slate-400">Custom ID: {{ subject.custom_id }}</div>
 </div>

@@ -23,6 +23,8 @@
       <app-receipt-card
         *ngFor="let receipt of getFilteredReceipts()"
         [receipt]="receipt"
+        (editRequested)="openUpdateModal($event)"
+        (deleteRequested)="openDeleteModal($event)"
       ></app-receipt-card>
     </div>
     <div *ngIf="getFilteredReceipts().length === 0" class="px-6 py-8 text-center text-slate-500 italic">
@@ -30,3 +32,6 @@
     </div>
   </div>
 </div>
+
+<app-update-official-receipts-modal (refresh)="loadReceipts()"></app-update-official-receipts-modal>
+<app-delete-official-receipts-modal (refresh)="loadReceipts()"></app-delete-official-receipts-modal>

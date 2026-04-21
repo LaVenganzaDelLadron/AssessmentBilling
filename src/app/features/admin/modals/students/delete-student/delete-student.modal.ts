@@ -1,6 +1,7 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Student as StudentModel, StudentsService } from '../../../../../shared/services/students.service';
+import { Student as StudentModel } from '../../../models/student.model';
+import { StudentsService } from '../../../services/students.service';
 
 @Component({
   selector: 'app-delete-student-modal',
@@ -21,7 +22,7 @@ export class DeleteStudentModalComponent {
 
   open(entity: StudentModel) {
     this.isOpen = true;
-    this.entityId = entity.id || null;
+    this.entityId = entity.id ?? null;
     this.errorMessage = '';
   }
 

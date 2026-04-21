@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://127.0.0.1:8000/api'
+  apiUrl: 'https://assessment-billing-v2.onrender.com/api'
 
 };

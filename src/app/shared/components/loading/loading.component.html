@@ -1,0 +1,14 @@
+<div
+  *ngIf="loadingService.isLoading()"
+  aria-live="polite"
+  aria-busy="true"
+  class="absolute inset-0 z-50 flex items-center justify-center bg-slate-50/80 backdrop-blur-sm"
+>
+  <div class="flex min-w-[18rem] flex-col items-center gap-4 rounded-[2rem] border border-slate-200 bg-white/95 px-8 py-7 text-center shadow-xl shadow-slate-200/70">
+    <div class="h-12 w-12 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600"></div>
+    <div class="space-y-1">
+      <p class="text-sm font-bold text-slate-900">Loading admin data</p>
+      <p class="text-xs text-slate-500">Please wait while we retrieve the latest records.</p>
+    </div>
+  </div>
+</div>

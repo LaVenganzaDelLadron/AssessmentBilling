@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Refund } from '../../models/refund.model';
 
@@ -11,4 +11,14 @@ import { Refund } from '../../models/refund.model';
 })
 export class RefundCard {
   @Input() refund!: Refund;
+  @Output() editRequested = new EventEmitter<Refund>();
+  @Output() deleteRequested = new EventEmitter<Refund>();
+
+  requestEdit(): void {
+    this.editRequested.emit(this.refund);
+  }
+
+  requestDelete(): void {
+    this.deleteRequested.emit(this.refund);
+  }
 }

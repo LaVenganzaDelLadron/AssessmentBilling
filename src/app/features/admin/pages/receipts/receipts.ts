@@ -1,18 +1,29 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OfficialReceipt } from '../../models/official-receipt.model';
 import { OfficialReceiptsService } from '../../services/official-receipts.service';
 import { ReceiptCard } from '../../cards/receipt-card/receipt-card';
+import { UpdateOfficialReceiptsModalComponent } from '../../modals/official-receipts/update-official-receipts/update-official-receipts.modal';
+import { DeleteOfficialReceiptsModalComponent } from '../../modals/official-receipts/delete-official-receipts/delete-official-receipts.modal';
 
 @Component({
   selector: 'app-receipts',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReceiptCard],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReceiptCard,
+    UpdateOfficialReceiptsModalComponent,
+    DeleteOfficialReceiptsModalComponent
+  ],
   templateUrl: './receipts.html',
   styleUrl: './receipts.css',
 })
 export class ReceiptsPage implements OnInit {
+  @ViewChild(UpdateOfficialReceiptsModalComponent) updateModal!: UpdateOfficialReceiptsModalComponent;
+  @ViewChild(DeleteOfficialReceiptsModalComponent) deleteModal!: DeleteOfficialReceiptsModalComponent;
+
   receipts: OfficialReceipt[] = [];
   errorMessage = '';
   searchQuery = '';
@@ -66,5 +77,13 @@ export class ReceiptsPage implements OnInit {
       (receipt.or_number ?? '').toLowerCase().includes(query) ||
       (receipt.issued_by ?? '').toLowerCase().includes(query)
     );
+  }
+
+  openUpdateModal(receipt: OfficialReceipt): void {
+    this.updateModal.open(receipt);
+  }
+
+  openDeleteModal(receipt: OfficialReceipt): void {
+    this.deleteModal.open(receipt);
   }
 }

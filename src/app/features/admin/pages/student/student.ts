@@ -1,18 +1,29 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Student as StudentModel } from '../../models/student.model';
 import { StudentsService } from '../../services/students.service';
 import { StudentCard } from '../../cards/student-card/student-card';
+import { UpdateStudentModalComponent } from '../../modals/students/update-student/update-student.modal';
+import { DeleteStudentModalComponent } from '../../modals/students/delete-student/delete-student.modal';
 
 @Component({
   selector: 'app-student',
   standalone: true,
-  imports: [CommonModule, FormsModule, StudentCard],
+  imports: [
+    CommonModule,
+    FormsModule,
+    StudentCard,
+    UpdateStudentModalComponent,
+    DeleteStudentModalComponent
+  ],
   templateUrl: './student.html',
   styleUrl: './student.css',
 })
 export class Student implements OnInit {
+  @ViewChild(UpdateStudentModalComponent) updateModal!: UpdateStudentModalComponent;
+  @ViewChild(DeleteStudentModalComponent) deleteModal!: DeleteStudentModalComponent;
+
   students: StudentModel[] = [];
   // isLoading removed
   errorMessage = '';
@@ -111,6 +122,14 @@ export class Student implements OnInit {
 
   trackByStudentId(_: number, student: StudentModel): number {
     return student.id;
+  }
+
+  openUpdateModal(student: StudentModel): void {
+    this.updateModal.open(student);
+  }
+
+  openDeleteModal(student: StudentModel): void {
+    this.deleteModal.open(student);
   }
 
   private getErrorMessage(error: unknown): string | null {
