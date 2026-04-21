@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, asyncScheduler, observeOn } from 'rxjs';
 import { environment } from '../../../environments/assessment/environment';
 
 export interface FeeStructure {
@@ -65,9 +65,15 @@ export class AdminDataService {
 
   constructor(private http: HttpClient) {}
 
+  private scheduleResponse<T>(request$: Observable<T>): Observable<T> {
+    return request$.pipe(observeOn(asyncScheduler));
+  }
+
   // Fee Structure
   getFeeStructures(): Observable<FeeStructure[]> {
-    return this.http.get<FeeStructure[]>(`${this.apiUrl}/admin/fee-structures`);
+    return this.scheduleResponse(
+      this.http.get<FeeStructure[]>(`${this.apiUrl}/admin/fee-structures`)
+    );
   }
 
   createFeeStructure(data: FeeStructure): Observable<FeeStructure> {
@@ -84,7 +90,9 @@ export class AdminDataService {
 
   // Enrollments
   getEnrollments(): Observable<Enrollment[]> {
-    return this.http.get<Enrollment[]>(`${this.apiUrl}/admin/enrollments`);
+    return this.scheduleResponse(
+      this.http.get<Enrollment[]>(`${this.apiUrl}/admin/enrollments`)
+    );
   }
 
   createEnrollment(data: Enrollment): Observable<Enrollment> {
@@ -101,7 +109,9 @@ export class AdminDataService {
 
   // Invoices
   getInvoices(): Observable<Invoice[]> {
-    return this.http.get<Invoice[]>(`${this.apiUrl}/admin/invoices`);
+    return this.scheduleResponse(
+      this.http.get<Invoice[]>(`${this.apiUrl}/admin/invoices`)
+    );
   }
 
   createInvoice(data: Invoice): Observable<Invoice> {
@@ -118,7 +128,9 @@ export class AdminDataService {
 
   // Payments
   getPayments(): Observable<Payment[]> {
-    return this.http.get<Payment[]>(`${this.apiUrl}/admin/payments`);
+    return this.scheduleResponse(
+      this.http.get<Payment[]>(`${this.apiUrl}/admin/payments`)
+    );
   }
 
   createPayment(data: Payment): Observable<Payment> {
@@ -135,7 +147,9 @@ export class AdminDataService {
 
   // Refunds
   getRefunds(): Observable<Refund[]> {
-    return this.http.get<Refund[]>(`${this.apiUrl}/admin/refunds`);
+    return this.scheduleResponse(
+      this.http.get<Refund[]>(`${this.apiUrl}/admin/refunds`)
+    );
   }
 
   createRefund(data: Refund): Observable<Refund> {

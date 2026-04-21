@@ -1,16 +1,44 @@
-<div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm flex flex-col gap-2">
-	<div class="flex items-center gap-2">
-		<span class="font-bold text-indigo-700 text-lg">Refund #{{ refund.id }}</span>
-		<span class="text-xs text-slate-500">Status: {{ refund.status }}</span>
-	</div>
-	<div class="text-slate-900 font-semibold">{{ refund.reason }}</div>
-	<div class="flex gap-4 text-xs text-slate-600 mt-1">
-		<span>Payment: <span class="font-bold">{{ refund.payment_id }}</span></span>
-		<span>Amount: <span class="font-bold">${{ refund.amount }}</span></span>
-		<span>Updated: <span class="font-bold">{{ refund.updated_at | date: 'MMM dd, yyyy, h:mm a' }}</span></span>
-	</div>
-	<div class="mt-3 flex gap-2 border-t border-slate-100 pt-3">
-		<button type="button" (click)="requestEdit()" class="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Edit</button>
-		<button type="button" (click)="requestDelete()" class="flex-1 rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50">Delete</button>
-	</div>
+<div class="group relative flex flex-col h-full overflow-hidden rounded-[1.5rem] border border-slate-200/70 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-rose-500/10 hover:border-rose-200/50">
+
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-2">
+      <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-50 text-rose-600 font-black text-[10px]">
+        RFND
+      </div>
+      <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Source: #{{ refund.payment_id }}</span>
+    </div>
+  </div>
+
+  <div class="flex-grow space-y-1 mb-5">
+    <h2 class="text-xl font-black text-slate-900 leading-tight tracking-tight min-h-[3rem] flex items-baseline gap-2">
+      <span class="text-slate-400 text-sm font-bold uppercase tracking-widest">RF #</span>
+      {{ refund.id }}
+    </h2>
+    <p class="text-[10px] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-wide italic">
+      <svg class="w-3.5 h-3.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      Reason: <span class="text-slate-600 not-italic">{{ refund.reason }}</span>
+    </p>
+  </div>
+
+  <div class="grid grid-cols-2 gap-3 p-3 rounded-2xl bg-slate-50/50 border border-slate-100 mb-6">
+    <div class="flex flex-col">
+      <span class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Amount Reversed</span>
+      <span class="text-[13px] font-black text-rose-600">P{{ refund.amount }}</span>
+    </div>
+    <div class="flex flex-col text-right">
+      <span class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Last Updated</span>
+      <span class="text-[11px] font-black text-slate-700">{{ refund.updated_at | date: 'MMM dd' }}</span>
+    </div>
+  </div>
+
+  <div class="mt-auto flex gap-2 pt-4 border-t border-slate-100">
+    <button (click)="requestEdit()" class="flex-1 flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-black text-slate-600 transition-all hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 active:scale-95">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+      EDIT
+    </button>
+    <button (click)="requestDelete()" class="flex-1 flex items-center justify-center gap-2 rounded-xl border border-transparent bg-slate-50 px-3 py-2.5 text-xs font-black text-slate-400 transition-all hover:bg-red-50 hover:text-red-600 active:scale-95">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+      DELETE
+    </button>
+  </div>
 </div>

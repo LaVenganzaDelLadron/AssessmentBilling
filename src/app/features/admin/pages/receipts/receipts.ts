@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OfficialReceipt } from '../../models/official-receipt.model';
@@ -21,6 +22,8 @@ import { DeleteOfficialReceiptsModalComponent } from '../../modals/official-rece
   styleUrl: './receipts.css',
 })
 export class ReceiptsPage implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild(UpdateOfficialReceiptsModalComponent) updateModal!: UpdateOfficialReceiptsModalComponent;
   @ViewChild(DeleteOfficialReceiptsModalComponent) deleteModal!: DeleteOfficialReceiptsModalComponent;
 
@@ -31,17 +34,12 @@ export class ReceiptsPage implements OnInit {
   constructor(private receiptsService: OfficialReceiptsService) {}
 
   ngOnInit() {
-    const cached = this.receiptsService.getCachedReceipts?.();
-    if (cached && cached.length > 0) {
-      this.receipts = cached;
-    } else {
-      this.loadReceipts();
-    }
+    this.loadReceipts();
   }
 
   loadReceipts() {
     this.errorMessage = '';
-    this.receiptsService.list().subscribe({
+    this.receiptsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: any) => {
         let mapped: OfficialReceipt[] = [];
         let data = Array.isArray(response) ? response : response.data ?? [];

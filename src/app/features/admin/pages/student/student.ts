@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Student as StudentModel } from '../../models/student.model';
@@ -21,11 +22,13 @@ import { DeleteStudentModalComponent } from '../../modals/students/delete-studen
   styleUrl: './student.css',
 })
 export class Student implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild(UpdateStudentModalComponent) updateModal!: UpdateStudentModalComponent;
   @ViewChild(DeleteStudentModalComponent) deleteModal!: DeleteStudentModalComponent;
 
   students: StudentModel[] = [];
-  // isLoading removed
+  isLoading = false;
   errorMessage = '';
   searchQuery = '';
   statusFilter: StudentModel['status'] | '' = '';
@@ -33,17 +36,13 @@ export class Student implements OnInit {
   constructor(private studentService: StudentsService) {}
 
   ngOnInit() {
-    const cached = this.studentService.getCachedStudents();
-    if (cached && cached.length > 0) {
-      this.students = cached;
-    } else {
-      this.loadStudents();
-    }
+    this.loadStudents();
   }
 
   loadStudents() {
     this.errorMessage = '';
-    this.studentService.list().subscribe({
+    this.isLoading = true;
+    this.studentService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: any) => {
         console.log('[Students] API response:', response);
         let mapped: StudentModel[] = [];
@@ -67,14 +66,17 @@ export class Student implements OnInit {
         }
         this.students = mapped;
         this.studentService.setCachedStudents(mapped);
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('[Students] API error:', error);
         if (error?.status === 404) {
           this.students = [];
+          this.isLoading = false;
           return;
         }
         this.errorMessage = this.getErrorMessage(error) || 'Failed to load students';
+        this.isLoading = false;
       }
     });
   }

@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Teacher } from '../../models/teacher.model';
@@ -21,28 +22,26 @@ import { DeleteTeacherModalComponent } from '../../modals/teachers/delete-teache
   styleUrl: './teachers.css',
 })
 export class Teachers implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild(UpdateTeacherModalComponent) updateModal!: UpdateTeacherModalComponent;
   @ViewChild(DeleteTeacherModalComponent) deleteModal!: DeleteTeacherModalComponent;
 
   teachers: Teacher[] = [];
-  // isLoading removed
+  isLoading = false;
   errorMessage = '';
   searchQuery = '';
 
   constructor(private teacherService: TeachersService) {}
 
   ngOnInit() {
-    const cached = this.teacherService.getCachedTeachers();
-    if (cached && cached.length > 0) {
-      this.teachers = cached;
-    } else {
-      this.loadTeachers();
-    }
+    this.loadTeachers();
   }
 
   loadTeachers() {
     this.errorMessage = '';
-    this.teacherService.list().subscribe({
+    this.isLoading = true;
+    this.teacherService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: any) => {
         console.log('[Teachers] API response:', response);
         let mapped: Teacher[] = [];
@@ -64,14 +63,17 @@ export class Teachers implements OnInit {
         }
         this.teachers = mapped;
         this.teacherService.setCachedTeachers(mapped);
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('[Teachers] API error:', error);
         if (error?.status === 404) {
           this.teachers = [];
+          this.isLoading = false;
           return;
         }
         this.errorMessage = this.getErrorMessage(error) || 'Failed to load teachers';
+        this.isLoading = false;
       }
     });
   }

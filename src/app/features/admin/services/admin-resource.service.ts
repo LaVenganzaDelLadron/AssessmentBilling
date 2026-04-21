@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Observable, of, tap } from 'rxjs';
+import { Observable, asyncScheduler, observeOn, scheduled, tap } from 'rxjs';
 import { environment } from '../../../../environments/assessment/environment';
 import { CacheService } from '../../../shared/services/cache.service';
 import {
@@ -124,7 +124,7 @@ export abstract class AdminReadService<TEntity> extends AdminEndpointService {
     if (!options?.refresh) {
       const cached = this.getCachedValue<AdminListResponse<TEntity>>(cacheSegment);
       if (cached !== null) {
-        return of(cached);
+        return scheduled([cached], asyncScheduler);
       }
     } else {
       this.clearCachedValue(cacheSegment);
@@ -134,7 +134,8 @@ export abstract class AdminReadService<TEntity> extends AdminEndpointService {
       this.collectionUrl(),
       this.requestOptions(params)
     ).pipe(
-      tap((response) => this.setCachedValue(cacheSegment, response, options?.ttlMs))
+      tap((response) => this.setCachedValue(cacheSegment, response, options?.ttlMs)),
+      observeOn(asyncScheduler)
     );
   }
 
@@ -148,7 +149,7 @@ export abstract class AdminReadService<TEntity> extends AdminEndpointService {
     if (!options?.refresh) {
       const cached = this.getCachedValue<AdminItemResponse<TEntity>>(cacheSegment);
       if (cached !== null) {
-        return of(cached);
+        return scheduled([cached], asyncScheduler);
       }
     } else {
       this.clearCachedValue(cacheSegment);
@@ -158,7 +159,8 @@ export abstract class AdminReadService<TEntity> extends AdminEndpointService {
       this.itemUrl(id),
       this.requestOptions(params)
     ).pipe(
-      tap((response) => this.setCachedValue(cacheSegment, response, options?.ttlMs))
+      tap((response) => this.setCachedValue(cacheSegment, response, options?.ttlMs)),
+      observeOn(asyncScheduler)
     );
   }
 

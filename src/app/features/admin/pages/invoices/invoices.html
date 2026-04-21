@@ -1,37 +1,66 @@
-<div class="p-8">
-  <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
-    <div>
-      <h1 class="text-3xl font-bold text-slate-900">Invoices</h1>
-      <p class="text-slate-500 text-sm mt-1">Listing data from <span class="font-semibold">GET /api/admin/invoices</span>.</p>
+<div class="min-h-screen bg-[#fcfdfe] font-sans text-slate-800 antialiased selection:bg-violet-100 p-6 lg:p-12">
+
+  <div class="max-w-[1600px] mx-auto">
+
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+      <div>
+        <nav class="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400 mb-1">
+          <span>Billing</span>
+          <svg class="w-2.5 h-2.5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" /></svg>
+          <span class="text-violet-500/80">Invoice Ledger</span>
+        </nav>
+        <h1 class="text-4xl font-black text-slate-900 tracking-tight">Invoices</h1>
+        <p class="text-slate-500 text-sm mt-1 font-medium">Monitor billing statements, payments, and student accounts.</p>
+      </div>
+
+      <button (click)="openAddModal()"
+        class="group flex items-center gap-2.5 rounded-xl bg-violet-600 px-8 py-4 text-sm font-bold text-white shadow-lg shadow-violet-200 transition-all hover:bg-violet-700 hover:-translate-y-0.5 active:scale-95">
+        <svg class="w-4.5 h-4.5 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" /></svg>
+        <span>Generate Invoice</span>
+      </button>
     </div>
-    <input
-      [(ngModel)]="searchQuery"
-      type="text"
-      placeholder="Search by invoice number, student, status, or ID..."
-      class="w-full md:w-96 px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500"
-    />
-  </div>
 
-  <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
-    <p class="text-red-700 font-semibold">{{ errorMessage }}</p>
-  </div>
-
-  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-
-      <app-invoices-card
-        *ngFor="let invoice of getFilteredInvoices(); trackBy: trackByInvoiceId"
-        [invoice]="invoice"
-        (editRequested)="openUpdateModal($event)"
-        (deleteRequested)="openDeleteModal($event)"
-      ></app-invoices-card>
+    <div class="relative w-full max-w-2xl group mb-10">
+      <input
+        [(ngModel)]="searchQuery"
+        placeholder="Search by invoice number, student, status, or ID..."
+        class="w-full pl-14 pr-6 py-4.5 bg-white border border-slate-200/80 rounded-[1.5rem] text-base focus:ring-4 focus:ring-violet-500/5 focus:border-violet-500/40 transition-all outline-none shadow-sm placeholder:text-slate-400"
+      >
+      <svg class="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-300 group-focus-within:text-violet-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
     </div>
-    <div *ngIf="getFilteredInvoices().length === 0" class="px-6 py-8 text-center text-slate-500 italic">
-      {{ searchQuery ? 'No invoices matched your search' : 'No invoices found' }}
+
+    <div *ngIf="errorMessage" class="flex items-center gap-3 bg-red-50 border border-red-100 rounded-2xl p-5 mb-10 animate-in fade-in slide-in-from-top-2">
+      <div class="p-2 bg-white rounded-lg text-red-500 shadow-sm">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      </div>
+      <p class="text-red-700 text-sm font-bold">{{ errorMessage }}</p>
+    </div>
+
+    <div class="bg-white border border-slate-200/70 rounded-[2.5rem] shadow-2xl shadow-slate-200/20 p-10 min-h-[600px]">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 sm:gap-10">
+        <app-invoices-card
+          *ngFor="let invoice of getFilteredInvoices(); trackBy: trackByInvoiceId"
+          [invoice]="invoice"
+          (editRequested)="openUpdateModal($event)"
+          (deleteRequested)="openDeleteModal($event)"
+          class="h-full"
+        ></app-invoices-card>
+      </div>
+
+      <div *ngIf="getFilteredInvoices().length === 0" class="flex flex-col items-center justify-center py-32 text-center">
+        <div class="h-28 w-28 bg-slate-50 rounded-[2.5rem] flex items-center justify-center mb-6 rotate-3 border border-slate-100">
+          <svg class="w-14 h-14 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+        </div>
+        <h3 class="text-slate-900 font-black text-xl mb-1 tracking-tight">No Invoices Found</h3>
+        <p class="text-slate-400 font-medium max-w-sm mx-auto text-sm">
+          {{ searchQuery ? 'We couldn\'t find any billing records matching your search.' : 'There are currently no generated invoices in the system.' }}
+        </p>
+      </div>
     </div>
   </div>
 
   <app-add-invoice-modal (refresh)="loadInvoices()"></app-add-invoice-modal>
   <app-update-invoice-modal (refresh)="loadInvoices()"></app-update-invoice-modal>
   <app-delete-invoice-modal (refresh)="loadInvoices()"></app-delete-invoice-modal>
+
 </div>

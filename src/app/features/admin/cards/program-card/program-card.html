@@ -1,13 +1,32 @@
-<div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm flex flex-col gap-2">
-	<div class="flex items-center gap-2">
-		<span class="font-bold text-violet-700 text-lg">{{ program.name }}</span>
-		<span class="text-xs text-slate-500">({{ program.status || '—' }})</span>
-	</div>
-	<div class="text-slate-900 font-semibold">{{ program.department || '—' }}</div>
-	<div class="flex flex-wrap gap-4 text-xs text-slate-600 mt-1">
-		<span>ID: <span class="font-bold">{{ program.id }}</span></span>
-		<span>Code: <span class="font-bold">{{ program.code || '—' }}</span></span>
-		<span>Updated: <span class="font-bold">{{ program.updated_at | date: 'short' }}</span></span>
-	</div>
-	<div class="flex-1 min-h-[120px]"></div>
+<div class="group relative flex flex-col h-full overflow-hidden rounded-[1.5rem] border border-slate-200/70 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-violet-500/10 hover:border-violet-200/50">
+
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-2">
+      <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50 text-violet-600 font-black text-[10px]">
+        PROG
+      </div>
+      <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{{ program.code || 'NO_CODE' }}</span>
+    </div>
+  </div>
+
+  <div class="flex-grow space-y-1 mb-5">
+    <h2 class="text-lg font-black text-slate-900 leading-tight tracking-tight min-h-[3rem]">
+      {{ program.name }}
+    </h2>
+    <p class="text-[10px] font-bold text-violet-600 flex items-center gap-1.5 uppercase tracking-wide">
+      <svg class="w-3.5 h-3.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+      {{ program.department || 'Unassigned Department' }}
+    </p>
+  </div>
+
+  <div class="grid grid-cols-2 gap-3 p-3 rounded-2xl bg-slate-50/50 border border-slate-100 mb-6">
+    <div class="flex flex-col">
+      <span class="text-[9px] font-bold text-slate-400 uppercase">System ID</span>
+      <span class="text-[11px] font-black text-slate-700">#{{ program.id }}</span>
+    </div>
+    <div class="flex flex-col text-right">
+      <span class="text-[9px] font-bold text-slate-400 uppercase">Last Sync</span>
+      <span class="text-[11px] font-black text-slate-700">{{ program.updated_at | date: 'MMM dd, yyyy' }}</span>
+    </div>
+  </div>
 </div>

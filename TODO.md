@@ -1,21 +1,12 @@
-# TODO: Make Payments UI identical to Subjects UI
+# Fix Auth Network Error - Dynamic Error Messages
 
-## Steps:
-- [x] Step 1: Update payment-card.html to match subject-card.html structure (header, details flex 3 items, no action buttons)
+## Plan Overview
+Update auth.service.ts handleError() to use dynamic apiUrl in error messages instead of hardcoded localhost:8000.
 
-- [x] Step 2: Update payment-card.css if needed (copy utilities)
+## Steps
+- [x] Step 1: Edit src/app/features/auth/services/auth.service.ts - Replace hardcoded error messages with dynamic ones using `this.apiUrl`
+- [ ] Step 2: Test login functionality in development
+- [ ] Step 3: Verify error messages show correct backend URL
+- [ ] Step 4: Complete task
 
-- [x] Step 3: Update add-payment.modal.html to match add-subject.modal.html (header bar, form classes, buttons layout)
-
-- [x] Step 4: Update update-payment.modal.html to match update-subject.modal.html (same as step 3)
-
-- [x] Step 5: Test UI changes
-
-- [ ] Step 6: Mark complete and attempt_completion
-
-All steps completed successfully.
-
-
-
-
-
+Current progress: Starting Step 1

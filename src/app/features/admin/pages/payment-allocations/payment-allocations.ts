@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminNumericValue } from '../../models/admin-api.model';
@@ -24,29 +25,27 @@ import { PaymentAllocationCard } from '../../cards/payment-allocation-card/payme
   styleUrl: './payment-allocations.css'
 })
 export class PaymentAllocations implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild(AddPaymentAllocationsModalComponent) addModal!: AddPaymentAllocationsModalComponent;
   @ViewChild(UpdatePaymentAllocationsModalComponent) updateModal!: UpdatePaymentAllocationsModalComponent;
   @ViewChild(DeletePaymentAllocationsModalComponent) deleteModal!: DeletePaymentAllocationsModalComponent;
 
   allocations: PaymentAllocation[] = [];
-  // isLoading removed
+  isLoading = false;
   errorMessage = '';
   searchQuery = '';
 
   constructor(private allocationsService: PaymentAllocationsService) {}
 
   ngOnInit(): void {
-    const cached = this.allocationsService.getCachedAllocations();
-    if (cached && cached.length > 0) {
-      this.allocations = cached;
-    } else {
-      this.loadAllocations();
-    }
+    this.loadAllocations();
   }
 
   loadAllocations(): void {
     this.errorMessage = '';
-    this.allocationsService.list().subscribe({
+    this.isLoading = true;
+    this.allocationsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: any) => {
         let mapped: PaymentAllocation[] = [];
         let data = Array.isArray(response) ? response : response.data ?? [];
@@ -62,14 +61,17 @@ export class PaymentAllocations implements OnInit {
         }
         this.allocations = mapped;
         this.allocationsService.setCachedAllocations(mapped);
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('[PaymentAllocations] API error:', error);
         if (error?.status === 404) {
           this.allocations = [];
+          this.isLoading = false;
           return;
         }
         this.errorMessage = this.getErrorMessage(error) || 'Failed to load payment allocations';
+        this.isLoading = false;
       }
     });
   }

@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -26,12 +27,14 @@ import { EnrollmentCard } from '../../cards/enrollment-card/enrollment-card';
   styleUrl: './enrollment.css',
 })
 export class Enrollment implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild(AddEnrollmentModalComponent) addModal!: AddEnrollmentModalComponent;
   @ViewChild(UpdateEnrollmentModalComponent) updateModal!: UpdateEnrollmentModalComponent;
   @ViewChild(DeleteEnrollmentModalComponent) deleteModal!: DeleteEnrollmentModalComponent;
 
   enrollments: EnrollmentModel[] = [];
-  // isLoading removed
+  isLoading = false;
   errorMessage = '';
   searchQuery = '';
   statusFilter: EnrollmentStatus | '' = '';
@@ -39,17 +42,13 @@ export class Enrollment implements OnInit {
   constructor(private enrollmentsService: EnrollmentsService) {}
 
   ngOnInit() {
-    const cached = this.enrollmentsService.getCachedEnrollments();
-    if (cached && cached.length > 0) {
-      this.enrollments = cached;
-    } else {
-      this.loadEnrollments();
-    }
+    this.loadEnrollments();
   }
 
   loadEnrollments() {
     this.errorMessage = '';
-    this.enrollmentsService.list().subscribe({
+    this.isLoading = true;
+    this.enrollmentsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: any) => {
         let mapped: EnrollmentModel[] = [];
         let data = Array.isArray(response) ? response : response.data ?? [];
@@ -68,14 +67,17 @@ export class Enrollment implements OnInit {
         }
         this.enrollments = mapped;
         this.enrollmentsService.setCachedEnrollments(mapped);
+        this.isLoading = false;
       },
       error: (error) => {
         if (error?.status === 404) {
           this.enrollments = [];
+          this.isLoading = false;
           return;
         }
         this.errorMessage = this.getErrorMessage(error) || 'Failed to load enrollments';
         console.error('Error:', error);
+        this.isLoading = false;
       }
     });
   }

@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Refund } from '../../models/refund.model';
@@ -23,12 +24,14 @@ import { RefundCard } from '../../cards/refund-card/refund-card';
   styleUrl: './refunds.css',
 })
 export class Refunds implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild(AddRefundModalComponent) addModal!: AddRefundModalComponent;
   @ViewChild(UpdateRefundModalComponent) updateModal!: UpdateRefundModalComponent;
   @ViewChild(DeleteRefundModalComponent) deleteModal!: DeleteRefundModalComponent;
 
   refunds: Refund[] = [];
-  // isLoading removed
+  isLoading = false;
   errorMessage = '';
   searchQuery = '';
   statusFilter = '';
@@ -36,17 +39,13 @@ export class Refunds implements OnInit {
   constructor(private refundsService: RefundsService) {}
 
   ngOnInit() {
-    const cached = this.refundsService.getCachedRefunds?.();
-    if (cached && cached.length > 0) {
-      this.refunds = cached;
-    } else {
-      this.loadRefunds();
-    }
+    this.loadRefunds();
   }
 
   loadRefunds() {
     this.errorMessage = '';
-    this.refundsService.list().subscribe({
+    this.isLoading = true;
+    this.refundsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: any) => {
         let mapped: Refund[] = [];
         let data = Array.isArray(response) ? response : response.data ?? [];
@@ -63,9 +62,16 @@ export class Refunds implements OnInit {
         }
         this.refunds = mapped;
         this.refundsService.setCachedRefunds?.(mapped);
+        this.isLoading = false;
       },
       error: (error: any) => {
+        if (error?.status === 404) {
+          this.refunds = [];
+          this.isLoading = false;
+          return;
+        }
         this.errorMessage = 'Failed to load refunds';
+        this.isLoading = false;
       }
     });
   }

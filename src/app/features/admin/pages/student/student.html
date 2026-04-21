@@ -1,48 +1,80 @@
-<div class="p-8">
-  <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
-    <div>
-      <h1 class="text-3xl font-bold text-slate-900">Students</h1>
-      <p class="text-slate-500 text-sm mt-1">Listing data from <span class="font-semibold">GET /api/admin/students</span>.</p>
+<div class="min-h-screen bg-[#fcfdfe] font-sans text-slate-800 antialiased selection:bg-indigo-100 p-6 lg:p-12">
+
+  <div class="max-w-[1600px] mx-auto">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+      <div>
+        <nav class="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400 mb-1">
+          <span>Database</span>
+          <svg class="w-2.5 h-2.5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" /></svg>
+          <span class="text-indigo-500/80">Student Directory</span>
+        </nav>
+        <h1 class="text-4xl font-black text-slate-900 tracking-tight">Students</h1>
+        <p class="text-slate-500 text-sm mt-1 font-medium">Manage student profiles, academic programs, and enrollment status.</p>
+      </div>
+
+      <div class="flex gap-3">
+         <button class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-bold text-slate-600 transition-all hover:bg-slate-50 active:scale-95">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+          <span>Export List</span>
+        </button>
+      </div>
     </div>
 
-    <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-      <input
-        [(ngModel)]="searchQuery"
-        type="text"
-        placeholder="Search by student no, name, program, or status..."
-        class="w-full sm:w-96 px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      />
+    <div class="flex flex-col lg:flex-row items-center gap-4 mb-10">
+      <div class="relative w-full max-w-2xl group">
+        <input
+          [(ngModel)]="searchQuery"
+          type="text"
+          placeholder="Search by student no, name, program, or status..."
+          class="w-full pl-14 pr-6 py-4.5 bg-white border border-slate-200/80 rounded-[1.5rem] text-base focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500/40 transition-all outline-none shadow-sm placeholder:text-slate-400"
+        >
+        <svg class="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-300 group-focus-within:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+      </div>
 
-      <select
-        [(ngModel)]="statusFilter"
-        class="px-4 py-3 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      >
-        <option value="">All statuses</option>
-        <option value="active">Active</option>
-        <option value="inactive">Inactive</option>
-      </select>
+      <div class="relative w-full lg:w-64">
+        <select
+          [(ngModel)]="statusFilter"
+          class="w-full appearance-none pl-6 pr-12 py-4.5 bg-white border border-slate-200/80 rounded-[1.5rem] text-sm font-bold text-slate-600 focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500/40 transition-all outline-none shadow-sm cursor-pointer"
+        >
+          <option value="">All Statuses</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+        <svg class="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="flex items-center gap-3 bg-red-50 border border-red-100 rounded-2xl p-5 mb-10 animate-in fade-in slide-in-from-top-2">
+      <div class="p-2 bg-white rounded-lg text-red-500 shadow-sm">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      </div>
+      <p class="text-red-700 text-sm font-bold">{{ errorMessage }}</p>
+    </div>
+
+    <div class="bg-white border border-slate-200/70 rounded-[2.5rem] shadow-2xl shadow-slate-200/20 p-10 min-h-[600px]">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 sm:gap-10">
+        <app-student-card
+          *ngFor="let student of getFilteredStudents(); trackBy: trackByStudentId"
+          [student]="student"
+          (editRequested)="openUpdateModal($event)"
+          (deleteRequested)="openDeleteModal($event)"
+          class="h-full transition-transform duration-300 hover:-translate-y-1"
+        ></app-student-card>
+      </div>
+
+      <div *ngIf="getFilteredStudents().length === 0" class="flex flex-col items-center justify-center py-32 text-center">
+        <div class="h-28 w-28 bg-slate-50 rounded-[2.5rem] flex items-center justify-center mb-6 rotate-3 border border-slate-100">
+          <svg class="w-14 h-14 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+        </div>
+        <h3 class="text-slate-900 font-black text-xl mb-1 tracking-tight">No Students Found</h3>
+        <p class="text-slate-400 font-medium max-w-sm mx-auto text-sm">
+          {{ searchQuery || statusFilter ? 'Try adjusting your filters or search terms to find specific student records.' : 'The student directory is currently empty.' }}
+        </p>
+      </div>
     </div>
   </div>
 
-  <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
-    <p class="text-red-700 font-semibold">{{ errorMessage }}</p>
-  </div>
+  <app-update-student-modal (refresh)="loadStudents()"></app-update-student-modal>
+  <app-delete-student-modal (refresh)="loadStudents()"></app-delete-student-modal>
 
-  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-
-      <app-student-card
-        *ngFor="let student of getFilteredStudents(); trackBy: trackByStudentId"
-        [student]="student"
-        (editRequested)="openUpdateModal($event)"
-        (deleteRequested)="openDeleteModal($event)"
-      ></app-student-card>
-    </div>
-    <div *ngIf="getFilteredStudents().length === 0" class="px-6 py-8 text-center text-slate-500 italic">
-      {{ searchQuery || statusFilter ? 'No students matched your filters' : 'No students found' }}
-    </div>
-  </div>
 </div>
-
-<app-update-student-modal (refresh)="loadStudents()"></app-update-student-modal>
-<app-delete-student-modal (refresh)="loadStudents()"></app-delete-student-modal>

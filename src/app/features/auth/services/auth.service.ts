@@ -166,11 +166,11 @@ export class AuthService {
 
     if (error.error instanceof ErrorEvent) {
       // Client-side error (network error, CORS, etc.)
-      errorMessage = error.error.message || 'Network error. Is the backend running on http://localhost:8000?';
+      errorMessage = error.error.message || `Network error. Is the backend reachable at ${this.apiUrl}?`;
       console.error('Client-side error:', errorMessage);
     } else if (error.status === 0) {
       // Network error or CORS issue
-      errorMessage = 'Cannot connect to backend. Is the server running on http://localhost:8000?';
+      errorMessage = `Cannot connect to backend. Is the server at ${this.apiUrl} running?`;
       console.error('Network/CORS error - backend not reachable');
     } else if (error.status === 422) {
       // Validation errors from Laravel

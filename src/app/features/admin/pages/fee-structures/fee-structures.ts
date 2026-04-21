@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminNumericValue } from '../../models/admin-api.model';
@@ -24,29 +25,27 @@ import { FeeStructureCard } from '../../cards/fee-structure-card/fee-structure-c
   styleUrl: './fee-structures.css',
 })
 export class FeeStructures implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild(AddFeeStructureModalComponent) addModal!: AddFeeStructureModalComponent;
   @ViewChild(UpdateFeeStructureModalComponent) updateModal!: UpdateFeeStructureModalComponent;
   @ViewChild(DeleteFeeStructureModalComponent) deleteModal!: DeleteFeeStructureModalComponent;
 
   fees: FeeStructure[] = [];
-  // isLoading removed
+  isLoading = false;
   errorMessage = '';
   searchQuery = '';
 
   constructor(private feeStructuresService: FeeStructuresService) {}
 
   ngOnInit() {
-    const cached = this.feeStructuresService.getCachedFees();
-    if (cached && cached.length > 0) {
-      this.fees = cached;
-    } else {
-      this.loadFees();
-    }
+    this.loadFees();
   }
 
   loadFees() {
     this.errorMessage = '';
-    this.feeStructuresService.list().subscribe({
+    this.isLoading = true;
+    this.feeStructuresService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: any) => {
         let mapped: FeeStructure[] = [];
         let data = Array.isArray(response) ? response : response.data ?? [];
@@ -63,14 +62,17 @@ export class FeeStructures implements OnInit {
         }
         this.fees = mapped;
         this.feeStructuresService.setCachedFees(mapped);
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('[FeeStructures] API error:', error);
         if (error?.status === 404) {
           this.fees = [];
+          this.isLoading = false;
           return;
         }
         this.errorMessage = this.getErrorMessage(error) || 'Failed to load fee structures';
+        this.isLoading = false;
       }
     });
   }

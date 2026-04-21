@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuditLog } from '../../models/audit-log.model';
@@ -12,8 +13,10 @@ import { AuditLogsService } from '../../services/audit-logs.service';
   styleUrl: './audit-logs.css',
 })
 export class AuditLogs implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   logs: AuditLog[] = [];
-  // isLoading removed
+  isLoading = false;
   errorMessage = '';
   searchQuery = '';
   actionFilter = '';
@@ -21,17 +24,13 @@ export class AuditLogs implements OnInit {
   constructor(private auditService: AuditLogsService) {}
 
   ngOnInit() {
-    const cached = this.auditService.getCachedLogs?.();
-    if (cached && cached.length > 0) {
-      this.logs = cached;
-    } else {
-      this.loadLogs();
-    }
+    this.loadLogs();
   }
 
   loadLogs() {
     this.errorMessage = '';
-    this.auditService.list().subscribe({
+    this.isLoading = true;
+    this.auditService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: any) => {
         let mapped: AuditLog[] = [];
         let data = Array.isArray(response) ? response : response.data ?? [];
@@ -49,13 +48,16 @@ export class AuditLogs implements OnInit {
         }
         this.logs = mapped;
         this.auditService.setCachedLogs?.(mapped);
+        this.isLoading = false;
       },
       error: (error) => {
         if (error?.status === 404) {
           this.logs = [];
+          this.isLoading = false;
           return;
         }
         this.errorMessage = this.getErrorMessage?.(error) || 'Failed to load audit logs';
+        this.isLoading = false;
       }
     });
   }

@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Payment } from '../../models/payment.model';
@@ -22,27 +23,26 @@ import { DeletePaymentModalComponent } from '../../modals/payments/delete-paymen
   styleUrl: './payments.css',
 })
 export class PaymentsPage implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild(UpdatePaymentModalComponent) updateModal!: UpdatePaymentModalComponent;
   @ViewChild(DeletePaymentModalComponent) deleteModal!: DeletePaymentModalComponent;
 
   payments: Payment[] = [];
+  isLoading = false;
   errorMessage = '';
   searchQuery = '';
 
   constructor(private paymentsService: PaymentsService) {}
 
   ngOnInit() {
-    const cached = this.paymentsService.getCachedPayments();
-    if (cached && cached.length > 0) {
-      this.payments = cached;
-    } else {
-      this.loadPayments();
-    }
+    this.loadPayments();
   }
 
   loadPayments() {
     this.errorMessage = '';
-    this.paymentsService.list().subscribe({
+    this.isLoading = true;
+    this.paymentsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: any) => {
         let mapped: Payment[] = [];
         let data = Array.isArray(response) ? response : response.data ?? [];
@@ -60,13 +60,16 @@ export class PaymentsPage implements OnInit {
         }
         this.payments = mapped;
         this.paymentsService.setCachedPayments(mapped);
+        this.isLoading = false;
       },
       error: (error) => {
         if (error?.status === 404) {
           this.payments = [];
+          this.isLoading = false;
           return;
         }
         this.errorMessage = 'Failed to load payments';
+        this.isLoading = false;
       }
     });
   }

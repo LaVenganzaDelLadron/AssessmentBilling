@@ -1,7 +1,10 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ProfileService, TeacherProfile } from '../../../../../shared/services/profile.service';
+import { TeachersService } from '../../../services/teachers.service';
+import { Teacher } from '../../../models/teacher.model';
+
+type UpdateTeacherPayload = Partial<Teacher>;
 
 @Component({
   selector: 'app-update-teacher-modal',
@@ -16,23 +19,22 @@ export class UpdateTeacherModalComponent {
   isOpen = false;
   isLoading = false;
   errorMessage = '';
-  currentEntity: TeacherProfile | null = null;
+  currentEntity: Teacher | null = null;
 
-  form: TeacherProfile = {};
+  form: UpdateTeacherPayload = {};
 
-  constructor(private profileService: ProfileService) {}
+  constructor(private service: TeachersService) {}
 
-  open(entity: TeacherProfile) {
+  open(entity: Teacher) {
     this.isOpen = true;
     this.currentEntity = entity;
     this.form = {
-      teacher_id: entity.teacher_id,
-      first_name: entity.first_name,
+      teacher_id: entity.teacher_id || '',
+      first_name: entity.first_name || '',
       middle_name: entity.middle_name || '',
-      last_name: entity.last_name,
+      last_name: entity.last_name || '',
       department: entity.department || '',
-      status: entity.status || 'active',
-      user_id: entity.user_id
+      status: entity.status || 'active'
     };
     this.errorMessage = '';
   }
@@ -45,10 +47,10 @@ export class UpdateTeacherModalComponent {
   }
 
   submit() {
-    if (!this.currentEntity?.user_id || !this.validate()) return;
+    if (!this.currentEntity?.id || !this.validate()) return;
 
     this.isLoading = true;
-    this.profileService.updateTeacherProfile(this.currentEntity.user_id, this.form).subscribe({
+    this.service.update(this.currentEntity.id, this.form as any).subscribe({
       next: () => {
         this.isLoading = false;
         this.refresh.emit();
@@ -56,7 +58,7 @@ export class UpdateTeacherModalComponent {
       },
       error: (error: any) => {
         this.isLoading = false;
-        this.errorMessage = error.error?.message || 'Failed to update teacher profile';
+        this.errorMessage = error.error?.message || 'Failed to update teacher';
       }
     });
   }

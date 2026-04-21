@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from '../../models/subject.model';
@@ -13,8 +14,10 @@ import { SubjectCard } from '../../cards/subject-card/subject-card';
   styleUrl: './subjects.css',
 })
 export class Subjects implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   subjects: Subject[] = [];
-  // isLoading removed
+  isLoading = false;
   errorMessage = '';
   searchQuery = '';
 
@@ -22,22 +25,18 @@ export class Subjects implements OnInit {
   constructor(private subjectService: SubjectsService) {}
 
   ngOnInit() {
-    const cached = this.subjectService.getCachedSubjects();
-    if (cached && cached.length > 0) {
-      this.subjects = cached;
-    } else {
-      this.loadSubjects();
-    }
+    this.loadSubjects();
   }
   // Program department lookup removed
 
   loadSubjects(forceRefresh = false) {
     this.errorMessage = '';
+    this.isLoading = true;
     const request$ = forceRefresh
       ? this.subjectService.refreshList()
       : this.subjectService.list();
 
-    request$.subscribe({
+    request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: any) => {
         console.log('[Subjects] API response:', response);
         let mapped: Subject[] = [];
@@ -60,14 +59,17 @@ export class Subjects implements OnInit {
         }
         this.subjects = mapped;
         this.subjectService.setCachedSubjects(mapped);
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('[Subjects] API error:', error);
         if (error?.status === 404) {
           this.subjects = [];
+          this.isLoading = false;
           return;
         }
         this.errorMessage = this.getErrorMessage(error) || 'Failed to load subjects';
+        this.isLoading = false;
       }
     });
   }

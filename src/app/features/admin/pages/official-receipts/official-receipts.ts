@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OfficialReceipt } from '../../models/official-receipt.model';
@@ -23,12 +24,14 @@ import { ReceiptCard } from '../../cards/receipt-card/receipt-card';
   styleUrl: './official-receipts.css'
 })
 export class OfficialReceipts implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild(AddOfficialReceiptsModalComponent) addModal!: AddOfficialReceiptsModalComponent;
   @ViewChild(UpdateOfficialReceiptsModalComponent) updateModal!: UpdateOfficialReceiptsModalComponent;
   @ViewChild(DeleteOfficialReceiptsModalComponent) deleteModal!: DeleteOfficialReceiptsModalComponent;
 
   receipts: OfficialReceipt[] = [];
-  // isLoading removed
+  isLoading = false;
   errorMessage = '';
   searchQuery = '';
 
@@ -40,18 +43,22 @@ export class OfficialReceipts implements OnInit {
 
   loadReceipts(): void {
     this.errorMessage = '';
-    this.receiptService.list().subscribe({
+    this.isLoading = true;
+    this.receiptService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         this.receipts = Array.isArray(response) ? response : response.data ?? [];
+        this.isLoading = false;
       },
       error: (error) => {
         if (error?.status === 404) {
           this.receipts = [];
+          this.isLoading = false;
           return;
         }
         this.errorMessage =
           this.getErrorMessage(error) || 'Failed to load official receipts';
         console.error('Error:', error);
+        this.isLoading = false;
       }
     });
   }

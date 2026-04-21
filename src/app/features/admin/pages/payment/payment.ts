@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService, Payment as PaymentModel } from '../../../../shared/services/admin-data.service';
@@ -20,6 +21,8 @@ import { DeletePaymentModalComponent } from '../../modals/payments/delete-paymen
   styleUrl: './payment.css',
 })
 export class Payment implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild(AddPaymentModalComponent) addModal!: AddPaymentModalComponent;
   @ViewChild(UpdatePaymentModalComponent) updateModal!: UpdatePaymentModalComponent;
   @ViewChild(DeletePaymentModalComponent) deleteModal!: DeletePaymentModalComponent;
@@ -78,7 +81,7 @@ export class Payment implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.adminDataService.getPayments().subscribe({
+    this.adminDataService.getPayments().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: any) => {
         console.log('[Payments] API response:', response);
         this.payments = Array.isArray(response) ? response : response?.data ?? [];

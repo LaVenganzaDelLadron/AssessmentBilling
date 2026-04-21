@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminNumericValue } from '../../models/admin-api.model';
@@ -24,12 +25,14 @@ import { InvoicesCard } from '../../cards/invoices-card/invoices-card';
   styleUrl: './invoices.css',
 })
 export class Invoices implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild(AddInvoiceModalComponent) addModal!: AddInvoiceModalComponent;
   @ViewChild(UpdateInvoiceModalComponent) updateModal!: UpdateInvoiceModalComponent;
   @ViewChild(DeleteInvoiceModalComponent) deleteModal!: DeleteInvoiceModalComponent;
 
   invoices: Invoice[] = [];
-  // isLoading removed
+  isLoading = false;
   errorMessage = '';
   searchQuery = '';
   statusFilter = '';
@@ -43,7 +46,8 @@ export class Invoices implements OnInit {
 
   loadInvoices() {
     this.errorMessage = '';
-    this.invoicesService.list().subscribe({
+    this.isLoading = true;
+    this.invoicesService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         console.log('[Invoices] API response:', response);
         const data = Array.isArray(response) ? response : response.data ?? [];
@@ -56,14 +60,17 @@ export class Invoices implements OnInit {
         } else {
           this.invoices = [];
         }
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('[Invoices] API error:', error);
         if (error?.status === 404) {
           this.invoices = [];
+          this.isLoading = false;
           return;
         }
         this.errorMessage = this.getErrorMessage(error) || 'Failed to load invoices';
+        this.isLoading = false;
       }
     });
   }

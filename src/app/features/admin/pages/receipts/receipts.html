@@ -1,37 +1,84 @@
-<div class="p-8">
-  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-    <div>
-      <h1 class="text-3xl font-bold text-slate-900">Official Receipts</h1>
-      <p class="text-slate-500 text-sm mt-1">Manage official receipts for payments.</p>
+<div class="min-h-screen bg-[#f8fafc] font-sans text-slate-800 antialiased selection:bg-emerald-100 p-6 lg:p-12">
+
+  <div class="max-w-[1600px] mx-auto">
+
+    <div class="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-12">
+      <div class="space-y-2">
+        <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+          <span class="hover:text-emerald-600 transition-colors cursor-pointer">Finance</span>
+          <svg class="w-3 h-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" /></svg>
+          <span class="text-emerald-500/80">Official Receipts</span>
+        </nav>
+        <h1 class="text-5xl font-black text-slate-900 tracking-tight leading-none">
+          Receipts <span class="text-emerald-500 text-2xl font-bold ml-2">({{ getFilteredReceipts().length }})</span>
+        </h1>
+        <p class="text-slate-500 text-sm font-medium max-w-lg">Audit trail for all issued official receipts, payment tracking, and issuer accountability.</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+         <button class="group flex items-center gap-2.5 rounded-2xl border border-slate-200 bg-white px-6 py-4 text-xs font-black uppercase tracking-widest text-slate-600 transition-all hover:bg-slate-50 hover:border-slate-300 active:scale-95 shadow-sm">
+          <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+          <span>Generate Report</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex flex-col lg:flex-row items-center gap-5 mb-12 p-2 bg-slate-200/30 rounded-[2rem] backdrop-blur-md">
+      <div class="relative w-full group">
+        <input
+          [(ngModel)]="searchQuery"
+          type="text"
+          placeholder="Search by OR number, payment ref, or issuer name..."
+          class="w-full pl-14 pr-6 py-5 bg-white border border-transparent rounded-[1.75rem] text-base font-medium focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500/20 transition-all outline-none shadow-sm placeholder:text-slate-400"
+        >
+        <svg class="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-300 group-focus-within:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+      </div>
+
+      <div class="hidden lg:flex items-center gap-2 pr-4">
+        <div class="h-10 w-[1px] bg-slate-300/50 mx-2"></div>
+        <button class="p-3 text-slate-400 hover:text-emerald-600 transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4.5h18m-18 5h18m-18 5h18m-18 5h18" /></svg>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="flex items-center gap-4 bg-white border-l-4 border-red-500 rounded-2xl p-6 mb-12 shadow-xl shadow-red-500/5 animate-in fade-in slide-in-from-top-4">
+      <div class="p-2.5 bg-red-50 rounded-xl text-red-500">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      </div>
+      <div>
+        <h4 class="text-red-900 font-black text-xs uppercase tracking-widest mb-0.5">Audit Alert</h4>
+        <p class="text-red-600/80 text-sm font-semibold">{{ errorMessage }}</p>
+      </div>
+    </div>
+
+    <div class="bg-white border border-slate-200/60 rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.05)] p-10 lg:p-14 min-h-[700px]">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
+        <app-receipt-card
+          *ngFor="let receipt of getFilteredReceipts()"
+          [receipt]="receipt"
+          (editRequested)="openUpdateModal($event)"
+          (deleteRequested)="openDeleteModal($event)"
+          class="h-full transition-all duration-500 hover:-translate-y-2 hover:drop-shadow-2xl"
+        ></app-receipt-card>
+      </div>
+
+      <div *ngIf="getFilteredReceipts().length === 0" class="flex flex-col items-center justify-center py-40 text-center">
+        <div class="relative h-32 w-32 mb-8">
+          <div class="absolute inset-0 bg-emerald-50 rounded-[3rem] rotate-6"></div>
+          <div class="absolute inset-0 bg-white border-2 border-slate-100 rounded-[3rem] flex items-center justify-center shadow-inner">
+            <svg class="w-16 h-16 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+          </div>
+        </div>
+        <h3 class="text-slate-900 font-black text-2xl mb-2 tracking-tight">No Records Found</h3>
+        <p class="text-slate-400 font-medium max-w-sm mx-auto text-sm leading-relaxed">
+          {{ searchQuery ? 'Try adjusting your audit filters to locate specific official records.' : 'The financial ledger is currently clear. No receipts have been issued for this period.' }}
+        </p>
+      </div>
     </div>
   </div>
 
-  <!-- Search -->
-  <div class="mb-6">
-    <input [(ngModel)]="searchQuery" placeholder="Search payment, OR number, or issuer..."
-      class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
-  </div>
+  <app-update-official-receipts-modal (refresh)="loadReceipts()"></app-update-official-receipts-modal>
+  <app-delete-official-receipts-modal (refresh)="loadReceipts()"></app-delete-official-receipts-modal>
 
-  <!-- Error State -->
-  <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
-    <p class="text-red-700 font-semibold">{{ errorMessage }}</p>
-  </div>
-
-  <!-- Card Grid -->
-  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <app-receipt-card
-        *ngFor="let receipt of getFilteredReceipts()"
-        [receipt]="receipt"
-        (editRequested)="openUpdateModal($event)"
-        (deleteRequested)="openDeleteModal($event)"
-      ></app-receipt-card>
-    </div>
-    <div *ngIf="getFilteredReceipts().length === 0" class="px-6 py-8 text-center text-slate-500 italic">
-      {{ searchQuery ? 'No receipts matched your search' : 'No receipts found' }}
-    </div>
-  </div>
 </div>
-
-<app-update-official-receipts-modal (refresh)="loadReceipts()"></app-update-official-receipts-modal>
-<app-delete-official-receipts-modal (refresh)="loadReceipts()"></app-delete-official-receipts-modal>

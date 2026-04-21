@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminNumericValue } from '../../models/admin-api.model';
@@ -24,12 +25,14 @@ import { InvoiceLineCard } from '../../cards/invoice-line-card/invoice-line-card
   styleUrl: './invoice-lines.css',
 })
 export class InvoiceLines implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild(AddInvoiceLinesModalComponent) addModal!: AddInvoiceLinesModalComponent;
   @ViewChild(UpdateInvoiceLinesModalComponent) updateModal!: UpdateInvoiceLinesModalComponent;
   @ViewChild(DeleteInvoiceLinesModalComponent) deleteModal!: DeleteInvoiceLinesModalComponent;
 
   lines: InvoiceLine[] = [];
-  // isLoading removed
+  isLoading = false;
   errorMessage = '';
   searchQuery = '';
 
@@ -41,19 +44,23 @@ export class InvoiceLines implements OnInit {
 
   loadLines() {
     this.errorMessage = '';
-    this.invoiceLinesService.list().subscribe({
+    this.isLoading = true;
+    this.invoiceLinesService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         console.log('[InvoiceLines] API response:', response);
         const data = Array.isArray(response) ? response : response.data ?? [];
         this.lines = Array.isArray(data) ? data : [];
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('[InvoiceLines] API error:', error);
         if (error?.status === 404) {
           this.lines = [];
+          this.isLoading = false;
           return;
         }
         this.errorMessage = this.getErrorMessage(error) || 'Failed to load invoice lines';
+        this.isLoading = false;
       }
     });
   }

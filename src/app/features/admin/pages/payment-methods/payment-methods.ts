@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PaymentMethod } from '../../models/payment-method.model';
@@ -23,12 +24,14 @@ import { PaymentMethodCard } from '../../cards/payment-method-card/payment-metho
   styleUrl: './payment-methods.css'
 })
 export class PaymentMethods implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild(AddPaymentMethodsModalComponent) addModal!: AddPaymentMethodsModalComponent;
   @ViewChild(UpdatePaymentMethodsModalComponent) updateModal!: UpdatePaymentMethodsModalComponent;
   @ViewChild(DeletePaymentMethodsModalComponent) deleteModal!: DeletePaymentMethodsModalComponent;
 
   methods: PaymentMethod[] = [];
-  // isLoading removed
+  isLoading = false;
   errorMessage = '';
   searchQuery = '';
 
@@ -40,20 +43,24 @@ export class PaymentMethods implements OnInit {
 
   loadMethods(): void {
     this.errorMessage = '';
-    this.methodsService.list().subscribe({
+    this.isLoading = true;
+    this.methodsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         console.log('[PaymentMethods] API response:', response);
         const data = Array.isArray(response) ? response : response.data ?? [];
         this.methods = Array.isArray(data) ? data : [];
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('[PaymentMethods] API error:', error);
         if (error?.status === 404) {
           this.methods = [];
+          this.isLoading = false;
           return;
         }
         this.errorMessage =
           this.getErrorMessage(error) || 'Failed to load payment methods';
+        this.isLoading = false;
       }
     });
   }

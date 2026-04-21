@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminNumericValue } from '../../models/admin-api.model';
@@ -24,12 +25,14 @@ import { AddAssessmentsModalComponent } from '../../modals/assessments/add-asses
   styleUrl: './assessment.css',
 })
 export class Assessment implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild(AddAssessmentsModalComponent) addModal!: AddAssessmentsModalComponent;
   @ViewChild(UpdateAssessmentsModalComponent) updateModal!: UpdateAssessmentsModalComponent;
   @ViewChild(DeleteAssessmentsModalComponent) deleteModal!: DeleteAssessmentsModalComponent;
 
   assessments: AssessmentModel[] = [];
-  // isLoading removed
+  isLoading = false;
   errorMessage = '';
   searchQuery = '';
   statusFilter: AssessmentStatus | '' = '';
@@ -37,17 +40,13 @@ export class Assessment implements OnInit {
   constructor(private assessmentService: AssessmentsService) {}
 
   ngOnInit() {
-    const cached = this.assessmentService.getCachedAssessments();
-    if (cached && cached.length > 0) {
-      this.assessments = cached;
-    } else {
-      this.loadAssessments();
-    }
+    this.loadAssessments();
   }
 
   loadAssessments() {
     this.errorMessage = '';
-    this.assessmentService.list().subscribe({
+    this.isLoading = true;
+    this.assessmentService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: any) => {
         let mapped: AssessmentModel[] = [];
         let data = Array.isArray(response) ? response : response.data ?? [];
@@ -73,14 +72,17 @@ export class Assessment implements OnInit {
         }
         this.assessments = mapped;
         this.assessmentService.setCachedAssessments(mapped);
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('[Assessments] API error:', error);
         if (error?.status === 404) {
           this.assessments = [];
+          this.isLoading = false;
           return;
         }
         this.errorMessage = this.getErrorMessage(error) || 'Failed to load assessments';
+        this.isLoading = false;
       }
     });
   }

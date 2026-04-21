@@ -1,7 +1,16 @@
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {
+  Observable,
+  Subject,
+  catchError,
+  of,
+  shareReplay,
+  startWith,
+  switchMap,
+  tap
+} from 'rxjs';
 import { DashboardService } from '../../services/dashboard.service';
 import {
   DashboardOverview,
@@ -9,7 +18,6 @@ import {
   DashboardStats,
   DashboardStatusBreakdown
 } from '../../models/dashboard.model';
-import { Invoice } from '../../models/invoice.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,50 +25,48 @@ import { Invoice } from '../../models/invoice.model';
   imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Dashboard implements OnInit {
-  private readonly destroyRef = inject(DestroyRef);
+export class Dashboard {
+  private readonly refreshRequests = new Subject<boolean>();
+  private latestOverview = this.createEmptyOverview();
 
-  stats: DashboardStats = this.createEmptyStats();
-  recentInvoices: Invoice[] = [];
-  revenueTrend: DashboardRevenuePoint[] = [];
-  paymentDistribution: DashboardStatusBreakdown[] = [];
-  lastUpdated = '';
+  readonly overview$: Observable<DashboardOverview> = this.refreshRequests.pipe(
+    startWith(false),
+    tap(() => {
+      this.errorMessage = '';
+    }),
+    switchMap((refresh) =>
+      this.dashboardService.getOverview(refresh).pipe(
+        tap((overview) => {
+          this.latestOverview = overview;
+        }),
+        startWith(this.latestOverview),
+        catchError((error: any) => {
+          console.error('Error loading dashboard overview:', error);
+          this.errorMessage = 'Failed to load dashboard data';
+          return of(this.latestOverview);
+        })
+      )
+    ),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
   errorMessage = '';
 
   constructor(private dashboardService: DashboardService) {}
 
-  ngOnInit() {
-    this.loadDashboard();
+  loadDashboard(refresh = false): void {
+    this.refreshRequests.next(refresh);
   }
 
-  loadDashboard(refresh = false) {
-    this.errorMessage = '';
-
-    this.dashboardService.getOverview(refresh).pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: (overview: DashboardOverview) => {
-        this.stats = overview.stats;
-        this.recentInvoices = overview.recentInvoices;
-        this.revenueTrend = overview.revenueTrend;
-        this.paymentDistribution = overview.paymentDistribution;
-        this.lastUpdated = overview.lastUpdated;
-      },
-      error: (error: any) => {
-        console.error('Error loading dashboard overview:', error);
-        this.errorMessage = 'Failed to load dashboard data';
-      }
-    });
-  }
-
-  getRevenuePercentage(): string {
-    if (this.revenueTrend.length < 2) {
+  getRevenuePercentage(revenueTrend: DashboardRevenuePoint[]): string {
+    if (revenueTrend.length < 2) {
       return 'No trend';
     }
 
-    const current = this.revenueTrend[this.revenueTrend.length - 1]?.amount ?? 0;
-    const previous = this.revenueTrend[this.revenueTrend.length - 2]?.amount ?? 0;
+    const current = revenueTrend[revenueTrend.length - 1]?.amount ?? 0;
+    const previous = revenueTrend[revenueTrend.length - 2]?.amount ?? 0;
 
     if (current === 0 && previous === 0) {
       return 'No trend';
@@ -75,8 +81,8 @@ export class Dashboard implements OnInit {
     return `${icon} ${Math.round(Math.abs(change))}%`;
   }
 
-  getStudentPercentage(): string {
-    const newStudents = this.stats.newStudents;
+  getStudentPercentage(stats: DashboardStats): string {
+    const newStudents = stats.newStudents;
 
     if (newStudents === 0) {
       return 'No new';
@@ -105,8 +111,8 @@ export class Dashboard implements OnInit {
     }).format(num);
   }
 
-  getLastUpdatedLabel(): string {
-    if (!this.lastUpdated) {
+  getLastUpdatedLabel(lastUpdated: string): string {
+    if (!lastUpdated) {
       return 'Not synced yet';
     }
 
@@ -116,12 +122,10 @@ export class Dashboard implements OnInit {
       year: 'numeric',
       hour: 'numeric',
       minute: '2-digit'
-    }).format(new Date(this.lastUpdated));
+    }).format(new Date(lastUpdated));
   }
 
-  getAssessmentShare(count: number): number {
-    const totalAssessments = this.stats.assessments;
-
+  getAssessmentShare(count: number, totalAssessments: number): number {
     if (totalAssessments === 0) {
       return 0;
     }
@@ -129,13 +133,13 @@ export class Dashboard implements OnInit {
     return (count / totalAssessments) * 100;
   }
 
-  getPendingInvoiceLabel(): string {
-    const count = this.stats.pendingInvoices;
+  getPendingInvoiceLabel(stats: DashboardStats): string {
+    const count = stats.pendingInvoices;
     return count === 1 ? '1 open invoice' : `${count} open invoices`;
   }
 
-  getOverdueInvoiceLabel(): string {
-    const overdueCount = this.paymentDistribution.find(
+  getOverdueInvoiceLabel(paymentDistribution: DashboardStatusBreakdown[]): string {
+    const overdueCount = paymentDistribution.find(
       (item) => item.status === 'overdue'
     )?.count ?? 0;
 
@@ -176,13 +180,13 @@ export class Dashboard implements OnInit {
     return classMap[status] || 'bg-slate-300';
   }
 
-  exportDashboardSnapshot(): void {
+  exportDashboardSnapshot(overview: DashboardOverview): void {
     const snapshot = {
       exported_at: new Date().toISOString(),
-      stats: this.stats,
-      revenue_trend: this.revenueTrend,
-      payment_distribution: this.paymentDistribution,
-      recent_invoices: this.recentInvoices
+      stats: overview.stats,
+      revenue_trend: overview.revenueTrend,
+      payment_distribution: overview.paymentDistribution,
+      recent_invoices: overview.recentInvoices
     };
 
     const blob = new Blob([JSON.stringify(snapshot, null, 2)], {
@@ -197,6 +201,16 @@ export class Dashboard implements OnInit {
     anchor.click();
 
     URL.revokeObjectURL(url);
+  }
+
+  private createEmptyOverview(): DashboardOverview {
+    return {
+      stats: this.createEmptyStats(),
+      recentInvoices: [],
+      revenueTrend: [],
+      paymentDistribution: [],
+      lastUpdated: ''
+    };
   }
 
   private createEmptyStats(): DashboardStats {

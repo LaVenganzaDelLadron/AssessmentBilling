@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Program } from '../../models/program.model';
@@ -13,25 +14,23 @@ import { ProgramCard } from '../../cards/program-card/program-card';
   styleUrl: './programs.css',
 })
 export class Programs implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   programs: Program[] = [];
-  // isLoading removed
+  isLoading = false;
   errorMessage = '';
   searchQuery: string = '';
 
   constructor(private programService: ProgramsService) {}
 
   ngOnInit() {
-    const cached = this.programService.getCachedPrograms();
-    if (cached && cached.length > 0) {
-      this.programs = cached;
-    } else {
-      this.loadPrograms();
-    }
+    this.loadPrograms();
   }
 
   loadPrograms() {
     this.errorMessage = '';
-    this.programService.list().subscribe({
+    this.isLoading = true;
+    this.programService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: any) => {
         let mapped: Program[] = [];
         if (response && response.data && Array.isArray(response.data)) {
@@ -64,14 +63,17 @@ export class Programs implements OnInit {
         this.programs = mapped;
         this.programService.setCachedPrograms(mapped);
         console.log('Mapped Programs:', this.programs);
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('[Programs] API error:', error);
         if (error?.status === 404) {
           this.programs = [];
+          this.isLoading = false;
           return;
         }
         this.errorMessage = this.getErrorMessage(error) || 'Failed to load programs';
+        this.isLoading = false;
       }
     });
   }

@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminNumericValue } from '../../models/admin-api.model';
@@ -7,6 +8,7 @@ import { AssessmentBreakdownService } from '../../services/assessment-breakdown.
 import { AddAssessmentBreakdownModalComponent } from '../../modals/assessment-breakdown/add-assessment-breakdown/add-assessment-breakdown.modal';
 import { UpdateAssessmentBreakdownModalComponent } from '../../modals/assessment-breakdown/update-assessment-breakdown/update-assessment-breakdown.modal';
 import { DeleteAssessmentBreakdownModalComponent } from '../../modals/assessment-breakdown/delete-assessment-breakdown/delete-assessment-breakdown.modal';
+import { AssessmentBreakdownCard } from '../../cards/assessment-breakdown-card/assessment-breakdown-card';
 
 @Component({
   selector: 'app-assessment-breakdown',
@@ -16,35 +18,34 @@ import { DeleteAssessmentBreakdownModalComponent } from '../../modals/assessment
     FormsModule,
     AddAssessmentBreakdownModalComponent,
     UpdateAssessmentBreakdownModalComponent,
-    DeleteAssessmentBreakdownModalComponent
+    DeleteAssessmentBreakdownModalComponent,
+    AssessmentBreakdownCard
   ],
   templateUrl: './assessment-breakdown.html',
   styleUrl: './assessment-breakdown.css',
 })
 export class AssessmentBreakdownPage implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild(AddAssessmentBreakdownModalComponent) addModal!: AddAssessmentBreakdownModalComponent;
   @ViewChild(UpdateAssessmentBreakdownModalComponent) updateModal!: UpdateAssessmentBreakdownModalComponent;
   @ViewChild(DeleteAssessmentBreakdownModalComponent) deleteModal!: DeleteAssessmentBreakdownModalComponent;
 
   breakdowns: AssessmentBreakdown[] = [];
-  // isLoading removed
+  isLoading = false;
   errorMessage = '';
   searchQuery = '';
 
   constructor(private breakdownService: AssessmentBreakdownService) {}
 
   ngOnInit() {
-    const cached = this.breakdownService.getCachedBreakdowns();
-    if (cached && cached.length > 0) {
-      this.breakdowns = cached;
-    } else {
-      this.loadBreakdowns();
-    }
+    this.loadBreakdowns();
   }
 
   loadBreakdowns() {
     this.errorMessage = '';
-    this.breakdownService.list().subscribe({
+    this.isLoading = true;
+    this.breakdownService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: any) => {
         let mapped: AssessmentBreakdown[] = [];
         let data = Array.isArray(response) ? response : response.data ?? [];
@@ -64,14 +65,17 @@ export class AssessmentBreakdownPage implements OnInit {
         }
         this.breakdowns = mapped;
         this.breakdownService.setCachedBreakdowns(mapped);
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('[AssessmentBreakdown] API error:', error);
         if (error?.status === 404) {
           this.breakdowns = [];
+          this.isLoading = false;
           return;
         }
         this.errorMessage = this.getErrorMessage(error) || 'Failed to load assessment breakdowns';
+        this.isLoading = false;
       }
     });
   }

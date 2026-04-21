@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AcademicTerm } from '../../models/academic-term.model';
@@ -12,38 +13,33 @@ import { DeleteAcademicTermsModalComponent } from '../../modals/academic-terms/d
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
-    AddAcademicTermsModalComponent,
-    UpdateAcademicTermsModalComponent,
-    DeleteAcademicTermsModalComponent
+    FormsModule
   ],
   templateUrl: './academic-terms.html',
   styleUrl: './academic-terms.css',
 })
 export class AcademicTerms implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild(AddAcademicTermsModalComponent) addModal!: AddAcademicTermsModalComponent;
   @ViewChild(UpdateAcademicTermsModalComponent) updateModal!: UpdateAcademicTermsModalComponent;
   @ViewChild(DeleteAcademicTermsModalComponent) deleteModal!: DeleteAcademicTermsModalComponent;
 
   terms: AcademicTerm[] = [];
-  // isLoading removed
+  isLoading = false;
   errorMessage = '';
   searchQuery = '';
 
   constructor(private academicTermsService: AcademicTermsService) {}
 
   ngOnInit() {
-    const cached = this.academicTermsService.getCachedTerms();
-    if (cached && cached.length > 0) {
-      this.terms = cached;
-    } else {
-      this.loadTerms();
-    }
+    this.loadTerms();
   }
 
   loadTerms() {
     this.errorMessage = '';
-    this.academicTermsService.list().subscribe({
+    this.isLoading = true;
+    this.academicTermsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: any) => {
         console.log('[AcademicTerms] API response:', response);
         let mapped: AcademicTerm[] = [];
@@ -62,14 +58,17 @@ export class AcademicTerms implements OnInit {
         }
         this.terms = mapped;
         this.academicTermsService.setCachedTerms(mapped);
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('[AcademicTerms] API error:', error);
         if (error?.status === 404) {
           this.terms = [];
+          this.isLoading = false;
           return;
         }
         this.errorMessage = this.getErrorMessage(error) || 'Failed to load academic terms';
+        this.isLoading = false;
       }
     });
   }

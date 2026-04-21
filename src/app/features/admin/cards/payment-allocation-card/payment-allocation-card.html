@@ -1,13 +1,46 @@
-<div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm flex flex-col gap-2">
-  <div class="flex items-center gap-2">
-    <span class="font-bold text-indigo-700 text-lg">Payment: {{ allocation.payment_id }}</span>
-    <span class="text-xs text-slate-500">Invoice: {{ allocation.invoice_id }}</span>
+<div class="group relative flex flex-col h-full overflow-hidden rounded-[1.5rem] border border-slate-200/70 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-violet-500/10 hover:border-violet-200/50">
+
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-2">
+      <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50 text-violet-600 font-black text-[10px]">
+        ALOC
+      </div>
+      <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Payment Link</span>
+    </div>
+
+    <div class="p-1.5 bg-slate-50 rounded-md text-slate-300 transition-colors group-hover:text-violet-400">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.828a4 4 0 005.656 0l4-4a4 4 0 015.656 5.656l-1.101 1.101" /></svg>
+    </div>
   </div>
-  <div class="flex gap-4 text-xs text-slate-600 mt-1">
-    <span>Amount Applied: <span class="font-bold">{{ allocation.amount_applied }}</span></span>
+
+  <div class="flex-grow space-y-3 mb-5">
+    <div class="flex flex-col gap-1">
+      <div class="flex items-center gap-2 text-slate-500 text-[10px] font-bold uppercase tracking-tight">
+        <span class="w-16">Payment</span>
+        <span class="text-slate-900 font-black tracking-normal">ID: {{ allocation.payment_id }}</span>
+      </div>
+      <div class="flex items-center gap-2 text-slate-500 text-[10px] font-bold uppercase tracking-tight">
+        <span class="w-16">Invoice</span>
+        <span class="text-indigo-600 font-black tracking-normal">#{{ allocation.invoice_id }}</span>
+      </div>
+    </div>
   </div>
-  <div class="mt-3 flex gap-2 border-t border-slate-100 pt-3">
-    <button type="button" (click)="requestEdit()" class="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Edit</button>
-    <button type="button" (click)="requestDelete()" class="flex-1 rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50">Delete</button>
+
+  <div class="grid grid-cols-1 gap-3 p-3 rounded-2xl bg-slate-50/50 border border-slate-100 mb-5">
+    <div class="flex flex-col">
+      <span class="text-[9px] font-bold text-slate-400 uppercase">Amount Applied</span>
+      <span class="text-base font-black text-slate-800">₱{{ allocation.amount_applied }}</span>
+    </div>
+  </div>
+
+  <div class="mt-auto flex gap-2 pt-4 border-t border-slate-100">
+    <button (click)="requestEdit()" class="flex-1 flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-black text-slate-600 transition-all hover:border-violet-200 hover:bg-violet-50 hover:text-violet-600 active:scale-95">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+      EDIT
+    </button>
+    <button (click)="requestDelete()" class="flex-1 flex items-center justify-center gap-2 rounded-xl border border-transparent bg-slate-50 px-3 py-2.5 text-xs font-black text-slate-400 transition-all hover:bg-red-50 hover:text-red-600 active:scale-95">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+      DELETE
+    </button>
   </div>
 </div>

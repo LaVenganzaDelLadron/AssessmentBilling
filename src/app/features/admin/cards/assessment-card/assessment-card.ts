@@ -5,7 +5,7 @@ import { Assessment } from '../../models/assessment.model';
 @Component({
   selector: 'app-assessment-card',
   standalone: true,
-  imports: [CommonModule, TitleCasePipe],
+  imports: [CommonModule],
   templateUrl: './assessment-card.html',
   styleUrl: './assessment-card.css',
 })

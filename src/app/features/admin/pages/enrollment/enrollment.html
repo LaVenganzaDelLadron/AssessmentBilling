@@ -1,35 +1,60 @@
-<div class="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-slate-100 antialiased">
-  <div class="bg-white/10 backdrop-blur-md border-b border-white/10 sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-6 py-6">
-      <div class="flex justify-between items-center">
-        <div>
-          <h1 class="text-3xl font-black text-white tracking-tight">Enrollments</h1>
-          <p class="text-sm text-slate-400 mt-1">Manage student enrollments</p>
-        </div>
-        <button (click)="openAddModal()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-all shadow-lg hover:-translate-y-0.5">+ Add Enrollment</button>
+<div class="min-h-screen bg-[#fcfdfe] font-sans text-slate-800 antialiased selection:bg-indigo-100 p-6 lg:p-12">
+
+  <div class="max-w-[1600px] mx-auto">
+
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+      <div>
+        <nav class="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400 mb-1">
+          <span>Academic</span>
+          <svg class="w-2.5 h-2.5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" /></svg>
+          <span class="text-indigo-500/80">Student Records</span>
+        </nav>
+        <h1 class="text-4xl font-black text-slate-900 tracking-tight">Enrollments</h1>
+        <p class="text-slate-500 text-sm mt-1 font-medium">Manage and monitor student course enrollments.</p>
       </div>
+
+      <button (click)="openAddModal()"
+        class="group flex items-center gap-2.5 rounded-xl bg-indigo-600 px-8 py-4 text-sm font-bold text-white shadow-lg shadow-indigo-200 transition-all hover:bg-indigo-700 hover:-translate-y-0.5 active:scale-95">
+        <svg class="w-4.5 h-4.5 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" /></svg>
+        <span>Add New Enrollment</span>
+      </button>
     </div>
-  </div>
 
-  <div class="max-w-7xl mx-auto px-6 py-8">
-    <div class="mb-8">
-      <input [(ngModel)]="searchQuery" type="text" placeholder="Search by student, subject, term, or status..." class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-all" />
+    <div class="relative w-full max-w-2xl group mb-10">
+      <input
+        [(ngModel)]="searchQuery"
+        placeholder="Search by student, subject, term, or status..."
+        class="w-full pl-14 pr-6 py-4.5 bg-white border border-slate-200/80 rounded-[1.5rem] text-base focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500/40 transition-all outline-none shadow-sm placeholder:text-slate-400"
+      >
+      <svg class="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-300 group-focus-within:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
     </div>
 
-    <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200">{{ errorMessage }}</div>
+    <div *ngIf="errorMessage" class="flex items-center gap-3 bg-red-50 border border-red-100 rounded-2xl p-5 mb-10 animate-in fade-in slide-in-from-top-2">
+      <div class="p-2 bg-white rounded-lg text-red-500 shadow-sm">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      </div>
+      <p class="text-red-700 text-sm font-bold">{{ errorMessage }}</p>
+    </div>
 
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-
+    <div class="bg-white border border-slate-200/70 rounded-[2.5rem] shadow-2xl shadow-slate-200/20 p-10 min-h-[600px]">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 sm:gap-10">
         <app-enrollment-card
           *ngFor="let enrollment of getFilteredEnrollments()"
           [enrollment]="enrollment"
           (editRequested)="openUpdateModal($event)"
           (deleteRequested)="openDeleteModal($event)"
+          class="h-full"
         ></app-enrollment-card>
       </div>
-      <div *ngIf="getFilteredEnrollments().length === 0" class="px-6 py-8 text-center text-slate-500 italic">
-        {{ searchQuery || statusFilter ? 'No enrollments matched your filters' : 'No enrollments found' }}
+
+      <div *ngIf="getFilteredEnrollments().length === 0" class="flex flex-col items-center justify-center py-32 text-center">
+        <div class="h-28 w-28 bg-slate-50 rounded-[2.5rem] flex items-center justify-center mb-6 rotate-3 border border-slate-100">
+          <svg class="w-14 h-14 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.998 5.998 0 00-12 0m12 0c0-1.657-1.343-3-3-3m-6 3c0-1.657 1.343-3 3-3m-3-3a3 3 0 100-6 3 3 0 000 6zm9-3a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+        </div>
+        <h3 class="text-slate-900 font-black text-xl mb-1">No Enrollment Records</h3>
+        <p class="text-slate-400 font-medium max-w-sm mx-auto">
+          {{ searchQuery ? 'No records match your current search query.' : 'There are currently no students enrolled in the system.' }}
+        </p>
       </div>
     </div>
   </div>
@@ -37,4 +62,5 @@
   <app-add-enrollment-modal (refresh)="loadEnrollments()"></app-add-enrollment-modal>
   <app-update-enrollment-modal (refresh)="loadEnrollments()"></app-update-enrollment-modal>
   <app-delete-enrollment-modal (refresh)="loadEnrollments()"></app-delete-enrollment-modal>
+
 </div>
