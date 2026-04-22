@@ -67,6 +67,11 @@ export const adminRoutes: Routes = [
           import('./pages/scholarships/scholarships').then(m => m.Scholarships)
       },
       {
+        path: 'student-scholarships',
+        loadComponent: () =>
+          import('./pages/student-scholarships/student-scholarships').then(m => m.StudentScholarships)
+      },
+      {
         path: 'teachers',
         loadComponent: () =>
           import('./pages/teachers/teachers').then(m => m.Teachers)

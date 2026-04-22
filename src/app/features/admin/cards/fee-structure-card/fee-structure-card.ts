@@ -14,6 +14,12 @@ export class FeeStructureCard {
   @Output() editRequested = new EventEmitter<FeeStructure>();
   @Output() deleteRequested = new EventEmitter<FeeStructure>();
 
+  get programDisplayName(): string {
+    return this.fee.program_name
+      || this.fee.program?.name
+      || `Program #${this.fee.program_id}`;
+  }
+
   requestEdit(): void {
     this.editRequested.emit(this.fee);
   }

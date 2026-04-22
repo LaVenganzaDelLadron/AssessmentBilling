@@ -53,6 +53,13 @@ export class FeeStructures implements OnInit {
           mapped = data.map((item: any) => ({
             id: item.id ?? item.fee_structure_id ?? null,
             program_id: item.program_id ?? null,
+            program_name: item.program_name ?? item.program?.name ?? null,
+            program: item.program
+              ? {
+                  id: item.program.id ?? item.program_id ?? 0,
+                  name: item.program.name ?? null
+                }
+              : null,
             fee_type: item.fee_type ?? '',
             amount: item.amount ?? 0,
             per_unit: !!item.per_unit,
@@ -96,6 +103,7 @@ export class FeeStructures implements OnInit {
 
     return this.fees.filter(fee =>
       fee.fee_type.toLowerCase().includes(query) ||
+      (fee.program_name ?? fee.program?.name ?? '').toLowerCase().includes(query) ||
       fee.program_id.toString().includes(query) ||
       String(fee.amount).toLowerCase().includes(query) ||
       (fee.per_unit ? 'per unit yes true' : 'per unit no false').includes(query)

@@ -1,5 +1,5 @@
 <div *ngIf="isOpen" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-2xl shadow-xl max-w-md w-full">
+  <div class="bg-white rounded-2xl shadow-xl max-w-xl w-full">
     <div class="flex justify-between items-center p-6 border-b border-slate-200">
       <h2 class="text-xl font-bold">Add Assessment Breakdown</h2>
       <button (click)="close()" class="text-slate-500 hover:text-slate-700">×</button>
@@ -7,41 +7,67 @@
 
     <form (ngSubmit)="submit()" class="p-6 space-y-4">
       <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-2">Assessment ID</label>
-        <input [(ngModel)]="form.assessment_id" name="assessment_id" type="number" min="1" placeholder="Assessment ID" class="w-full px-3 py-2 border border-slate-300 rounded hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <label class="block text-sm font-semibold text-slate-700 mb-2">Assessment</label>
+        <select [(ngModel)]="form.assessment_id" (ngModelChange)="onAssessmentChange()" name="assessment_id" class="w-full px-3 py-2 border border-slate-300 rounded hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option [ngValue]="null">Select assessment</option>
+          <option *ngFor="let assessment of assessments" [ngValue]="assessment.id">
+            {{ getAssessmentLabel(assessment) }}
+          </option>
+        </select>
       </div>
+
       <div>
         <label class="block text-sm font-semibold text-slate-700 mb-2">Source Type</label>
         <select [(ngModel)]="form.source_type" (ngModelChange)="onSourceTypeChange()" name="source_type" class="w-full px-3 py-2 border border-slate-300 rounded hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
           <option *ngFor="let type of sourceTypes" [value]="type">{{ type | titlecase }}</option>
         </select>
       </div>
+
       <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-2">
-          Source ID
-          <span class="text-xs font-normal text-slate-500" *ngIf="requiresSourceId()">(required for subject and fee)</span>
-        </label>
-        <input [(ngModel)]="form.source_id" name="source_id" type="text" [placeholder]="requiresSourceId() ? 'Enter source ID' : 'Optional for discount'" class="w-full px-3 py-2 border border-slate-300 rounded hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <label class="block text-sm font-semibold text-slate-700 mb-2">Source Record</label>
+        <ng-container *ngIf="isAutomaticMode; else manualSourceId">
+          <select [(ngModel)]="form.source_id" (ngModelChange)="onSourceChange()" name="source_id" class="w-full px-3 py-2 border border-slate-300 rounded hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Select source record</option>
+            <option *ngFor="let option of availableSourceOptions" [value]="option.id">
+              {{ option.label }}
+            </option>
+          </select>
+        </ng-container>
+        <ng-template #manualSourceId>
+          <input [(ngModel)]="form.source_id" name="source_id" type="text" placeholder="Optional for discount" class="w-full px-3 py-2 border border-slate-300 rounded hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </ng-template>
       </div>
+
+      <div *ngIf="isAutomaticMode">
+        <label class="block text-sm font-semibold text-slate-700 mb-2">Auto Source ID</label>
+        <input [value]="form.source_id || 'Will be set from source record'" readonly class="w-full px-3 py-2 border border-slate-200 rounded bg-slate-50 text-slate-600">
+      </div>
+
       <div>
         <label class="block text-sm font-semibold text-slate-700 mb-2">Description</label>
-        <input [(ngModel)]="form.description" name="description" type="text" placeholder="Description" class="w-full px-3 py-2 border border-slate-300 rounded hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <input [(ngModel)]="form.description" [readonly]="isAutomaticMode" name="description" type="text" [placeholder]="isAutomaticMode ? 'Auto-generated description' : 'Description'" class="w-full px-3 py-2 border border-slate-300 rounded hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 read-only:bg-slate-50">
       </div>
+
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-2">Units</label>
-          <input [(ngModel)]="form.units" name="units" type="number" min="0" step="0.01" placeholder="Optional" class="w-full px-3 py-2 border border-slate-300 rounded hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input [(ngModel)]="form.units" [readonly]="isAutomaticMode" name="units" type="number" min="0" step="0.01" placeholder="Optional" class="w-full px-3 py-2 border border-slate-300 rounded hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 read-only:bg-slate-50">
         </div>
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-2">Rate</label>
-          <input [(ngModel)]="form.rate" name="rate" type="number" min="0" step="0.01" placeholder="Optional" class="w-full px-3 py-2 border border-slate-300 rounded hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input [(ngModel)]="form.rate" [readonly]="isAutomaticMode" name="rate" type="number" min="0" step="0.01" placeholder="Optional" class="w-full px-3 py-2 border border-slate-300 rounded hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 read-only:bg-slate-50">
         </div>
       </div>
+
       <div>
         <label class="block text-sm font-semibold text-slate-700 mb-2">Amount</label>
-        <input [(ngModel)]="form.amount" name="amount" type="number" step="0.01" placeholder="Amount" class="w-full px-3 py-2 border border-slate-300 rounded hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <input [(ngModel)]="form.amount" [readonly]="isAutomaticMode" name="amount" type="number" step="0.01" placeholder="Amount" class="w-full px-3 py-2 border border-slate-300 rounded hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 read-only:bg-slate-50">
       </div>
     </form>
+
+    <div *ngIf="isLoadingReferenceData" class="bg-slate-50 text-slate-700 p-3 mx-6 mb-4 rounded">
+      Loading assessments, subjects, and fees...
+    </div>
 
     <div *ngIf="errorMessage" class="bg-red-50 text-red-700 p-3 mx-6 mb-4 rounded">
       {{ errorMessage }}
@@ -49,7 +75,7 @@
 
     <div class="flex justify-end gap-3 p-6 border-t border-slate-200">
       <button (click)="close()" class="px-4 py-2 text-slate-700 border rounded hover:bg-slate-50">Cancel</button>
-      <button type="submit" (click)="submit()" [disabled]="isLoading" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
+      <button type="submit" (click)="submit()" [disabled]="isLoading || isLoadingReferenceData" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
         {{ isLoading ? 'Loading...' : 'Add' }}
       </button>
     </div>
