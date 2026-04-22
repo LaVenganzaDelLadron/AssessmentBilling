@@ -26,16 +26,18 @@ export class SubjectsService {
     private cache: CacheService
   ) {}
 
-  list(): Observable<Subject[]> {
-    const cacheKey = `${this.cachePrefix}list`;
-    const cached = this.cache.get<Subject[]>(cacheKey);
+list(params: {page?: number, per_page?: number} = {}): Observable<any> {
+    const paramsStr = new URLSearchParams(params as any).toString();
+    const url = `${this.apiUrl}/admin/subjects${paramsStr ? `?${paramsStr}` : ''}`;
+    const cacheKey = `${this.cachePrefix}list${paramsStr ? `_${paramsStr}` : ''}`;
+    const cached = this.cache.get<any>(cacheKey);
 
     if (cached) {
       return of(cached);
     }
 
-    return this.http.get<Subject[]>(`${this.apiUrl}/admin/subjects`).pipe(
-      tap((subjects) => this.cache.set(cacheKey, subjects))
+    return this.http.get<any>(url).pipe(
+      tap((response) => this.cache.set(cacheKey, response))
     );
   }
 

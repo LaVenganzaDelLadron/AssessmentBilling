@@ -36,7 +36,7 @@
       <p class="text-red-700 text-sm font-bold">{{ errorMessage }}</p>
     </div>
 
-    <div class="bg-white border border-slate-200/70 rounded-[2.5rem] shadow-2xl shadow-slate-200/20 p-10 min-h-[600px]">
+    <div class="bg-white border border-slate-200/70 rounded-[2.5rem] shadow-2xl shadow-slate-200/20 p-10 max-h-[70vh] overflow-y-auto min-h-[400px]">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 sm:gap-10">
         <app-enrollment-card
           *ngFor="let enrollment of getFilteredEnrollments()"

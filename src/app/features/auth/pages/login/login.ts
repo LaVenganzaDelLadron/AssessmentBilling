@@ -72,10 +72,9 @@ export class LoginComponent {
         // Check if first login and show tutorial
         this.tutorialService.checkFirstLogin(userId, role as any);
 
-        console.log('User role:', role, 'Redirecting to:', routeMap[role]);
-        setTimeout(() => {
-          this.router.navigate([routeMap[role] || '/student']);
-        }, 500);
+        console.time('login-redirect');
+        this.router.navigate([`${routeMap[role] || '/student'}/dashboard`]);
+        console.timeEnd('login-redirect');
       },
       error: (error) => {
         console.error('Login error:', error);

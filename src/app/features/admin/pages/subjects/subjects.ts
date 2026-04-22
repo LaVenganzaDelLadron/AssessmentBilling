@@ -24,17 +24,17 @@ export class Subjects implements OnInit {
 
   constructor(private subjectService: SubjectsService) {}
 
-  ngOnInit() {
-    this.loadSubjects();
+ngOnInit() {
+    this.loadSubjects({ page: 1, per_page: 25 });
   }
-  // Program department lookup removed
 
-  loadSubjects(forceRefresh = false) {
+loadSubjects(paramsOrForce: { page?: number; per_page?: number } | boolean = { page: 1, per_page: 25 }, forceRefresh = false) {
+    const params = typeof paramsOrForce === 'boolean' ? { page: 1, per_page: 25 } : paramsOrForce;
     this.errorMessage = '';
     this.isLoading = true;
     const request$ = forceRefresh
       ? this.subjectService.refreshList()
-      : this.subjectService.list();
+      : this.subjectService.list(params);
 
     request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: any) => {

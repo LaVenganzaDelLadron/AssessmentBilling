@@ -27,16 +27,18 @@ export class StudentsService {
     private cache: CacheService
   ) {}
 
-  list(): Observable<Student[]> {
-    const cacheKey = `${this.cachePrefix}list`;
-    const cached = this.cache.get<Student[]>(cacheKey);
+list(params: {page?: number, per_page?: number} = {}): Observable<any> {
+    const paramsStr = new URLSearchParams(params as any).toString();
+    const url = `${this.apiUrl}/admin/students${paramsStr ? `?${paramsStr}` : ''}`;
+    const cacheKey = `${this.cachePrefix}list${paramsStr ? `_${paramsStr}` : ''}`;
+    const cached = this.cache.get<any>(cacheKey);
 
     if (cached) {
       return of(cached);
     }
 
-    return this.http.get<Student[]>(`${this.apiUrl}/admin/students`).pipe(
-      tap((students) => this.cache.set(cacheKey, students))
+    return this.http.get<any>(url).pipe(
+      tap((response) => this.cache.set(cacheKey, response))
     );
   }
 

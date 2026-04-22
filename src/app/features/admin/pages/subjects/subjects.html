@@ -52,7 +52,7 @@
       </div>
     </div>
 
-    <div class="bg-white border border-slate-200/60 rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.05)] p-10 lg:p-14 min-h-[700px]">
+    <div class="bg-white border border-slate-200/60 rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.05)] p-10 lg:p-14 max-h-[70vh] overflow-y-auto min-h-[400px]">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
         <app-subject-card
           *ngFor="let subject of getFilteredSubjects(); trackBy: trackBySubjectId"

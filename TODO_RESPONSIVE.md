@@ -1,10 +1,12 @@
-# Admin Responsive UI Updates Progress
+# TODO: Make Pages Responsive & Scrollable
 
-**Completed:**
-- [x] Payments UI matched subjects
-- [x] All major admin pages: grid `md:2 lg:3 xl:4`
-- [x] Cards: flex-wrap text, spacer, stacked buttons
-- [x] Assessment breakdown table → square cards
+**Status:** In progress
 
-**Status: Complete**
+**Issues found:**
+- src/app/features/admin/pages/assessment-breakdown/assessment-breakdown.html: Multiple div closing tag errors (NG5002)
+- Other pages may have similar issues
+
+**Status:** Fixed assessment-breakdown.html\n\n**Pattern discovered:** Most pages use `min-h-screen` outer div + content containers. To make content scrollable:\n\n1. Add `max-h-[calc(100vh-200px)] overflow-y-auto` to main content containers\n2. Keep layout header fixed\n3. Apply to all ~25 admin page .html files\n\n**Next:** Create pattern for common responsive layout, test on dashboard first.
+
+**Next:** Read assessment-breakdown.html fully and recreate clean version.
 

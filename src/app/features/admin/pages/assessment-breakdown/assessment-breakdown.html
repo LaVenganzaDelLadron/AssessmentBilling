@@ -1,5 +1,4 @@
 <div class="min-h-screen bg-[#fcfdfe] font-sans text-slate-800 antialiased selection:bg-indigo-100 p-6 lg:p-12">
-
   <div class="max-w-[1600px] mx-auto">
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
       <div>
@@ -11,20 +10,14 @@
         <h1 class="text-3xl font-black text-slate-900 tracking-tight">Assessment Breakdowns</h1>
         <p class="text-slate-500 text-sm mt-1 font-medium">Manage assessment criteria and scoring structures.</p>
       </div>
-
-      <button (click)="openAddModal()"
-        class="group flex items-center gap-2.5 rounded-xl bg-indigo-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-200 transition-all hover:bg-indigo-700 hover:-translate-y-0.5 active:scale-95">
+      <button (click)="openAddModal()" class="group flex items-center gap-2.5 rounded-xl bg-indigo-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-200 transition-all hover:bg-indigo-700 hover:-translate-y-0.5 active:scale-95">
         <svg class="w-4 h-4 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" /></svg>
         <span>Add Breakdown</span>
       </button>
     </div>
 
     <div class="relative w-full max-w-2xl group mb-8">
-      <input
-        [(ngModel)]="searchQuery"
-        placeholder="Search description, source, or assessment ID..."
-        class="w-full pl-12 pr-4 py-4 bg-white border border-slate-200/80 rounded-[1.25rem] text-sm focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500/40 transition-all outline-none shadow-sm placeholder:text-slate-400"
-      >
+      <input [(ngModel)]="searchQuery" placeholder="Search description, source, or assessment ID..." class="w-full pl-12 pr-4 py-4 bg-white border border-slate-200/80 rounded-[1.25rem] text-sm focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500/40 transition-all outline-none shadow-sm placeholder:text-slate-400">
       <svg class="absolute left-4.5 top-4.5 w-5 h-5 text-slate-300 group-focus-within:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
     </div>
 
@@ -35,31 +28,22 @@
       <p class="text-red-700 text-sm font-bold">{{ errorMessage }}</p>
     </div>
 
-    <div class="bg-white border border-slate-200/70 rounded-[2rem] shadow-xl shadow-slate-200/15 p-8 min-h-[500px]">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-        <app-assessment-breakdown-card
-          *ngFor="let breakdown of getFilteredBreakdowns()"
-          [breakdown]="breakdown"
-          (editRequested)="openUpdateModal($event)"
-          (deleteRequested)="openDeleteModal($event)"
-          class="transition-all duration-300 hover:-translate-y-1.5"
-        ></app-assessment-breakdown-card>
+    <div class="bg-white border border-slate-200/70 rounded-[2rem] shadow-xl shadow-slate-200/15 p-8 max-h-[70vh] overflow-y-auto scrollbar-custom">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 pb-4">
+        <app-assessment-breakdown-card *ngFor="let breakdown of getFilteredBreakdowns()" [breakdown]="breakdown" (editRequested)="openUpdateModal($event)" (deleteRequested)="openDeleteModal($event)" class="transition-all duration-300 hover:-translate-y-1.5">
+        </app-assessment-breakdown-card>
       </div>
-
       <div *ngIf="getFilteredBreakdowns().length === 0" class="flex flex-col items-center justify-center py-24 text-center">
         <div class="h-24 w-24 bg-slate-50 rounded-[2rem] flex items-center justify-center mb-6 rotate-3">
           <svg class="w-12 h-12 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
         </div>
         <h3 class="text-slate-900 font-black text-lg mb-1">No Results Found</h3>
-        <p class="text-slate-400 font-medium max-w-xs mx-auto">
-          {{ searchQuery ? 'Try adjusting your search terms or filters to find what you are looking for.' : 'Start building your assessment structure by adding a new breakdown.' }}
-        </p>
+        <p class="text-slate-400 font-medium max-w-xs mx-auto">{{ searchQuery ? 'Try adjusting your search terms or filters to find what you are looking for.' : 'Start building your assessment structure by adding a new breakdown.' }}</p>
       </div>
     </div>
   </div>
-
-  <app-add-assessment-breakdown-modal (refresh)="loadBreakdowns()"></app-add-assessment-breakdown-modal>
-  <app-update-assessment-breakdown-modal (refresh)="loadBreakdowns()"></app-update-assessment-breakdown-modal>
-  <app-delete-assessment-breakdown-modal (refresh)="loadBreakdowns()"></app-delete-assessment-breakdown-modal>
-
 </div>
+
+<app-add-assessment-breakdown-modal (refresh)="loadBreakdowns()"></app-add-assessment-breakdown-modal>
+<app-update-assessment-breakdown-modal (refresh)="loadBreakdowns()"></app-update-assessment-breakdown-modal>
+<app-delete-assessment-breakdown-modal (refresh)="loadBreakdowns()"></app-delete-assessment-breakdown-modal>

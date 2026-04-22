@@ -35,14 +35,14 @@ export class Student implements OnInit {
 
   constructor(private studentService: StudentsService) {}
 
-  ngOnInit() {
-    this.loadStudents();
+ngOnInit() {
+    this.loadStudents({ page: 1, per_page: 25 });
   }
 
-  loadStudents() {
+  loadStudents(params: { page?: number; per_page?: number } = { page: 1, per_page: 25 }) {
     this.errorMessage = '';
     this.isLoading = true;
-    this.studentService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.studentService.list(params).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: any) => {
         console.log('[Students] API response:', response);
         let mapped: StudentModel[] = [];

@@ -1,1 +1,18 @@
-/* Assessment Breakdown Styles */
+/* Custom Scrollbar for the container */
+.scrollbar-custom::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 20px; /* Keeps the scrollbar from touching the rounded corners */
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: #e2e8f0; /* slate-200 */
+  border-radius: 10px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background: #6366f1; /* indigo-500 */
+}
