@@ -27,6 +27,11 @@ export const teacherRoutes: Routes = [
           import('./pages/subjects/subjects').then(m => m.Subjects)
       },
       {
+        path: 'academic-terms',
+        loadComponent: () =>
+          import('./pages/academic-terms/academic-terms').then(m => m.TeacherAcademicTermsPage)
+      },
+      {
         path: 'enrollments',
         loadComponent: () =>
           import('./pages/enrollments/enrollments').then(m => m.Enrollments)
@@ -35,6 +40,11 @@ export const teacherRoutes: Routes = [
         path: 'assessments',
         loadComponent: () =>
           import('./pages/assessments/assessments').then(m => m.Assessments)
+      },
+      {
+        path: 'assessment-breakdown',
+        loadComponent: () =>
+          import('./pages/assessment-breakdown/assessment-breakdown').then(m => m.TeacherAssessmentBreakdownPage)
       }
     ]
   }

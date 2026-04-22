@@ -1,0 +1,115 @@
+<div *ngIf="isOpen" class="teacher-modal-backdrop">
+  <div class="teacher-modal">
+    <div class="teacher-modal__header">
+      <div>
+        <p class="teacher-modal__eyebrow">Teacher Assessment</p>
+        <h2>Add Assessment</h2>
+      </div>
+      <button type="button" (click)="close()">×</button>
+    </div>
+
+    <form (ngSubmit)="submit()" class="teacher-modal__body">
+      <div class="teacher-modal__grid">
+        <label>
+          <span>Student</span>
+          <select [(ngModel)]="form.student_id" name="student_id" (ngModelChange)="onStudentChange()">
+            <option [ngValue]="null">Select student</option>
+            <option *ngFor="let student of students" [ngValue]="student.id">{{ student.label }}</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Academic Term</span>
+          <select [(ngModel)]="form.academic_term_id" name="academic_term_id" (ngModelChange)="onAcademicTermChange()">
+            <option [ngValue]="null">Select academic term</option>
+            <option *ngFor="let term of availableTerms" [ngValue]="term.academic_term_id">
+              {{ term.school_year }} • {{ term.semester }}
+            </option>
+          </select>
+        </label>
+      </div>
+
+      <div class="teacher-modal__grid teacher-modal__grid--three">
+        <label>
+          <span>Semester</span>
+          <input [ngModel]="form.semester" name="semester_display" readonly>
+        </label>
+        <label>
+          <span>School Year</span>
+          <input [ngModel]="form.school_year" name="school_year_display" readonly>
+        </label>
+        <label>
+          <span>Total Units</span>
+          <input [ngModel]="form.total_units" name="total_units_display" readonly>
+        </label>
+      </div>
+
+      <div class="teacher-modal__note">
+        <strong>Subjects for selected term</strong>
+        <p *ngIf="selectedSubjectNames.length === 0">Pick a student and term to load enrolled subjects automatically.</p>
+        <ul *ngIf="selectedSubjectNames.length > 0">
+          <li *ngFor="let subject of selectedSubjectNames">{{ subject }}</li>
+        </ul>
+      </div>
+
+      <div class="teacher-modal__grid">
+        <label>
+          <span>Status</span>
+          <select [(ngModel)]="form.status" name="status">
+            <option value="draft">Draft</option>
+            <option value="finalized">Finalized</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="teacher-modal__grid">
+        <label>
+          <span>Tuition Fee</span>
+          <input [(ngModel)]="form.tuition_fee" name="tuition_fee" type="number" min="0" step="0.01">
+        </label>
+        <label>
+          <span>Misc Fee</span>
+          <input [(ngModel)]="form.misc_fee" name="misc_fee" type="number" min="0" step="0.01">
+        </label>
+      </div>
+
+      <div class="teacher-modal__grid">
+        <label>
+          <span>Lab Fee</span>
+          <input [(ngModel)]="form.lab_fee" name="lab_fee" type="number" min="0" step="0.01">
+        </label>
+        <label>
+          <span>Other Fees</span>
+          <input [(ngModel)]="form.other_fees" name="other_fees" type="number" min="0" step="0.01">
+        </label>
+      </div>
+
+      <div class="teacher-modal__grid">
+        <label>
+          <span>Discount</span>
+          <input [(ngModel)]="form.discount" name="discount" type="number" min="0" step="0.01">
+        </label>
+      </div>
+
+      <div class="teacher-modal__summary">
+        <article>
+          <span>Total Amount</span>
+          <strong>{{ computedTotalAmount | number:'1.2-2' }}</strong>
+        </article>
+        <article>
+          <span>Net Amount</span>
+          <strong>{{ computedNetAmount | number:'1.2-2' }}</strong>
+        </article>
+      </div>
+
+      <div *ngIf="errorMessage" class="teacher-modal__error">{{ errorMessage }}</div>
+
+      <div class="teacher-modal__actions">
+        <button type="button" class="teacher-modal__secondary" (click)="close()">Cancel</button>
+        <button type="submit" [disabled]="isLoading || isLoadingReferenceData">
+          {{ isLoading ? 'Saving...' : 'Create Assessment' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

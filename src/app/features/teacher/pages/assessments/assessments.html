@@ -1,14 +1,54 @@
-<div class="p-8">
-  <div class="flex justify-between items-center mb-6">
+<section class="teacher-page">
+  <div class="teacher-page__header">
     <div>
-      <h1 class="text-3xl font-bold text-slate-900">Assessments</h1>
-      <p class="text-slate-600 mt-2">Create, read, and update assessments for your subjects only</p>
+      <p class="teacher-page__eyebrow">Teacher Workspace</p>
+      <h1>Assessments</h1>
+      <p>Create, update, and finalize assessment records for the students and terms in your own teaching scope.</p>
     </div>
-    <button class="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700">
-      + New Assessment
-    </button>
+
+    <button type="button" class="teacher-page__cta" (click)="openAddModal()">Create Assessment</button>
   </div>
-  <div class="bg-white rounded-lg border border-slate-200 p-6">
-    <p class="text-slate-600">Your assessments will appear here.</p>
+
+  <div class="teacher-page__stats">
+    <article>
+      <span>Total Assessments</span>
+      <strong>{{ assessments.length }}</strong>
+    </article>
+    <article>
+      <span>Finalized</span>
+      <strong>{{ finalizedCount }}</strong>
+    </article>
   </div>
-</div>
+
+  <div class="teacher-page__toolbar teacher-page__toolbar--split">
+    <input [(ngModel)]="searchQuery" type="text" placeholder="Search by student, term, or status">
+    <select [(ngModel)]="statusFilter">
+      <option value="">All Status</option>
+      <option value="draft">Draft</option>
+      <option value="finalized">Finalized</option>
+    </select>
+  </div>
+
+  <div *ngIf="errorMessage" class="teacher-page__error">{{ errorMessage }}</div>
+
+  <div class="teacher-page__surface">
+    <div *ngIf="isLoading" class="teacher-page__empty">Loading assessments...</div>
+
+    <div *ngIf="!isLoading && filteredAssessments.length > 0" class="teacher-page__grid">
+      <app-teacher-assessment-card
+        *ngFor="let assessment of filteredAssessments"
+        [assessment]="assessment"
+        (editRequested)="openUpdateModal($event)"
+        (deleteRequested)="openDeleteModal($event)"
+      />
+    </div>
+
+    <div *ngIf="!isLoading && filteredAssessments.length === 0" class="teacher-page__empty">
+      {{ searchQuery || statusFilter ? 'No assessments matched your filters.' : 'No assessments available yet.' }}
+    </div>
+  </div>
+
+  <app-teacher-add-assessment-modal (refresh)="loadAssessments()"></app-teacher-add-assessment-modal>
+  <app-teacher-update-assessment-modal (refresh)="loadAssessments()"></app-teacher-update-assessment-modal>
+  <app-teacher-delete-assessment-modal (refresh)="loadAssessments()"></app-teacher-delete-assessment-modal>
+</section>

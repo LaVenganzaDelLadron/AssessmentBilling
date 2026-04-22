@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProfileService, TeacherProfile } from '../../../../shared/services/profile.service';
-import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-teacher-profile',
@@ -12,7 +12,10 @@ import { AuthService } from '../../../auth/services/auth.service';
   styleUrl: './profile.css',
 })
 export class Profile implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   profile: TeacherProfile | null = null;
+  private originalProfile: TeacherProfile | null = null;
   isLoading = false;
   isSaving = false;
   successMessage = '';
@@ -30,8 +33,7 @@ export class Profile implements OnInit {
   ];
 
   constructor(
-    private profileService: ProfileService,
-    private authService: AuthService
+    private profileService: ProfileService
   ) {}
 
   ngOnInit(): void {
@@ -39,23 +41,23 @@ export class Profile implements OnInit {
   }
 
   loadProfile(): void {
-    const currentUser = this.authService.currentUser$ as any;
-    currentUser.subscribe((user: any) => {
-      if (user?.id) {
-        this.isLoading = true;
-        this.profileService.getTeacherProfile(user.id).subscribe({
-          next: (data) => {
-            this.profile = data;
-            this.isLoading = false;
-          },
-          error: (err) => {
-            console.error('Error loading profile:', err);
-            this.errorMessage = 'Failed to load profile. Please try again.';
-            this.isLoading = false;
-          }
-        });
-      }
-    });
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.profileService.getTeacherProfile()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.profile = { ...data };
+          this.originalProfile = { ...data };
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error loading profile:', err);
+          this.errorMessage = 'Failed to load teacher profile. Please try again.';
+          this.isLoading = false;
+        }
+      });
   }
 
   toggleEdit(): void {
@@ -71,32 +73,46 @@ export class Profile implements OnInit {
     this.successMessage = '';
     this.errorMessage = '';
 
-    const currentUser = this.authService.currentUser$ as any;
-    currentUser.subscribe((user: any) => {
-      if (user?.id) {
-        this.profileService.updateTeacherProfile(user.id, this.profile!).subscribe({
-          next: (data) => {
-            this.profile = data;
-            this.isEditing = false;
-            this.isSaving = false;
-            this.successMessage = 'Profile updated successfully!';
-            setTimeout(() => {
-              this.successMessage = '';
-            }, 3000);
-          },
-          error: (err) => {
-            console.error('Error saving profile:', err);
-            this.errorMessage = 'Failed to save profile. Please try again.';
-            this.isSaving = false;
-          }
-        });
-      }
-    });
+    this.profileService.updateTeacherProfile(this.profile)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.profile = { ...data };
+          this.originalProfile = { ...data };
+          this.isEditing = false;
+          this.isSaving = false;
+          this.successMessage = 'Profile updated successfully!';
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 3000);
+        },
+        error: (err) => {
+          console.error('Error saving profile:', err);
+          this.errorMessage = 'Failed to save profile. Please try again.';
+          this.isSaving = false;
+        }
+      });
   }
 
   cancel(): void {
+    this.profile = this.originalProfile ? { ...this.originalProfile } : this.profile;
     this.isEditing = false;
     this.errorMessage = '';
     this.successMessage = '';
+  }
+
+  get fullName(): string {
+    if (!this.profile) {
+      return 'Teacher';
+    }
+
+    return [this.profile.first_name, this.profile.middle_name, this.profile.last_name]
+      .filter(Boolean)
+      .join(' ')
+      .trim();
+  }
+
+  get teacherStatusLabel(): string {
+    return this.profile?.status === 'inactive' ? 'Inactive' : 'Active';
   }
 }

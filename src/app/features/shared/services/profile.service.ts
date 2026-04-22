@@ -54,12 +54,12 @@ export class ProfileService {
   }
 
   // Teacher Profile
-  getTeacherProfile(userId: number): Observable<TeacherProfile> {
-    return this.http.get<TeacherProfile>(`${this.apiUrl}/teacher/profile/${userId}`);
+  getTeacherProfile(): Observable<TeacherProfile> {
+    return this.http.get<TeacherProfile>(`${this.apiUrl}/teacher/profile`);
   }
 
-  updateTeacherProfile(userId: number, data: TeacherProfile): Observable<TeacherProfile> {
-    return this.http.put<TeacherProfile>(`${this.apiUrl}/teacher/profile/${userId}`, data);
+  updateTeacherProfile(data: TeacherProfile): Observable<TeacherProfile> {
+    return this.http.put<TeacherProfile>(`${this.apiUrl}/teacher/profile`, data);
   }
 
   createTeacherProfile(data: TeacherProfile): Observable<TeacherProfile> {

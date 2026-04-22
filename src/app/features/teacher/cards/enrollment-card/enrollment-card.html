@@ -1,0 +1,23 @@
+<article class="teacher-card">
+  <div class="teacher-card__header">
+    <div>
+      <p class="teacher-card__eyebrow">Enrollment</p>
+      <h3 class="teacher-card__title">{{ getStudentLabel() }}</h3>
+    </div>
+    <span class="teacher-card__badge">{{ enrollment.status || 'pending' }}</span>
+  </div>
+
+  <p class="teacher-card__name">{{ getSubjectLabel() }}</p>
+  <p class="teacher-card__meta">{{ enrollment.school_year }} • {{ enrollment.semester }}</p>
+
+  <div class="teacher-card__stats">
+    <div>
+      <span>Student ID</span>
+      <strong>#{{ enrollment.student_id }}</strong>
+    </div>
+    <div>
+      <span>Term</span>
+      <strong>#{{ enrollment.academic_term_id }}</strong>
+    </div>
+  </div>
+</article>

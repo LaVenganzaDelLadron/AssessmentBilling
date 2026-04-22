@@ -1,0 +1,14 @@
+<article class="teacher-card">
+  <div class="teacher-card__header">
+    <div>
+      <p class="teacher-card__eyebrow">Academic Term</p>
+      <h3 class="teacher-card__title">{{ term.school_year }}</h3>
+    </div>
+    <span class="teacher-card__badge" [class.teacher-card__badge--active]="term.is_active">
+      {{ term.is_active ? 'active' : 'inactive' }}
+    </span>
+  </div>
+
+  <p class="teacher-card__name">{{ term.semester }}</p>
+  <p class="teacher-card__meta">{{ term.start_date || 'No start date' }} to {{ term.end_date || 'No end date' }}</p>
+</article>

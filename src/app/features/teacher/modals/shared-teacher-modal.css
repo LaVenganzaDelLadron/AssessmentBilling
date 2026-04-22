@@ -1,0 +1,188 @@
+.teacher-modal-backdrop {
+  align-items: center;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 1.25rem;
+  position: fixed;
+  z-index: 60;
+}
+
+.teacher-modal {
+  background: #ffffff;
+  border: 1px solid #dcfce7;
+  border-radius: 1.75rem;
+  box-shadow: 0 35px 80px -40px rgba(15, 23, 42, 0.45);
+  max-height: 90vh;
+  max-width: 860px;
+  overflow: auto;
+  width: min(860px, 100%);
+}
+
+.teacher-modal--compact {
+  max-width: 520px;
+}
+
+.teacher-modal__header,
+.teacher-modal__actions {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.teacher-modal__header {
+  border-bottom: 1px solid #dcfce7;
+  padding: 1.5rem 1.5rem 1.25rem;
+}
+
+.teacher-modal__header h2 {
+  color: #14532d;
+  font-size: 1.4rem;
+  font-weight: 900;
+}
+
+.teacher-modal__header button {
+  background: transparent;
+  border: none;
+  color: #4b5563;
+  cursor: pointer;
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.teacher-modal__eyebrow {
+  color: #15803d;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+}
+
+.teacher-modal__body {
+  display: grid;
+  gap: 1.1rem;
+  padding: 1.5rem;
+}
+
+.teacher-modal__grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.teacher-modal__grid--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 768px) {
+  .teacher-modal__grid,
+  .teacher-modal__grid--three {
+    grid-template-columns: 1fr;
+  }
+}
+
+.teacher-modal__body label {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.teacher-modal__body span {
+  color: #166534;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.teacher-modal__body input,
+.teacher-modal__body select,
+.teacher-modal__body textarea {
+  appearance: none;
+  border: 1px solid #bbf7d0;
+  border-radius: 1rem;
+  outline: none;
+  padding: 0.9rem 1rem;
+  width: 100%;
+}
+
+.teacher-modal__body textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.teacher-modal__body input:focus,
+.teacher-modal__body select:focus,
+.teacher-modal__body textarea:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
+}
+
+.teacher-modal__note,
+.teacher-modal__summary {
+  background: #f0fdf4;
+  border: 1px solid #dcfce7;
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.teacher-modal__note strong,
+.teacher-modal__summary strong {
+  color: #14532d;
+}
+
+.teacher-modal__note p,
+.teacher-modal__copy {
+  color: #4b5563;
+}
+
+.teacher-modal__note ul {
+  margin: 0.75rem 0 0;
+  padding-left: 1rem;
+}
+
+.teacher-modal__summary {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.teacher-modal__summary span {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.teacher-modal__actions {
+  justify-content: flex-end;
+}
+
+.teacher-modal__actions button {
+  border: 1px solid transparent;
+  border-radius: 0.95rem;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.85rem 1.2rem;
+}
+
+.teacher-modal__secondary {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.teacher-modal__actions button:not(.teacher-modal__secondary):not(.teacher-modal__danger) {
+  background: #15803d;
+  color: white;
+}
+
+.teacher-modal__danger {
+  background: #b91c1c;
+  color: white;
+}
+
+.teacher-modal__error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 1rem;
+  color: #b91c1c;
+  padding: 0.9rem 1rem;
+}

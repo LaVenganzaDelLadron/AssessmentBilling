@@ -1,0 +1,27 @@
+<article class="teacher-card">
+  <div class="teacher-card__header">
+    <div>
+      <p class="teacher-card__eyebrow">Assessment #{{ assessment.id }}</p>
+      <h3 class="teacher-card__title">{{ assessment.student_name || ('Student #' + assessment.student_id) }}</h3>
+    </div>
+    <span class="teacher-card__badge">{{ assessment.status }}</span>
+  </div>
+
+  <p class="teacher-card__name">{{ assessment.school_year }} • {{ assessment.semester }}</p>
+
+  <div class="teacher-card__stats">
+    <div>
+      <span>Total Units</span>
+      <strong>{{ assessment.total_units }}</strong>
+    </div>
+    <div>
+      <span>Net Amount</span>
+      <strong>₱{{ assessment.net_amount }}</strong>
+    </div>
+  </div>
+
+  <div class="teacher-card__actions">
+    <button type="button" (click)="requestEdit()">Update</button>
+    <button type="button" class="teacher-card__danger" (click)="requestDelete()">Delete</button>
+  </div>
+</article>

@@ -1,154 +1,113 @@
-<div class="p-8 max-w-4xl mx-auto">
-  <!-- Header -->
-  <div class="mb-8">
-    <h1 class="text-4xl font-bold text-slate-900">Teacher Profile</h1>
-    <p class="text-slate-600 mt-2">{{ isEditing ? 'Edit your profile information' : 'View your profile information' }}</p>
+<section class="teacher-page">
+  <div class="teacher-page__header">
+    <div>
+      <p class="teacher-page__eyebrow">Teacher Workspace</p>
+      <h1>Profile</h1>
+      <p>{{ isEditing ? 'Update your teacher record using the fields exposed by the teacher profile route.' : 'Review and maintain the profile information available to your teacher account.' }}</p>
+    </div>
+    <button *ngIf="profile && !isEditing" type="button" class="teacher-page__cta" (click)="toggleEdit()">Edit Profile</button>
   </div>
 
-  <!-- Loading State -->
-  <div *ngIf="isLoading" class="text-center py-8">
-    <p class="text-slate-600">Loading profile...</p>
+  <div class="teacher-page__stats teacher-page__stats--wide" *ngIf="profile">
+    <article>
+      <span>Teacher</span>
+      <strong>{{ fullName || 'Not set' }}</strong>
+    </article>
+    <article>
+      <span>Teacher ID</span>
+      <strong>{{ profile.teacher_id || 'Pending' }}</strong>
+    </article>
+    <article>
+      <span>Department</span>
+      <strong>{{ profile.department || 'Not assigned' }}</strong>
+    </article>
+    <article>
+      <span>Status</span>
+      <strong>{{ teacherStatusLabel }}</strong>
+    </article>
   </div>
 
-  <!-- Success Message -->
-  <div *ngIf="successMessage" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-    <p class="text-green-700 font-medium">{{ successMessage }}</p>
-  </div>
+  <div *ngIf="successMessage" class="teacher-page__success">{{ successMessage }}</div>
+  <div *ngIf="errorMessage" class="teacher-page__error">{{ errorMessage }}</div>
 
-  <!-- Error Message -->
-  <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-    <p class="text-red-700 font-medium">{{ errorMessage }}</p>
-  </div>
+  <div class="teacher-page__surface">
+    <div *ngIf="isLoading" class="teacher-page__empty">Loading teacher profile...</div>
 
-  <!-- Profile Form -->
-  <div *ngIf="profile && !isLoading" class="bg-white rounded-lg border border-slate-200 p-8">
-    <form (ngSubmit)="saveProfile()">
-      <!-- Personal Information -->
-      <div class="mb-8">
-        <h2 class="text-xl font-semibold text-slate-900 mb-6">Personal Information</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- First Name -->
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-2">First Name *</label>
-            <input
-              type="text"
-              [(ngModel)]="profile.first_name"
-              name="firstName"
-              [disabled]="!isEditing"
-              required
-              class="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900"
-              [ngClass]="{ 'bg-slate-50': !isEditing, 'bg-white': isEditing }"
-            />
-          </div>
-
-          <!-- Middle Name -->
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-2">Middle Name</label>
-            <input
-              type="text"
-              [(ngModel)]="profile.middle_name"
-              name="middleName"
-              [disabled]="!isEditing"
-              class="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900"
-              [ngClass]="{ 'bg-slate-50': !isEditing, 'bg-white': isEditing }"
-            />
-          </div>
-
-          <!-- Last Name -->
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-2">Last Name *</label>
-            <input
-              type="text"
-              [(ngModel)]="profile.last_name"
-              name="lastName"
-              [disabled]="!isEditing"
-              required
-              class="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900"
-              [ngClass]="{ 'bg-slate-50': !isEditing, 'bg-white': isEditing }"
-            />
-          </div>
-
-          <!-- Teacher ID -->
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-2">Teacher ID *</label>
-            <input
-              type="text"
-              [(ngModel)]="profile.teacher_id"
-              name="teacherId"
-              [disabled]="!isEditing"
-              required
-              class="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900"
-              [ngClass]="{ 'bg-slate-50': !isEditing, 'bg-white': isEditing }"
-            />
-          </div>
+    <form *ngIf="profile && !isLoading" (ngSubmit)="saveProfile()" class="teacher-profile">
+      <div class="teacher-profile__summary">
+        <div>
+          <p class="teacher-profile__eyebrow">Account Snapshot</p>
+          <h2>{{ fullName || 'Teacher profile' }}</h2>
+          <p>These fields map to the authenticated teacher profile endpoints only.</p>
+        </div>
+        <div class="teacher-profile__chips">
+          <span>{{ teacherStatusLabel }}</span>
+          <span>{{ profile.department || 'Department pending' }}</span>
         </div>
       </div>
 
-      <!-- Professional Information -->
-      <div class="mb-8">
-        <h2 class="text-xl font-semibold text-slate-900 mb-6">Professional Information</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Department -->
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-2">Department</label>
-            <select
-              [(ngModel)]="profile.department"
-              name="department"
-              [disabled]="!isEditing"
-              class="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900"
-              [ngClass]="{ 'bg-slate-50': !isEditing, 'bg-white': isEditing }"
-            >
-              <option value="">-- Select Department --</option>
+      <div class="teacher-profile__section">
+        <div>
+          <h3>Personal Information</h3>
+          <p>Core teacher identity details shown in your portal profile.</p>
+        </div>
+
+        <div class="teacher-profile__grid">
+          <label>
+            <span>First Name</span>
+            <input type="text" [(ngModel)]="profile.first_name" name="firstName" [disabled]="!isEditing" required>
+          </label>
+
+          <label>
+            <span>Middle Name</span>
+            <input type="text" [(ngModel)]="profile.middle_name" name="middleName" [disabled]="!isEditing">
+          </label>
+
+          <label>
+            <span>Last Name</span>
+            <input type="text" [(ngModel)]="profile.last_name" name="lastName" [disabled]="!isEditing" required>
+          </label>
+
+          <label>
+            <span>Teacher ID</span>
+            <input type="text" [(ngModel)]="profile.teacher_id" name="teacherId" [disabled]="!isEditing" required>
+          </label>
+        </div>
+      </div>
+
+      <div class="teacher-profile__section">
+        <div>
+          <h3>Professional Information</h3>
+          <p>Keep your department and teacher availability up to date.</p>
+        </div>
+
+        <div class="teacher-profile__grid">
+          <label>
+            <span>Department</span>
+            <select [(ngModel)]="profile.department" name="department" [disabled]="!isEditing">
+              <option value="">Select department</option>
               <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
             </select>
-          </div>
+          </label>
 
-          <!-- Status -->
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-2">Status</label>
-            <select
-              [(ngModel)]="profile.status"
-              name="status"
-              [disabled]="!isEditing"
-              class="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900"
-              [ngClass]="{ 'bg-slate-50': !isEditing, 'bg-white': isEditing }"
-            >
+          <label>
+            <span>Status</span>
+            <select [(ngModel)]="profile.status" name="status" [disabled]="!isEditing">
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
-          </div>
+          </label>
         </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="flex gap-4 pt-6 border-t border-slate-200">
-        <button
-          *ngIf="!isEditing"
-          type="button"
-          (click)="toggleEdit()"
-          class="px-6 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition"
-        >
-          Edit Profile
-        </button>
-
-        <button
-          *ngIf="isEditing"
-          type="submit"
-          [disabled]="isSaving"
-          class="px-6 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition disabled:opacity-50"
-        >
-          {{ isSaving ? 'Saving...' : 'Save Changes' }}
-        </button>
-
-        <button
-          *ngIf="isEditing"
-          type="button"
-          (click)="cancel()"
-          class="px-6 py-2 bg-slate-300 text-slate-900 font-medium rounded-lg hover:bg-slate-400 transition"
-        >
-          Cancel
-        </button>
+      <div class="teacher-profile__actions" *ngIf="isEditing">
+        <button type="button" class="teacher-profile__secondary" (click)="cancel()">Cancel</button>
+        <button type="submit" [disabled]="isSaving">{{ isSaving ? 'Saving...' : 'Save Changes' }}</button>
       </div>
     </form>
+
+    <div *ngIf="!profile && !isLoading" class="teacher-page__empty">
+      No teacher profile data is available for this account yet.
+    </div>
   </div>
-</div>
+</section>

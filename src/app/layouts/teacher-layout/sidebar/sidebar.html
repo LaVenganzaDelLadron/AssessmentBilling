@@ -32,6 +32,13 @@
       <span>My Subjects</span>
     </a>
 
+    <a routerLink="/teacher/academic-terms" routerLinkActive="bg-green-600 text-white" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-green-100 font-medium transition-all hover:bg-green-700 hover:text-white">
+      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v11a2 2 0 002 2z" />
+      </svg>
+      <span>Academic Terms</span>
+    </a>
+
     <a routerLink="/teacher/enrollments" routerLinkActive="bg-green-600 text-white" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-green-100 font-medium transition-all hover:bg-green-700 hover:text-white">
       <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-2a6 6 0 0112 0v2zm0 0h6v-2a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -44,6 +51,13 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
       </svg>
       <span>Assessments</span>
+    </a>
+
+    <a routerLink="/teacher/assessment-breakdown" routerLinkActive="bg-green-600 text-white" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-green-100 font-medium transition-all hover:bg-green-700 hover:text-white">
+      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6m3 6V7m3 10v-4m3 8H6a2 2 0 01-2-2V5a2 2 0 012-2h6.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <span>Breakdown</span>
     </a>
 
     <div class="text-xs font-bold uppercase tracking-widest text-green-400 px-4 py-2 mt-4">Account</div>
@@ -67,12 +81,17 @@
       <div class="flex items-center space-x-3">
         <div class="h-10 w-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex-shrink-0"></div>
         <div>
-          <p class="text-sm font-semibold text-white">Teacher</p>
-          <p class="text-xs text-green-300">teacher@university.edu</p>
+          <p class="text-sm font-semibold text-white">{{ (authService.currentUser$ | async)?.name || 'Teacher' }}</p>
+          <p class="text-xs text-green-300">{{ (authService.currentUser$ | async)?.email || 'teacher@university.edu' }}</p>
         </div>
       </div>
-      <button class="w-full text-left px-3 py-2 text-sm text-green-100 hover:text-white hover:bg-green-600 rounded transition-all">
-        Logout
+      <button
+        type="button"
+        (click)="logout()"
+        [disabled]="isLoggingOut"
+        class="w-full text-left px-3 py-2 text-sm text-green-100 hover:text-white hover:bg-green-600 rounded transition-all disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {{ isLoggingOut ? 'Logging out...' : 'Logout' }}
       </button>
     </div>
   </div>

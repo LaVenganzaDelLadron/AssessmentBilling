@@ -1,9 +1,41 @@
-<div class="p-8">
-  <div class="mb-6">
-    <h1 class="text-3xl font-bold text-slate-900">My Subjects</h1>
-    <p class="text-slate-600 mt-2">View your assigned subjects (read-only)</p>
+<section class="teacher-page">
+  <div class="teacher-page__header">
+    <div>
+      <p class="teacher-page__eyebrow">Teacher Workspace</p>
+      <h1>My Subjects</h1>
+      <p>Track the subjects assigned to you, their units, and the program context behind each class.</p>
+    </div>
   </div>
-  <div class="bg-white rounded-lg border border-slate-200 p-6">
-    <p class="text-slate-600">Your assigned subjects will appear here.</p>
+
+  <div class="teacher-page__stats">
+    <article>
+      <span>Total Subjects</span>
+      <strong>{{ subjects.length }}</strong>
+    </article>
+    <article>
+      <span>Total Units</span>
+      <strong>{{ totalUnits }}</strong>
+    </article>
   </div>
-</div>
+
+  <div class="teacher-page__toolbar">
+    <input [(ngModel)]="searchQuery" type="text" placeholder="Search by code, name, program, or type">
+  </div>
+
+  <div *ngIf="errorMessage" class="teacher-page__error">{{ errorMessage }}</div>
+
+  <div class="teacher-page__surface">
+    <div *ngIf="isLoading" class="teacher-page__empty">Loading subjects...</div>
+
+    <div *ngIf="!isLoading && filteredSubjects.length > 0" class="teacher-page__grid">
+      <app-teacher-subject-card
+        *ngFor="let subject of filteredSubjects"
+        [subject]="subject"
+      />
+    </div>
+
+    <div *ngIf="!isLoading && filteredSubjects.length === 0" class="teacher-page__empty">
+      {{ searchQuery ? 'No subjects matched your search.' : 'No subjects assigned yet.' }}
+    </div>
+  </div>
+</section>

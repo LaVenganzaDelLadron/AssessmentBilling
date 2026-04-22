@@ -1,0 +1,5 @@
+:host {
+  display: block;
+}
+
+@import '../shared-teacher-page.css';

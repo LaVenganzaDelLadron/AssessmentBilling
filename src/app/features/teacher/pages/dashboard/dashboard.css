@@ -1,0 +1,83 @@
+:host {
+  display: block;
+}
+
+@import '../shared-teacher-page.css';
+
+.teacher-dashboard {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .teacher-dashboard {
+    grid-template-columns: 1.05fr 1fr;
+  }
+}
+
+.teacher-dashboard__panel {
+  border: 1px solid #dcfce7;
+  border-radius: 1.5rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
+  padding: 1.5rem;
+}
+
+.teacher-dashboard__panel-header h2 {
+  color: #14532d;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.teacher-dashboard__panel-header p,
+.teacher-dashboard__recent-list p {
+  color: #4b5563;
+  margin-top: 0.35rem;
+}
+
+.teacher-dashboard__links {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-top: 1.25rem;
+}
+
+.teacher-dashboard__links a {
+  border: 1px solid #bbf7d0;
+  border-radius: 1rem;
+  color: #166534;
+  font-weight: 700;
+  padding: 1rem;
+  text-decoration: none;
+}
+
+.teacher-dashboard__recent-list {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.25rem;
+}
+
+.teacher-dashboard__recent-list article {
+  align-items: center;
+  background: white;
+  border: 1px solid #dcfce7;
+  border-radius: 1rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.teacher-dashboard__recent-list strong {
+  color: #14532d;
+  display: block;
+}
+
+.teacher-dashboard__recent-list span {
+  background: #dcfce7;
+  border-radius: 999px;
+  color: #166534;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.35rem 0.7rem;
+  text-transform: capitalize;
+}

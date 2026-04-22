@@ -1,0 +1,29 @@
+<article class="teacher-card">
+  <div class="teacher-card__header">
+    <div>
+      <p class="teacher-card__eyebrow">Breakdown #{{ breakdown.id }}</p>
+      <h3 class="teacher-card__title">{{ breakdown.description }}</h3>
+    </div>
+    <span class="teacher-card__badge">{{ breakdown.source_type }}</span>
+  </div>
+
+  <div class="teacher-card__stats">
+    <div>
+      <span>Assessment</span>
+      <strong>#{{ breakdown.assessment_id }}</strong>
+    </div>
+    <div>
+      <span>Source</span>
+      <strong>{{ breakdown.source_id || 'Manual' }}</strong>
+    </div>
+    <div>
+      <span>Amount</span>
+      <strong>₱{{ breakdown.amount }}</strong>
+    </div>
+  </div>
+
+  <div class="teacher-card__actions">
+    <button type="button" (click)="requestEdit()">Update</button>
+    <button type="button" class="teacher-card__danger" (click)="requestDelete()">Delete</button>
+  </div>
+</article>

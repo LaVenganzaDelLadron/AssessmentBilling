@@ -1,0 +1,28 @@
+<div *ngIf="isOpen" class="teacher-modal-backdrop">
+  <div class="teacher-modal teacher-modal--compact">
+    <div class="teacher-modal__header">
+      <div>
+        <p class="teacher-modal__eyebrow">Teacher Assessment</p>
+        <h2>Delete Assessment</h2>
+      </div>
+      <button type="button" (click)="close()">×</button>
+    </div>
+
+    <div class="teacher-modal__body">
+      <p class="teacher-modal__copy">
+        Delete the assessment for
+        <strong>{{ assessment?.student_name || ('Student #' + assessment?.student_id) }}</strong>
+        in <strong>{{ assessment?.school_year }} • {{ assessment?.semester }}</strong>?
+      </p>
+
+      <div *ngIf="errorMessage" class="teacher-modal__error">{{ errorMessage }}</div>
+
+      <div class="teacher-modal__actions">
+        <button type="button" class="teacher-modal__secondary" (click)="close()">Cancel</button>
+        <button type="button" class="teacher-modal__danger" (click)="confirm()">
+          {{ isLoading ? 'Deleting...' : 'Delete Assessment' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

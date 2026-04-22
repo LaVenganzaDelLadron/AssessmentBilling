@@ -1,0 +1,51 @@
+<section class="teacher-page">
+  <div class="teacher-page__header">
+    <div>
+      <p class="teacher-page__eyebrow">Teacher Workspace</p>
+      <h1>Assessment Breakdown</h1>
+      <p>Manage the line items behind each assessment, including subject-based tuition rows and manual fee or discount entries.</p>
+    </div>
+
+    <button type="button" class="teacher-page__cta" (click)="openAddModal()">Add Breakdown</button>
+  </div>
+
+  <div class="teacher-page__stats">
+    <article>
+      <span>Total Rows</span>
+      <strong>{{ breakdowns.length }}</strong>
+    </article>
+  </div>
+
+  <div class="teacher-page__toolbar teacher-page__toolbar--split">
+    <input [(ngModel)]="searchQuery" type="text" placeholder="Search by description, assessment, or source">
+    <select [(ngModel)]="sourceFilter">
+      <option value="">All Source Types</option>
+      <option value="subject">Subject</option>
+      <option value="fee">Fee</option>
+      <option value="discount">Discount</option>
+    </select>
+  </div>
+
+  <div *ngIf="errorMessage" class="teacher-page__error">{{ errorMessage }}</div>
+
+  <div class="teacher-page__surface">
+    <div *ngIf="isLoading" class="teacher-page__empty">Loading assessment breakdowns...</div>
+
+    <div *ngIf="!isLoading && filteredBreakdowns.length > 0" class="teacher-page__grid">
+      <app-teacher-assessment-breakdown-card
+        *ngFor="let breakdown of filteredBreakdowns"
+        [breakdown]="breakdown"
+        (editRequested)="openUpdateModal($event)"
+        (deleteRequested)="openDeleteModal($event)"
+      />
+    </div>
+
+    <div *ngIf="!isLoading && filteredBreakdowns.length === 0" class="teacher-page__empty">
+      {{ searchQuery || sourceFilter ? 'No breakdown rows matched your filters.' : 'No breakdown rows available yet.' }}
+    </div>
+  </div>
+
+  <app-teacher-add-assessment-breakdown-modal (refresh)="loadBreakdowns()"></app-teacher-add-assessment-breakdown-modal>
+  <app-teacher-update-assessment-breakdown-modal (refresh)="loadBreakdowns()"></app-teacher-update-assessment-breakdown-modal>
+  <app-teacher-delete-assessment-breakdown-modal (refresh)="loadBreakdowns()"></app-teacher-delete-assessment-breakdown-modal>
+</section>

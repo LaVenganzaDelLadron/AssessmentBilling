@@ -1,0 +1,23 @@
+<article class="teacher-card">
+  <div class="teacher-card__header">
+    <div>
+      <p class="teacher-card__eyebrow">Subject</p>
+      <h3 class="teacher-card__title">{{ subject.code || 'No code' }}</h3>
+    </div>
+    <span class="teacher-card__badge">{{ subject.status || 'active' }}</span>
+  </div>
+
+  <p class="teacher-card__name">{{ subject.name }}</p>
+  <p class="teacher-card__meta">{{ getProgramLabel() }}</p>
+
+  <div class="teacher-card__stats">
+    <div>
+      <span>Units</span>
+      <strong>{{ subject.units }}</strong>
+    </div>
+    <div>
+      <span>Type</span>
+      <strong>{{ subject.type || 'Lecture' }}</strong>
+    </div>
+  </div>
+</article>

@@ -1,36 +1,79 @@
-<div class="p-8">
-  <div class="mb-8">
-    <h1 class="text-3xl font-bold text-slate-900">Teacher Dashboard</h1>
-    <p class="text-slate-600 mt-2">Limited access to assigned subjects and assessments</p>
-  </div>
-
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-    <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
-      <p class="text-slate-600 text-sm font-semibold uppercase">My Subjects</p>
-      <h3 class="text-2xl font-bold text-slate-900 mt-2">0</h3>
-    </div>
-    <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
-      <p class="text-slate-600 text-sm font-semibold uppercase">Students</p>
-      <h3 class="text-2xl font-bold text-slate-900 mt-2">0</h3>
-    </div>
-    <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
-      <p class="text-slate-600 text-sm font-semibold uppercase">Assessments</p>
-      <h3 class="text-2xl font-bold text-slate-900 mt-2">0</h3>
-    </div>
-    <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
-      <p class="text-slate-600 text-sm font-semibold uppercase">Current Term</p>
-      <h3 class="text-lg font-bold text-slate-900 mt-2">Read Only</h3>
+<section class="teacher-page">
+  <div class="teacher-page__header">
+    <div>
+      <p class="teacher-page__eyebrow">Teacher Workspace</p>
+      <h1>Dashboard</h1>
+      <p>One place to watch your teaching load, active enrollments, and assessment work in progress.</p>
     </div>
   </div>
 
-  <div class="mt-8 p-6 bg-green-50 border border-green-200 rounded-lg">
-    <h3 class="font-bold text-green-900">Access Permissions</h3>
-    <ul class="mt-3 space-y-2 text-sm text-green-800">
-      <li>✓ View assigned subjects</li>
-      <li>✓ View students enrolled in your subjects</li>
-      <li>✓ Create, read, update assessments for your subjects</li>
-      <li>✓ Manage assessment breakdown</li>
-      <li>✓ View current academic term</li>
-    </ul>
+  <div *ngIf="errorMessage" class="teacher-page__error">{{ errorMessage }}</div>
+
+  <div class="teacher-page__stats teacher-page__stats--wide">
+    <article>
+      <span>Subjects</span>
+      <strong>{{ subjects.length }}</strong>
+    </article>
+    <article>
+      <span>Enrollments</span>
+      <strong>{{ enrollments.length }}</strong>
+    </article>
+    <article>
+      <span>Assessments</span>
+      <strong>{{ assessments.length }}</strong>
+    </article>
+    <article>
+      <span>Finalized</span>
+      <strong>{{ finalizedCount }}</strong>
+    </article>
+    <article>
+      <span>Breakdowns</span>
+      <strong>{{ breakdowns.length }}</strong>
+    </article>
   </div>
-</div>
+
+  <div class="teacher-page__surface">
+    <div *ngIf="isLoading" class="teacher-page__empty">Loading dashboard...</div>
+
+    <div *ngIf="!isLoading" class="teacher-dashboard">
+      <div class="teacher-dashboard__panel">
+        <div class="teacher-dashboard__panel-header">
+          <div>
+            <h2>Quick Access</h2>
+            <p>Jump into the areas you’ll use most.</p>
+          </div>
+        </div>
+        <div class="teacher-dashboard__links">
+          <a routerLink="/teacher/subjects">Subjects</a>
+          <a routerLink="/teacher/enrollments">Enrollments</a>
+          <a routerLink="/teacher/assessments">Assessments</a>
+          <a routerLink="/teacher/assessment-breakdown">Assessment Breakdown</a>
+          <a routerLink="/teacher/academic-terms">Academic Terms</a>
+        </div>
+      </div>
+
+      <div class="teacher-dashboard__panel">
+        <div class="teacher-dashboard__panel-header">
+          <div>
+            <h2>Recent Assessments</h2>
+            <p>Latest assessment records from your teaching scope.</p>
+          </div>
+        </div>
+
+        <div *ngIf="recentAssessments.length === 0" class="teacher-page__empty teacher-page__empty--compact">
+          No recent assessments yet.
+        </div>
+
+        <div *ngIf="recentAssessments.length > 0" class="teacher-dashboard__recent-list">
+          <article *ngFor="let assessment of recentAssessments">
+            <div>
+              <strong>{{ assessment.student_name || ('Student #' + assessment.student_id) }}</strong>
+              <p>{{ assessment.school_year }} • {{ assessment.semester }}</p>
+            </div>
+            <span>{{ assessment.status }}</span>
+          </article>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,41 @@
+<section class="teacher-page">
+  <div class="teacher-page__header">
+    <div>
+      <p class="teacher-page__eyebrow">Teacher Workspace</p>
+      <h1>Academic Terms</h1>
+      <p>Review the school years and semesters available to your teaching workload.</p>
+    </div>
+  </div>
+
+  <div class="teacher-page__stats">
+    <article>
+      <span>Total Terms</span>
+      <strong>{{ terms.length }}</strong>
+    </article>
+    <article>
+      <span>Active Terms</span>
+      <strong>{{ activeCount }}</strong>
+    </article>
+  </div>
+
+  <div class="teacher-page__toolbar">
+    <input [(ngModel)]="searchQuery" type="text" placeholder="Search by school year or semester">
+  </div>
+
+  <div *ngIf="errorMessage" class="teacher-page__error">{{ errorMessage }}</div>
+
+  <div class="teacher-page__surface">
+    <div *ngIf="isLoading" class="teacher-page__empty">Loading academic terms...</div>
+
+    <div *ngIf="!isLoading && filteredTerms.length > 0" class="teacher-page__grid">
+      <app-teacher-academic-term-card
+        *ngFor="let term of filteredTerms"
+        [term]="term"
+      />
+    </div>
+
+    <div *ngIf="!isLoading && filteredTerms.length === 0" class="teacher-page__empty">
+      {{ searchQuery ? 'No academic terms matched your search.' : 'No academic terms available yet.' }}
+    </div>
+  </div>
+</section>

@@ -1,9 +1,41 @@
-<div class="p-8">
-  <div class="mb-6">
-    <h1 class="text-3xl font-bold text-slate-900">Student Enrollments</h1>
-    <p class="text-slate-600 mt-2">View students enrolled in your subjects (read-only)</p>
+<section class="teacher-page">
+  <div class="teacher-page__header">
+    <div>
+      <p class="teacher-page__eyebrow">Teacher Workspace</p>
+      <h1>Enrollments</h1>
+      <p>See which students are attached to the classes you manage and keep track of term coverage.</p>
+    </div>
   </div>
-  <div class="bg-white rounded-lg border border-slate-200 p-6">
-    <p class="text-slate-600">Students enrolled in your subjects will appear here.</p>
+
+  <div class="teacher-page__stats">
+    <article>
+      <span>Total Enrollments</span>
+      <strong>{{ enrollments.length }}</strong>
+    </article>
+    <article>
+      <span>Active</span>
+      <strong>{{ activeCount }}</strong>
+    </article>
   </div>
-</div>
+
+  <div class="teacher-page__toolbar">
+    <input [(ngModel)]="searchQuery" type="text" placeholder="Search by student, subject, term, or status">
+  </div>
+
+  <div *ngIf="errorMessage" class="teacher-page__error">{{ errorMessage }}</div>
+
+  <div class="teacher-page__surface">
+    <div *ngIf="isLoading" class="teacher-page__empty">Loading enrollments...</div>
+
+    <div *ngIf="!isLoading && filteredEnrollments.length > 0" class="teacher-page__grid">
+      <app-teacher-enrollment-card
+        *ngFor="let enrollment of filteredEnrollments"
+        [enrollment]="enrollment"
+      />
+    </div>
+
+    <div *ngIf="!isLoading && filteredEnrollments.length === 0" class="teacher-page__empty">
+      {{ searchQuery ? 'No enrollments matched your search.' : 'No enrollments available yet.' }}
+    </div>
+  </div>
+</section>
