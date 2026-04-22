@@ -47,11 +47,6 @@ export const adminRoutes: Routes = [
           import('./pages/report/report').then(m => m.Report)
       },
       {
-        path: 'settings',
-        loadComponent: () =>
-          import('./pages/settings/settings').then(m => m.Settings)
-      },
-      {
         path: 'academic-terms',
         loadComponent: () =>
           import('./pages/academic-terms/academic-terms').then(m => m.AcademicTerms)
@@ -65,6 +60,11 @@ export const adminRoutes: Routes = [
         path: 'fee-structures',
         loadComponent: () =>
           import('./pages/fee-structures/fee-structures').then(m => m.FeeStructures)
+      },
+      {
+        path: 'scholarships',
+        loadComponent: () =>
+          import('./pages/scholarships/scholarships').then(m => m.Scholarships)
       },
       {
         path: 'teachers',

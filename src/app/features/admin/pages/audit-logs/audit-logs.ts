@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuditLog } from '../../models/audit-log.model';
 import { AuditLogsService } from '../../services/audit-logs.service';
+import { LogCard } from '../../cards/log-card/log-card';
 
 @Component({
   selector: 'app-audit-logs',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LogCard],
   templateUrl: './audit-logs.html',
   styleUrl: './audit-logs.css',
 })
@@ -62,6 +63,10 @@ export class AuditLogs implements OnInit {
     });
   }
 
+  refreshLogs(): void {
+    this.loadLogs();
+  }
+
   getFilteredLogs(): AuditLog[] {
     let filtered = this.logs;
 
@@ -77,28 +82,38 @@ export class AuditLogs implements OnInit {
     return filtered;
   }
 
-  getActionBadge(action: string): string {
-    const base = 'px-3 py-1 rounded-full text-xs font-bold';
-
-    switch(this.normalizeAction(action)) {
-      case 'create': return `${base} bg-green-100 text-green-800`;
-      case 'update': return `${base} bg-blue-100 text-blue-800`;
-      case 'delete': return `${base} bg-red-100 text-red-800`;
-      default: return `${base} bg-slate-100 text-slate-800`;
-    }
+  getTotalLogs(): number {
+    return this.logs.length;
   }
 
-  getActionIconClasses(action: string): string {
-    switch (this.normalizeAction(action)) {
-      case 'create':
-        return 'bg-emerald-50 text-emerald-600';
-      case 'update':
-        return 'bg-amber-50 text-amber-600';
-      case 'delete':
-        return 'bg-rose-50 text-rose-600';
-      default:
-        return 'bg-slate-100 text-slate-600';
-    }
+  getVisibleLogCount(): number {
+    return this.getFilteredLogs().length;
+  }
+
+  getUniqueEntityCount(): number {
+    return new Set(
+      this.logs
+        .map((log) => `${log.entity_type}:${log.entity_id}`)
+        .filter((entity) => entity !== ':')
+    ).size;
+  }
+
+  getRecentActivityCount(): number {
+    const now = new Date();
+
+    return this.logs.filter((log) => {
+      if (!log.created_at) {
+        return false;
+      }
+
+      const createdAt = new Date(log.created_at);
+      if (Number.isNaN(createdAt.getTime())) {
+        return false;
+      }
+
+      const diff = now.getTime() - createdAt.getTime();
+      return diff >= 0 && diff <= 7 * 24 * 60 * 60 * 1000;
+    }).length;
   }
 
   getActionOptions(): string[] {
@@ -145,6 +160,18 @@ export class AuditLogs implements OnInit {
   getActionDisplay(action: string): string {
     const normalized = this.normalizeAction(action);
     return normalized ? normalized.toUpperCase() : 'EVENT';
+  }
+
+  getPageSummary(): string {
+    if (this.isLoading) {
+      return 'Preparing the latest audit entries.';
+    }
+
+    if (this.errorMessage) {
+      return 'The audit stream is temporarily unavailable.';
+    }
+
+    return `${this.getVisibleLogCount()} of ${this.getTotalLogs()} logs visible across ${this.getUniqueEntityCount()} tracked entities.`;
   }
 
   trackByLogId(_: number, log: AuditLog): number {

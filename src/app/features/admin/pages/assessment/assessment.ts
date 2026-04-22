@@ -6,9 +6,9 @@ import { AdminNumericValue } from '../../models/admin-api.model';
 import { Assessment as AssessmentModel, AssessmentStatus } from '../../models/assessment.model';
 import { AssessmentsService } from '../../services/assessments.service';
 import { AssessmentCard } from '../../cards/assessment-card/assessment-card';
-import { UpdateAssessmentsModalComponent } from '../../modals/assessments/update-assessments/update-assessments.modal';
-import { DeleteAssessmentsModalComponent } from '../../modals/assessments/delete-assessments/delete-assessments.modal';
-import { AddAssessmentsModalComponent } from '../../modals/assessments/add-assessments/add-assessments.modal';
+import { UpdateAssessmentModalComponent } from '../../modals/assessment/update-assessment/update-assessment.modal';
+import { DeleteAssessmentModalComponent } from '../../modals/assessment/delete-assessment/delete-assessment.modal';
+import { AddAssessmentModalComponent } from '../../modals/assessment/add-assessment/add-assessment.modal';
 
 @Component({
   selector: 'app-assessment',
@@ -16,9 +16,9 @@ import { AddAssessmentsModalComponent } from '../../modals/assessments/add-asses
   imports: [
     CommonModule,
     FormsModule,
-    AddAssessmentsModalComponent,
-    UpdateAssessmentsModalComponent,
-    DeleteAssessmentsModalComponent,
+    AddAssessmentModalComponent,
+    UpdateAssessmentModalComponent,
+    DeleteAssessmentModalComponent,
     AssessmentCard
   ],
   templateUrl: './assessment.html',
@@ -27,9 +27,9 @@ import { AddAssessmentsModalComponent } from '../../modals/assessments/add-asses
 export class Assessment implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
-  @ViewChild(AddAssessmentsModalComponent) addModal!: AddAssessmentsModalComponent;
-  @ViewChild(UpdateAssessmentsModalComponent) updateModal!: UpdateAssessmentsModalComponent;
-  @ViewChild(DeleteAssessmentsModalComponent) deleteModal!: DeleteAssessmentsModalComponent;
+  @ViewChild(AddAssessmentModalComponent) addModal!: AddAssessmentModalComponent;
+  @ViewChild(UpdateAssessmentModalComponent) updateModal!: UpdateAssessmentModalComponent;
+  @ViewChild(DeleteAssessmentModalComponent) deleteModal!: DeleteAssessmentModalComponent;
 
   assessments: AssessmentModel[] = [];
   isLoading = false;
@@ -54,6 +54,7 @@ export class Assessment implements OnInit {
           mapped = data.map((item: any) => ({
             id: item.id ?? item.assessment_id ?? null,
             student_id: item.student_id ?? null,
+            student_name: this.resolveStudentName(item),
             academic_term_id: item.academic_term_id ?? null,
             semester: item.semester ?? '',
             school_year: item.school_year ?? '',
@@ -152,6 +153,47 @@ export class Assessment implements OnInit {
 
   getTermLabel(assessment: AssessmentModel): string {
     return `${assessment.semester} • ${assessment.school_year}`;
+  }
+
+  private resolveStudentName(item: any): string | null {
+    const directName = this.cleanText(
+      item.student_name ??
+      item.studentName ??
+      item.student?.name ??
+      item.student?.full_name
+    );
+    if (directName) {
+      return directName;
+    }
+
+    const fromNestedParts = this.composeName(
+      item.student?.first_name ?? item.student?.firstname ?? item.student?.given_name,
+      item.student?.last_name ?? item.student?.lastname ?? item.student?.surname
+    );
+    if (fromNestedParts) {
+      return fromNestedParts;
+    }
+
+    return this.composeName(
+      item.first_name ?? item.firstname ?? item.given_name,
+      item.last_name ?? item.lastname ?? item.surname
+    );
+  }
+
+  private composeName(first: unknown, last: unknown): string | null {
+    const joined = [this.cleanText(first), this.cleanText(last)]
+      .filter((part): part is string => Boolean(part))
+      .join(' ')
+      .trim();
+    return joined || null;
+  }
+
+  private cleanText(value: unknown): string | null {
+    if (typeof value !== 'string') {
+      return null;
+    }
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : null;
   }
 
   private getErrorMessage(error: unknown): string | null {

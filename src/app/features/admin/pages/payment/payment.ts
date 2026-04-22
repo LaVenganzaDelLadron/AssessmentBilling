@@ -6,6 +6,8 @@ import { AdminDataService, Payment as PaymentModel } from '../../../../shared/se
 import { AddPaymentModalComponent } from '../../modals/payments/add-payment/add-payment.modal';
 import { UpdatePaymentModalComponent } from '../../modals/payments/update-payment/update-payment.modal';
 import { DeletePaymentModalComponent } from '../../modals/payments/delete-payment/delete-payment.modal';
+import { PaymentCard } from '../../cards/payment-card/payment-card';
+import { Payment as PaymentCardModel } from '../../models/payment.model';
 
 @Component({
   selector: 'app-payment',
@@ -13,6 +15,7 @@ import { DeletePaymentModalComponent } from '../../modals/payments/delete-paymen
   imports: [
     CommonModule,
     FormsModule,
+    PaymentCard,
     AddPaymentModalComponent,
     UpdatePaymentModalComponent,
     DeletePaymentModalComponent
@@ -125,6 +128,38 @@ export class Payment implements OnInit {
     );
   }
 
+  getTotalCollected(): number {
+    return this.getFilteredPayments().reduce((sum, payment) => {
+      const amount = Number(payment.amount_paid ?? 0);
+      return sum + (Number.isNaN(amount) ? 0 : amount);
+    }, 0);
+  }
+
+  getUniqueMethodCount(): number {
+    return new Set(
+      this.getFilteredPayments()
+        .map((payment) => this.getPaymentMethod(payment.payment_method_id))
+        .filter((method) => method && method !== 'Unknown')
+    ).size;
+  }
+
+  getRecentPaymentCount(): number {
+    const now = new Date();
+    return this.getFilteredPayments().filter((payment) => {
+      if (!payment.paid_at) {
+        return false;
+      }
+
+      const paidAt = new Date(payment.paid_at);
+      if (Number.isNaN(paidAt.getTime())) {
+        return false;
+      }
+
+      const diff = now.getTime() - paidAt.getTime();
+      return diff >= 0 && diff <= 7 * 24 * 60 * 60 * 1000;
+    }).length;
+  }
+
   getPaymentMethod(method: string | number) {
     if (typeof method === 'string') {
       return method;
@@ -139,7 +174,12 @@ export class Payment implements OnInit {
       return String(value ?? '0.00');
     }
 
-    return numericValue.toFixed(2);
+    return new Intl.NumberFormat('en-PH', {
+      style: 'currency',
+      currency: 'PHP',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(numericValue);
   }
 
   refreshPayments() {
@@ -149,5 +189,18 @@ export class Payment implements OnInit {
   generateSamplePayments() {
     this.payments = [...this.mockPayments];
     this.errorMessage = '';
+  }
+
+  toCardPayment(payment: PaymentModel): PaymentCardModel {
+    return {
+      id: Number(payment.id ?? 0),
+      invoice_id: Number(payment.invoice_id ?? 0),
+      amount_paid: payment.amount_paid,
+      reference_number: payment.reference_number ?? null,
+      paid_at: payment.paid_at ?? new Date().toISOString(),
+      payment_method: this.getPaymentMethod(payment.payment_method_id),
+      created_at: payment.updated_at ?? null,
+      updated_at: payment.updated_at ?? null
+    };
   }
 }

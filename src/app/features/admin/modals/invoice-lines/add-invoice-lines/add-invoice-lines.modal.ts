@@ -1,11 +1,30 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Output, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import {
   CreateInvoiceLinePayload,
   InvoiceLineType
 } from '../../../models/invoice-line.model';
+import { Invoice } from '../../../models/invoice.model';
+import { Subject } from '../../../models/subject.model';
 import { InvoiceLinesService } from '../../../services/invoice-lines.service';
+import { InvoicesService } from '../../../services/invoices.service';
+import { SubjectsService } from '../../../services/subjects.service';
+
+interface InvoiceOption {
+  id: number;
+  invoice_number: string;
+}
+
+interface SubjectOption {
+  id: number;
+  code: string;
+  name: string;
+  units: number;
+}
 
 @Component({
   selector: 'app-add-invoice-lines-modal',
@@ -14,14 +33,20 @@ import { InvoiceLinesService } from '../../../services/invoice-lines.service';
   templateUrl: './add-invoice-lines.modal.html'
 })
 export class AddInvoiceLinesModalComponent {
+  private readonly destroyRef = inject(DestroyRef);
+
   @Output() refresh = new EventEmitter<void>();
 
   isOpen = false;
   isLoading = false;
+  isReferenceLoading = false;
+  referenceLoadFailed = false;
   errorMessage = '';
   successMessage = '';
 
   form: CreateInvoiceLinePayload = this.createEmptyForm();
+  invoices: InvoiceOption[] = [];
+  subjects: SubjectOption[] = [];
   readonly lineTypes: InvoiceLineType[] = [
     'tuition',
     'lab_fee',
@@ -30,11 +55,16 @@ export class AddInvoiceLinesModalComponent {
     'other'
   ];
 
-  constructor(private invoiceLinesService: InvoiceLinesService) {}
+  constructor(
+    private invoiceLinesService: InvoiceLinesService,
+    private invoicesService: InvoicesService,
+    private subjectsService: SubjectsService
+  ) {}
 
   open(): void {
     this.isOpen = true;
     this.resetForm();
+    this.loadReferenceData();
   }
 
   close(): void {
@@ -51,6 +81,28 @@ export class AddInvoiceLinesModalComponent {
       .split('_')
       .map(part => part.charAt(0).toUpperCase() + part.slice(1))
       .join(' ');
+  }
+
+  getSubjectLabel(subject: SubjectOption): string {
+    return `${subject.code} - ${subject.name} (${subject.units.toFixed(2)} units)`;
+  }
+
+  isAutoUnitsEnabled(): boolean {
+    return this.form.line_type === 'tuition' && this.normalizeOptionalNumber(this.form.subject_id) !== null;
+  }
+
+  onLineTypeChange(): void {
+    if (this.form.line_type !== 'tuition') {
+      this.form.subject_id = null;
+      if (Number(this.form.quantity) < 0.01) {
+        this.form.quantity = 1;
+      }
+    }
+    this.applyAutoQuantityFromSubject();
+  }
+
+  onSubjectChange(): void {
+    this.applyAutoQuantityFromSubject();
   }
 
   validate(): boolean {
@@ -79,6 +131,10 @@ export class AddInvoiceLinesModalComponent {
       return false;
     }
     const normalizedSubjectId = this.normalizeOptionalNumber(this.form.subject_id);
+    if (this.form.line_type === 'tuition' && normalizedSubjectId === null) {
+      this.errorMessage = 'Subject is required for tuition line type';
+      return false;
+    }
     if (normalizedSubjectId !== null && normalizedSubjectId <= 0) {
       this.errorMessage = 'Subject ID must be a valid number';
       return false;
@@ -111,8 +167,50 @@ export class AddInvoiceLinesModalComponent {
 
   private resetForm(): void {
     this.form = this.createEmptyForm();
+    this.referenceLoadFailed = false;
     this.errorMessage = '';
     this.successMessage = '';
+  }
+
+  private loadReferenceData(): void {
+    this.isReferenceLoading = true;
+    this.referenceLoadFailed = false;
+
+    forkJoin({
+      invoices: this.invoicesService.list().pipe(catchError(() => of([]))),
+      subjects: this.subjectsService.list().pipe(catchError(() => of([])))
+    })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ invoices, subjects }) => {
+          this.invoices = this.extractListData<Invoice>(invoices)
+            .map((invoice) => ({
+              id: Number(invoice.id),
+              invoice_number: String(invoice.invoice_number ?? `#${invoice.id}`)
+            }))
+            .filter((invoice) => Number.isFinite(invoice.id))
+            .sort((left, right) => right.id - left.id);
+
+          this.subjects = this.extractListData<Subject>(subjects)
+            .map((subject) => ({
+              id: Number(subject.id),
+              code: String(subject.subject_code ?? subject.code ?? `SUB-${subject.id}`),
+              name: String(subject.name ?? `Subject #${subject.id}`),
+              units: this.toNumber(subject.units, 1)
+            }))
+            .filter((subject) => Number.isFinite(subject.id))
+            .sort((left, right) => left.name.localeCompare(right.name));
+
+          this.referenceLoadFailed = this.invoices.length === 0;
+          this.applyInvoiceDefault();
+          this.applyAutoQuantityFromSubject();
+          this.isReferenceLoading = false;
+        },
+        error: () => {
+          this.referenceLoadFailed = true;
+          this.isReferenceLoading = false;
+        }
+      });
   }
 
   private createEmptyForm(): CreateInvoiceLinePayload {
@@ -139,6 +237,44 @@ export class AddInvoiceLinesModalComponent {
     };
   }
 
+  private applyInvoiceDefault(): void {
+    if (this.form.invoice_id > 0) {
+      return;
+    }
+
+    if (this.invoices.length > 0) {
+      this.form.invoice_id = this.invoices[0].id;
+    }
+  }
+
+  private applyAutoQuantityFromSubject(): void {
+    if (!this.isAutoUnitsEnabled()) {
+      return;
+    }
+
+    const subjectId = this.normalizeOptionalNumber(this.form.subject_id);
+    const selectedSubject = this.subjects.find((subject) => subject.id === subjectId);
+
+    if (!selectedSubject) {
+      return;
+    }
+
+    this.form.quantity = selectedSubject.units;
+
+    if (!this.form.description.trim()) {
+      this.form.description = selectedSubject.name;
+    }
+  }
+
+  private extractListData<T>(response: unknown): T[] {
+    if (Array.isArray(response)) {
+      return response as T[];
+    }
+
+    const data = (response as { data?: unknown } | null)?.data;
+    return Array.isArray(data) ? (data as T[]) : [];
+  }
+
   private calculateAmount(quantity: number | string | null, unitPrice: number | string | null): number {
     const numericQuantity = Number(quantity);
     const numericUnitPrice = Number(unitPrice);
@@ -156,6 +292,11 @@ export class AddInvoiceLinesModalComponent {
     }
 
     return Number(value);
+  }
+
+  private toNumber(value: unknown, fallback: number = 0): number {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
   }
 
   private getErrorMessage(error: unknown): string | null {

@@ -1,261 +1,176 @@
-<div class="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-slate-100 antialiased">
-  <main class="max-w-[1400px] mx-auto px-6 py-10 space-y-10 lg:px-8">
+<div class="min-h-screen bg-[#fcfdfe] font-sans text-slate-900 antialiased selection:bg-indigo-100">
+  <div class="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-indigo-50/50 to-transparent pointer-events-none"></div>
+
+  <main class="relative mx-auto max-w-[1650px] px-6 py-10 lg:px-12 lg:py-16">
     <ng-container *ngIf="overview$ | async as overview">
 
-      <!-- Header -->
-      <div class="flex flex-col gap-4 md:flex-row md:items-end justify-between">
-        <div class="space-y-2">
-          <p class="text-xs uppercase tracking-[0.35em] text-blue-600 font-bold">Admin dashboard</p>
-          <h2 class="text-3xl font-black tracking-tight text-slate-900">System overview</h2>
-          <p class="text-slate-500 text-sm max-w-2xl">Live financial and academic metrics pulled from students, assessments, invoices, and payments.</p>
-          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Last synced {{ getLastUpdatedLabel(overview.lastUpdated) }}</p>
-        </div>
-        <div class="flex flex-wrap gap-3">
-          <button
-            type="button"
-            (click)="loadDashboard(true)"
-            class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
-          >
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m14.124 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-14.124-2m14.124 2H15"/></svg>
-            Refresh data
-          </button>
-          <button
-            type="button"
-            (click)="exportDashboardSnapshot(overview)"
-            class="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 shadow-sm transition hover:border-blue-300 hover:bg-blue-100"
-          >
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-5l-4-4m0 0L8 11m4-4v12"/></svg>
-            Export snapshot
-          </button>
-          <button
-            routerLink="/admin/assessment"
-            class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700"
-          >
-            + New assessment
-          </button>
-        </div>
-      </div>
-
-      <!-- Error State -->
-      <div *ngIf="errorMessage" class="rounded-3xl border border-red-200 bg-red-50 p-6 shadow-sm">
-        <p class="text-red-700 font-semibold">{{ errorMessage }}</p>
-      </div>
-
-      <!-- Stats Cards -->
-      <section class="grid gap-6 xl:grid-cols-6">
-        <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm transition hover:border-blue-300">
-          <p class="text-[10px] uppercase tracking-[0.25em] text-slate-400">Total revenue</p>
-          <div class="mt-4 flex items-end justify-between gap-4">
-            <h3 class="text-2xl font-black text-slate-900">{{ formatCurrency(overview.stats.totalRevenue) }}</h3>
-            <span class="rounded-full bg-green-50 px-3 py-1 text-[10px] font-bold text-green-700">{{ getRevenuePercentage(overview.revenueTrend) }}</span>
+      <header class="mb-16 flex flex-col justify-between gap-10 lg:flex-row lg:items-end">
+        <div class="space-y-5">
+          <div class="inline-flex items-center gap-2.5 rounded-full bg-white px-4 py-1.5 shadow-sm ring-1 ring-slate-200/60">
+            <span class="flex h-2 w-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]"></span>
+            <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500">Live Engine v3.2</p>
           </div>
+          <h1 class="text-6xl font-black tracking-tight text-slate-950 sm:text-7xl">
+            Insight<span class="text-indigo-600">.</span>
+          </h1>
+          <p class="max-w-xl text-lg font-medium leading-relaxed text-slate-500/90">
+            Intelligent financial reconciliation and academic performance orchestration.
+          </p>
         </div>
 
-        <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm transition hover:border-amber-300">
-          <p class="text-[10px] uppercase tracking-[0.25em] text-slate-400">Pending payments</p>
-          <div class="mt-4 flex items-end justify-between gap-4">
-            <h3 class="text-2xl font-black text-slate-900">{{ formatCurrency(overview.stats.pendingPayments) }}</h3>
-            <span class="rounded-full bg-amber-50 px-3 py-1 text-[10px] font-bold text-amber-700">{{ getPendingInvoiceLabel(overview.stats) }}</span>
-          </div>
-        </div>
-
-        <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm transition hover:border-red-300">
-          <p class="text-[10px] uppercase tracking-[0.25em] text-slate-400">Overdue</p>
-          <div class="mt-4 flex items-end justify-between gap-4">
-            <h3 class="text-2xl font-black text-red-600">{{ formatCurrency(overview.stats.overdueAmount) }}</h3>
-            <span class="rounded-full bg-red-50 px-3 py-1 text-[10px] font-bold text-red-700">{{ getOverdueInvoiceLabel(overview.paymentDistribution) }}</span>
-          </div>
-        </div>
-
-        <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm transition hover:border-blue-300">
-          <p class="text-[10px] uppercase tracking-[0.25em] text-slate-400">Paid this month</p>
-          <div class="mt-4 flex items-end justify-between gap-4">
-            <h3 class="text-2xl font-black text-slate-900">{{ formatCurrency(overview.stats.paidThisMonth) }}</h3>
-            <span class="rounded-full bg-blue-50 px-3 py-1 text-[10px] font-bold text-blue-700">Current</span>
-          </div>
-        </div>
-
-        <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm transition hover:border-emerald-300">
-          <p class="text-[10px] uppercase tracking-[0.25em] text-slate-400">Students</p>
-          <div class="mt-4 flex items-end justify-between gap-4">
-            <h3 class="text-2xl font-black text-slate-900">{{ overview.stats.totalStudents }}</h3>
-            <span class="rounded-full bg-green-50 px-3 py-1 text-[10px] font-bold text-green-700">{{ getStudentPercentage(overview.stats) }}</span>
-          </div>
-        </div>
-
-        <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm transition hover:border-slate-300">
-          <p class="text-[10px] uppercase tracking-[0.25em] text-slate-400">Assessments</p>
-          <div class="mt-4 flex items-end justify-between gap-4">
-            <h3 class="text-2xl font-black text-slate-900">{{ overview.stats.assessments }}</h3>
-            <span class="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold text-slate-700">Active</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- Charts Section -->
-      <div class="grid gap-8 lg:grid-cols-3">
-        <div class="lg:col-span-2 rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
-          <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-4">
+          <div class="group flex items-center gap-5 rounded-[2rem] bg-white p-3 pr-8 shadow-sm transition-all hover:shadow-md ring-1 ring-slate-200/70">
+            <div class="flex h-14 w-14 items-center justify-center rounded-[1.25rem] bg-slate-950 text-white transition-transform group-hover:rotate-12">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            </div>
             <div>
-              <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400">Revenue dynamics</p>
-              <h3 class="mt-3 text-xl font-black text-slate-900">Monthly revenue trends</h3>
-            </div>
-            <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700">
-              Last 6 months
-            </div>
-          </div>
-          <div *ngIf="overview.revenueTrend.length > 0; else emptyRevenueState" class="space-y-6">
-            <div class="grid h-[18rem] grid-cols-6 items-end gap-4">
-              <div *ngFor="let point of overview.revenueTrend" class="flex h-full flex-col justify-end gap-3">
-                <span class="text-center text-xs font-semibold text-slate-500">{{ point.amount > 0 ? formatCompactCurrency(point.amount) : '$0' }}</span>
-                <div class="flex-1 rounded-[1.75rem] bg-slate-50 p-3">
-                  <div class="flex h-full items-end">
-                    <div
-                      class="w-full rounded-2xl transition-all duration-300"
-                      [ngClass]="point.isCurrentMonth ? 'bg-blue-600 shadow-lg shadow-blue-100' : 'bg-slate-300'"
-                      [style.height.%]="getRevenueBarHeight(point)"
-                    ></div>
-                  </div>
-                </div>
-                <span class="text-center text-xs font-bold uppercase tracking-[0.2em]" [ngClass]="point.isCurrentMonth ? 'text-blue-700' : 'text-slate-400'">
-                  {{ point.label }}
-                </span>
-              </div>
-            </div>
-            <div class="rounded-[1.5rem] border border-slate-100 bg-slate-50/80 px-5 py-4 text-sm text-slate-600">
-              Revenue this month is {{ formatCurrency(overview.stats.paidThisMonth) }} based on recorded payment activity.
+              <span class="block text-[10px] font-bold uppercase tracking-widest text-slate-400">Database Sync</span>
+              <span class="block text-sm font-black text-slate-900">{{ getLastUpdatedLabel(overview.lastUpdated) }}</span>
             </div>
           </div>
         </div>
-        <div class="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
-          <div class="mb-8">
-            <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400">Status breakdown</p>
-            <h3 class="mt-3 text-xl font-black text-slate-900">Payment distribution</h3>
-          </div>
-          <div *ngIf="overview.paymentDistribution.length > 0; else emptyDistributionState" class="space-y-6">
-            <div class="flex h-4 overflow-hidden rounded-full bg-slate-100">
-              <div
-                *ngFor="let item of overview.paymentDistribution"
-                class="h-full transition-all duration-300"
-                [ngClass]="getDistributionFillClass(item.status)"
-                [style.width.%]="item.percentage"
-              ></div>
+      </header>
+
+      <div class="grid grid-cols-1 gap-10 lg:grid-cols-12">
+
+        <div class="space-y-10 lg:col-span-8">
+
+          <section class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <div class="group relative overflow-hidden rounded-[2.5rem] bg-slate-950 p-8 text-white shadow-2xl transition-all hover:-translate-y-2">
+              <div class="relative z-10">
+                <div class="flex items-center justify-between">
+                  <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">Gross Revenue</p>
+                  <svg class="h-5 w-5 text-indigo-400 opacity-0 transition-opacity group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                </div>
+                <h3 class="mt-8 text-4xl font-black tracking-tighter">{{ formatCurrency(overview.stats.totalRevenue) }}</h3>
+                <div class="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-500/15 px-3 py-1 text-[10px] font-black text-emerald-400">
+                  <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                  {{ getRevenuePercentage(overview.revenueTrend) }}
+                </div>
+              </div>
+              <div class="absolute -right-10 -bottom-10 h-40 w-40 rounded-full bg-indigo-500/20 blur-[60px] transition-all group-hover:bg-indigo-500/30"></div>
             </div>
 
-            <div class="space-y-4">
-              <div *ngFor="let item of overview.paymentDistribution" class="rounded-[1.5rem] border border-slate-100 bg-slate-50/70 p-4">
-                <div class="flex items-center justify-between gap-4">
+            <div class="group rounded-[2.5rem] border border-slate-200/80 bg-white p-8 transition-all hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/5">
+              <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">Active Pool</p>
+              <h3 class="mt-8 text-4xl font-black text-slate-950 group-hover:text-indigo-600 transition-colors">{{ overview.stats.totalStudents }}</h3>
+              <p class="mt-2 text-xs font-bold text-slate-500"><span class="text-emerald-600">+{{ getStudentPercentage(overview.stats) }}</span> since last term</p>
+            </div>
+
+            <div class="group rounded-[2.5rem] border border-slate-200/80 bg-white p-8 transition-all hover:bg-rose-50/30 hover:border-rose-100">
+              <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">Arrears</p>
+              <h3 class="mt-8 text-4xl font-black text-rose-600">{{ formatCurrency(overview.stats.overdueAmount) }}</h3>
+              <div class="mt-4 flex items-center gap-2">
+                <span class="flex h-2 w-2 rounded-full bg-rose-500"></span>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-rose-500">High Risk</p>
+              </div>
+            </div>
+          </section>
+
+
+          <section class="overflow-hidden rounded-[3rem] border border-slate-200/80 bg-white shadow-sm">
+            <div class="flex items-center justify-between px-10 py-9">
+              <h3 class="text-2xl font-black text-slate-950">Recent Activity</h3>
+              <button class="group flex items-center gap-2 text-xs font-black uppercase tracking-widest text-indigo-600">
+                Audit Trail
+                <svg class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead>
+                  <tr class="bg-slate-50/70 text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400">
+                    <th class="px-10 py-6">Identity</th>
+                    <th class="px-10 py-6 text-center">Status</th>
+                    <th class="px-10 py-6">Nominal Value</th>
+                    <th class="px-10 py-6 text-right">Settlement</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr *ngFor="let invoice of overview.recentInvoices" class="group cursor-pointer transition-colors hover:bg-slate-50/50">
+                    <td class="px-10 py-7">
+                      <div class="flex flex-col gap-1">
+                        <span class="text-sm font-black text-slate-900">{{ invoice.invoice_number }}</span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 group-hover:text-indigo-500 transition-colors">Transaction Ref</span>
+                      </div>
+                    </td>
+                    <td class="px-10 py-7 text-center">
+                      <span [ngClass]="getStatusBadgeClass(invoice.status)" class="inline-flex rounded-lg px-3 py-1.5 text-[10px] font-black uppercase tracking-widest ring-1 ring-inset">
+                        {{ invoice.status }}
+                      </span>
+                    </td>
+                    <td class="px-10 py-7">
+                      <span class="text-sm font-black text-slate-700">{{ formatCurrency(invoice.total_amount) }}</span>
+                    </td>
+                    <td class="px-10 py-7 text-right">
+                      <span class="text-xs font-bold text-slate-500">{{ invoice.due_date | date: 'MMM dd, yyyy' }}</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <div class="space-y-10 lg:col-span-4">
+
+          <div class="rounded-[3rem] bg-white p-10 shadow-sm ring-1 ring-slate-200/80">
+            <h3 class="text-xl font-black tracking-tight text-slate-950">Cash Distribution</h3>
+            <p class="mt-2 text-sm font-medium text-slate-500">Real-time status breakdown</p>
+
+            <div class="mt-12 space-y-9">
+              <div *ngFor="let item of overview.paymentDistribution" class="space-y-4">
+                <div class="flex items-center justify-between">
                   <div class="flex items-center gap-3">
-                    <span class="h-3 w-3 rounded-full" [ngClass]="getDistributionFillClass(item.status)"></span>
-                    <div>
-                      <p class="text-sm font-bold text-slate-800">{{ item.label }}</p>
-                      <p class="text-xs text-slate-500">{{ item.count }} invoices</p>
-                    </div>
+                    <span class="h-3 w-3 rounded-full shadow-sm" [ngClass]="getDistributionFillClass(item.status)"></span>
+                    <span class="text-[11px] font-black uppercase tracking-[0.15em] text-slate-900">{{ item.label }}</span>
                   </div>
-                  <div class="text-right">
-                    <p class="text-sm font-black text-slate-900">{{ item.percentage | number: '1.0-0' }}%</p>
-                    <p class="text-xs text-slate-500">{{ formatCurrency(item.amount) }}</p>
-                  </div>
+                  <span class="text-xs font-black text-slate-950">{{ item.percentage | number: '1.0-0' }}%</span>
                 </div>
-                <div class="mt-3 h-2 overflow-hidden rounded-full bg-white">
-                  <div
-                    class="h-full rounded-full transition-all duration-300"
-                    [ngClass]="getDistributionFillClass(item.status)"
-                    [style.width.%]="item.percentage"
-                  ></div>
+                <div class="h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div class="h-full rounded-full transition-all duration-1000 ease-out" [ngClass]="getDistributionFillClass(item.status)" [style.width.%]="item.percentage"></div>
+                </div>
+                <div class="flex justify-between">
+                   <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ item.count }} Records</p>
+                   <p class="text-[10px] font-black text-slate-600">{{ formatCurrency(item.amount) }}</p>
                 </div>
               </div>
             </div>
+          </div>
+
+          <div class="relative overflow-hidden rounded-[3rem] bg-indigo-600 p-10 text-white shadow-2xl shadow-indigo-500/20">
+            <div class="relative z-10">
+              <h3 class="text-2xl font-black tracking-tight">Academic Pulse</h3>
+              <p class="mt-2 text-sm font-medium text-white/70">Assessment tracking engine</p>
+
+              <div class="mt-10 space-y-5">
+                <div class="flex items-center justify-between rounded-[1.5rem] bg-white/10 p-6 backdrop-blur-md ring-1 ring-white/20 transition-transform hover:scale-[1.02]">
+                  <div>
+                    <span class="block text-[10px] font-bold uppercase tracking-widest text-white/60">Finalized</span>
+                    <span class="mt-1 block text-3xl font-black">{{ overview.stats.upcomingAssessments }}</span>
+                  </div>
+                  <svg class="h-8 w-8 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+
+                <div class="flex items-center justify-between rounded-[1.5rem] bg-white/10 p-6 backdrop-blur-md ring-1 ring-white/20 transition-transform hover:scale-[1.02]">
+                  <div>
+                    <span class="block text-[10px] font-bold uppercase tracking-widest text-white/60">Draft Mode</span>
+                    <span class="mt-1 block text-3xl font-black">{{ overview.stats.pendingAssessments }}</span>
+                  </div>
+                  <svg class="h-8 w-8 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                </div>
+              </div>
+
+              <button routerLink="/admin/assessment" class="group mt-10 flex w-full items-center justify-center gap-3 rounded-2xl bg-white py-5 text-sm font-black text-indigo-600 shadow-xl transition-all hover:bg-slate-50 hover:shadow-2xl">
+                Configuration Hub
+                <svg class="h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+              </button>
+            </div>
+
+            <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-[80px]"></div>
           </div>
         </div>
       </div>
-
-      <!-- Recent Data Section -->
-      <section class="grid gap-8 xl:grid-cols-2 pb-12">
-        <div class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
-          <div class="flex items-center justify-between border-b border-slate-100 px-8 py-5">
-            <h3 class="font-bold text-slate-800">Recent invoices</h3>
-            <button
-              routerLink="/admin/invoices"
-              class="rounded-2xl bg-blue-50 px-4 py-2 text-xs font-bold text-blue-600 transition hover:bg-blue-100"
-            >
-              Full history
-            </button>
-          </div>
-          <table class="w-full border-collapse text-left">
-            <thead>
-              <tr class="bg-slate-50 text-[10px] uppercase tracking-widest text-slate-400 font-bold border-b border-slate-100">
-                <th class="px-8 py-4">Invoice #</th>
-                <th class="px-8 py-4">Amount</th>
-                <th class="px-8 py-4">Status</th>
-                <th class="px-8 py-4 text-right">Due date</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100 text-sm text-slate-700">
-              <tr *ngFor="let invoice of overview.recentInvoices" class="hover:bg-slate-50 transition-colors cursor-pointer">
-                <td class="px-8 py-4 font-semibold">{{ invoice.invoice_number }}</td>
-                <td class="px-8 py-4 text-slate-600">{{ formatCurrency(invoice.total_amount) }}</td>
-                <td class="px-8 py-4">
-                  <span [ngClass]="'inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-black ' + getStatusBadgeClass(invoice.status)">
-                    {{ invoice.status }}
-                  </span>
-                </td>
-                <td class="px-8 py-4 text-right text-xs text-slate-400">{{ invoice.due_date | date: 'MMM dd, yyyy' }}</td>
-              </tr>
-              <tr *ngIf="overview.recentInvoices.length === 0">
-                <td colspan="4" class="px-8 py-6 text-center text-slate-400 italic">No recent invoices</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-5">
-            <h3 class="font-bold text-slate-800">Assessment summary</h3>
-            <button
-              routerLink="/admin/assessment"
-              class="rounded-2xl bg-blue-50 px-4 py-2 text-xs font-black text-blue-600 transition hover:bg-blue-100"
-            >
-              View all
-            </button>
-          </div>
-          <div class="space-y-4 pt-6">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-              <div>
-                <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-bold">Total assessments</p>
-                <p class="mt-2 text-2xl font-black text-slate-900">{{ overview.stats.assessments }}</p>
-              </div>
-              <p class="text-sm font-bold text-slate-700">100%</p>
-            </div>
-            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-              <div>
-                <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-bold">Finalized</p>
-                <p class="mt-2 text-lg font-black text-blue-600">{{ overview.stats.upcomingAssessments }}</p>
-              </div>
-              <span class="rounded-full bg-blue-50 px-3 py-1 text-[10px] font-bold text-blue-600">{{ getAssessmentShare(overview.stats.upcomingAssessments, overview.stats.assessments) | number: '1.0-0' }}%</span>
-            </div>
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-bold">Draft</p>
-                <p class="mt-2 text-lg font-black text-amber-600">{{ overview.stats.pendingAssessments }}</p>
-              </div>
-              <span class="rounded-full bg-amber-50 px-3 py-1 text-[10px] font-bold text-amber-700">{{ getAssessmentShare(overview.stats.pendingAssessments, overview.stats.assessments) | number: '1.0-0' }}%</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <ng-template #emptyRevenueState>
-        <div class="flex h-[18rem] items-center justify-center rounded-[2rem] border border-dashed border-slate-200 bg-slate-50 text-slate-400 italic">
-          No payment activity yet to chart.
-        </div>
-      </ng-template>
-
-      <ng-template #emptyDistributionState>
-        <div class="flex h-[18rem] items-center justify-center rounded-[2rem] border border-dashed border-slate-200 bg-slate-50 text-slate-400 italic">
-          No invoice distribution available yet.
-        </div>
-      </ng-template>
     </ng-container>
   </main>
 </div>

@@ -4,6 +4,7 @@ export type AssessmentStatus = 'draft' | 'finalized';
 
 export interface Assessment extends BaseAdminModel {
   student_id: number;
+  student_name?: string | null;
   academic_term_id: number;
   semester: string;
   school_year: string;

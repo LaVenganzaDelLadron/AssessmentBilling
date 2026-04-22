@@ -1,12 +1,20 @@
-import { Component, ViewChild, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, ViewChild, Output, EventEmitter, OnInit, DestroyRef, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   Assessment as AssessmentModel,
   AssessmentStatus,
   UpdateAssessmentPayload
 } from '../../../models/assessment.model';
 import { AssessmentsService } from '../../../services/assessments.service';
+import { EnrollmentsService } from '../../../services/enrollments.service';
+import { SubjectsService } from '../../../services/subjects.service';
+import { StudentsService } from '../../../services/students.service';
+import { AcademicTermsService } from '../../../services/academic-terms.service';
+import { Student } from '../../../models/student.model';
+import { Subject } from '../../../models/subject.model';
+import { AcademicTerm } from '../../../models/academic-term.model';
 
 interface AssessmentForm {
   student_id: number | null;
@@ -22,6 +30,15 @@ interface AssessmentForm {
   status: AssessmentStatus;
 }
 
+interface EnrollmentBundle {
+  student_id: number;
+  student_name: string;
+  academic_term_id: number;
+  school_year: string;
+  semester: string;
+  subject_ids: number[];
+}
+
 @Component({
   selector: 'app-update-assessments-modal',
   standalone: true,
@@ -30,18 +47,31 @@ interface AssessmentForm {
   styleUrl: './update-assessments.modal.css'
 })
 export class UpdateAssessmentsModalComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild('modal') modal: any;
   @Output() refresh = new EventEmitter<void>();
 
   isOpen = false;
   isLoading = false;
+  isLoadingReferenceData = false;
   errorMessage = '';
 
   currentEntity: AssessmentModel | null = null;
-  readonly semesters = ['1st Semester', '2nd Semester', 'Summer'];
   form: AssessmentForm = this.createEmptyForm();
+  students: Student[] = [];
+  subjectsById = new Map<number, Subject>();
+  termsById = new Map<number, AcademicTerm>();
+  enrollmentBundles: EnrollmentBundle[] = [];
+  selectedSubjectNames: string[] = [];
 
-  constructor(private assessmentsService: AssessmentsService) {}
+  constructor(
+    private assessmentsService: AssessmentsService,
+    private enrollmentsService: EnrollmentsService,
+    private subjectsService: SubjectsService,
+    private studentsService: StudentsService,
+    private academicTermsService: AcademicTermsService
+  ) {}
 
   ngOnInit(): void {}
 
@@ -62,6 +92,7 @@ export class UpdateAssessmentsModalComponent implements OnInit {
     };
     this.errorMessage = '';
     this.isOpen = true;
+    this.loadReferenceData();
   }
 
   close(): void {
@@ -69,13 +100,48 @@ export class UpdateAssessmentsModalComponent implements OnInit {
     this.resetForm();
   }
 
+  onStudentChange(): void {
+    this.form.academic_term_id = null;
+    this.form.semester = '';
+    this.form.school_year = '';
+    this.form.total_units = 0;
+    this.selectedSubjectNames = [];
+  }
+
+  onAcademicTermChange(): void {
+    this.recomputeFromEnrollment();
+  }
+
+  getAvailableTerms(): EnrollmentBundle[] {
+    if (!this.form.student_id) {
+      return [];
+    }
+
+    return this.enrollmentBundles
+      .filter((bundle) => bundle.student_id === this.form.student_id)
+      .sort((a, b) => this.getTermLabel(a).localeCompare(this.getTermLabel(b)));
+  }
+
+  getStudentLabel(student: Student): string {
+    const fullName = [student.first_name, student.middle_name, student.last_name]
+      .filter(Boolean)
+      .join(' ')
+      .trim();
+
+    return fullName || `Student #${student.id}`;
+  }
+
+  getTermLabel(bundle: EnrollmentBundle): string {
+    return `${bundle.school_year} • ${bundle.semester}`;
+  }
+
   validate(): boolean {
     if (!this.form.student_id) {
-      this.errorMessage = 'Student ID is required';
+      this.errorMessage = 'Student is required';
       return false;
     }
     if (!this.form.academic_term_id) {
-      this.errorMessage = 'Academic term ID is required';
+      this.errorMessage = 'Academic term is required';
       return false;
     }
     if (!this.form.semester.trim()) {
@@ -158,10 +224,282 @@ export class UpdateAssessmentsModalComponent implements OnInit {
     return this.computedTotalAmount - (this.form.discount ?? 0);
   }
 
+  private loadReferenceData(): void {
+    this.isLoadingReferenceData = true;
+
+    this.loadStudents();
+    this.loadSubjects();
+    this.loadTerms();
+    this.loadEnrollmentBundles();
+  }
+
+  private loadStudents(): void {
+    const cached = this.studentsService.getCachedStudents();
+    if (cached?.length) {
+      this.students = [...cached].sort((a, b) =>
+        this.getStudentLabel(a).localeCompare(this.getStudentLabel(b))
+      );
+      return;
+    }
+
+    this.studentsService
+      .list({ page: 1, per_page: 200 })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response: any) => {
+          const data = Array.isArray(response) ? response : response.data ?? [];
+          if (!Array.isArray(data)) {
+            this.students = [];
+            return;
+          }
+
+          this.students = data
+            .map((item: any) => ({
+              id: this.normalizeNumber(item.id ?? item.student_id) ?? 0,
+              student_no: item.student_no ?? '',
+              first_name: item.first_name ?? '',
+              middle_name: item.middle_name ?? null,
+              last_name: item.last_name ?? '',
+              email: item.email ?? null,
+              program_id: this.normalizeNumber(item.program_id) ?? 0,
+              year_level: this.normalizeNumber(item.year_level) ?? 0,
+              status: item.status ?? 'inactive',
+              user_id: this.normalizeNumber(item.user_id),
+              program: item.program ?? null,
+              created_at: item.created_at ?? null,
+              updated_at: item.updated_at ?? null
+            }))
+            .filter((student: Student) => !!student.id)
+            .sort((a: Student, b: Student) =>
+              this.getStudentLabel(a).localeCompare(this.getStudentLabel(b))
+            );
+
+          this.studentsService.setCachedStudents(this.students);
+        },
+        error: () => {
+          this.students = [];
+        }
+      });
+  }
+
+  private loadSubjects(): void {
+    const cached = this.subjectsService.getCachedSubjects();
+    if (cached?.length) {
+      this.subjectsById = new Map(cached.map((subject) => [subject.id, subject]));
+      this.recomputeFromEnrollment();
+      return;
+    }
+
+    this.subjectsService
+      .list()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response: any) => {
+          const data = Array.isArray(response) ? response : response.data ?? [];
+          if (!Array.isArray(data)) {
+            this.subjectsById = new Map();
+            return;
+          }
+
+          const mapped: Subject[] = data
+            .map((item: any) => ({
+              id: this.normalizeNumber(item.id ?? item.subject_id) ?? 0,
+              code: item.code ?? item.subject_code ?? '',
+              subject_code: item.subject_code ?? null,
+              name: item.name ?? item.subject_name ?? 'N/A',
+              units: item.units ?? 0,
+              program_id: this.normalizeNumber(item.program_id),
+              created_at: item.created_at ?? null,
+              updated_at: item.updated_at ?? null
+            }))
+            .filter((subject: Subject) => !!subject.id);
+
+          this.subjectsById = new Map(mapped.map((subject) => [subject.id, subject]));
+          this.subjectsService.setCachedSubjects(mapped);
+          this.recomputeFromEnrollment();
+        },
+        error: () => {
+          this.subjectsById = new Map();
+          this.recomputeFromEnrollment();
+        }
+      });
+  }
+
+  private loadTerms(): void {
+    const cached = this.academicTermsService.getCachedTerms();
+    if (cached?.length) {
+      this.termsById = new Map(cached.map((term) => [term.id, term]));
+      return;
+    }
+
+    this.academicTermsService
+      .list()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response: any) => {
+          const data = Array.isArray(response) ? response : response.data ?? [];
+          if (!Array.isArray(data)) {
+            this.termsById = new Map();
+            return;
+          }
+
+          const mapped: AcademicTerm[] = data
+            .map((item: any) => ({
+              id: this.normalizeNumber(item.id ?? item.term_id) ?? 0,
+              school_year: item.school_year ?? '',
+              semester: item.semester ?? '',
+              start_date: item.start_date ?? '',
+              end_date: item.end_date ?? '',
+              is_active: !!item.is_active,
+              created_at: item.created_at ?? null,
+              updated_at: item.updated_at ?? null
+            }))
+            .filter((term: AcademicTerm) => !!term.id);
+
+          this.termsById = new Map(mapped.map((term) => [term.id, term]));
+          this.academicTermsService.setCachedTerms(mapped);
+        },
+        error: () => {
+          this.termsById = new Map();
+        }
+      });
+  }
+
+  private loadEnrollmentBundles(): void {
+    this.enrollmentsService
+      .list()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response: any) => {
+          const data = Array.isArray(response) ? response : response.data ?? [];
+          this.enrollmentBundles = this.mapEnrollmentBundles(data);
+          this.isLoadingReferenceData = false;
+          this.recomputeFromEnrollment();
+        },
+        error: () => {
+          this.enrollmentBundles = [];
+          this.isLoadingReferenceData = false;
+          this.recomputeFromEnrollment();
+        }
+      });
+  }
+
+  private recomputeFromEnrollment(): void {
+    const bundle = this.enrollmentBundles.find(
+      (row) =>
+        row.student_id === this.form.student_id &&
+        row.academic_term_id === this.form.academic_term_id
+    );
+
+    if (!bundle) {
+      this.form.semester = '';
+      this.form.school_year = '';
+      this.form.total_units = 0;
+      this.selectedSubjectNames = [];
+      return;
+    }
+
+    this.form.semester = bundle.semester;
+    this.form.school_year = bundle.school_year;
+    this.form.total_units = this.computeTotalUnits(bundle.subject_ids);
+    this.selectedSubjectNames = this.getSubjectNames(bundle.subject_ids);
+  }
+
+  private computeTotalUnits(subjectIds: number[]): number {
+    return subjectIds.reduce((sum, subjectId) => {
+      const subject = this.subjectsById.get(subjectId);
+      const units = Number(subject?.units ?? 0);
+      return sum + (Number.isNaN(units) ? 0 : units);
+    }, 0);
+  }
+
+  private getSubjectNames(subjectIds: number[]): string[] {
+    return subjectIds.map((subjectId) => {
+      const subject = this.subjectsById.get(subjectId);
+      if (subject) {
+        return `${subject.code || subject.subject_code || `#${subject.id}`} - ${subject.name}`;
+      }
+      return `Subject #${subjectId}`;
+    });
+  }
+
+  private mapEnrollmentBundles(data: unknown): EnrollmentBundle[] {
+    if (!Array.isArray(data)) {
+      return [];
+    }
+
+    const grouped = new Map<string, EnrollmentBundle>();
+
+    for (const item of data as any[]) {
+      const studentId = this.normalizeNumber(item.student_id ?? item.student?.id);
+      const termId = this.normalizeNumber(item.academic_term_id ?? item.academic_term?.id);
+
+      if (!studentId || !termId) {
+        continue;
+      }
+
+      const key = `${studentId}:${termId}`;
+      const schoolYear = this.safeText(item.school_year ?? item.academic_term?.school_year);
+      const semester = this.safeText(item.semester ?? item.academic_term?.semester);
+      const studentName = this.safeText(item.student?.name) || this.getStudentNameById(studentId);
+
+      if (!grouped.has(key)) {
+        grouped.set(key, {
+          student_id: studentId,
+          student_name: studentName,
+          academic_term_id: termId,
+          school_year: schoolYear || this.termsById.get(termId)?.school_year || '',
+          semester: semester || this.termsById.get(termId)?.semester || '',
+          subject_ids: []
+        });
+      }
+
+      const target = grouped.get(key)!;
+      const subjectIds = this.extractSubjectIds(item);
+      for (const subjectId of subjectIds) {
+        if (!target.subject_ids.includes(subjectId)) {
+          target.subject_ids.push(subjectId);
+        }
+      }
+    }
+
+    return Array.from(grouped.values())
+      .filter((bundle) => bundle.subject_ids.length > 0)
+      .sort((a, b) => {
+        if (a.student_name !== b.student_name) {
+          return a.student_name.localeCompare(b.student_name);
+        }
+        return this.getTermLabel(a).localeCompare(this.getTermLabel(b));
+      });
+  }
+
+  private extractSubjectIds(item: any): number[] {
+    if (Array.isArray(item.subjects)) {
+      return item.subjects
+        .filter((subject: any) => this.safeText(subject?.status).toLowerCase() !== 'dropped')
+        .map((subject: any) => this.normalizeNumber(subject?.id))
+        .filter((id: number | null): id is number => !!id);
+    }
+
+    const status = this.safeText(item.status).toLowerCase();
+    if (status === 'dropped') {
+      return [];
+    }
+
+    const subjectId = this.normalizeNumber(item.subject_id ?? item.subject?.id);
+    return subjectId ? [subjectId] : [];
+  }
+
+  private getStudentNameById(studentId: number): string {
+    const student = this.students.find((entry) => entry.id === studentId);
+    return student ? this.getStudentLabel(student) : `Student #${studentId}`;
+  }
+
   private resetForm(): void {
     this.form = this.createEmptyForm();
     this.errorMessage = '';
     this.currentEntity = null;
+    this.selectedSubjectNames = [];
   }
 
   private createEmptyForm(): AssessmentForm {
@@ -170,7 +508,7 @@ export class UpdateAssessmentsModalComponent implements OnInit {
       academic_term_id: null,
       semester: '',
       school_year: '',
-      total_units: null,
+      total_units: 0,
       tuition_fee: null,
       misc_fee: null,
       lab_fee: null,
@@ -201,6 +539,23 @@ export class UpdateAssessmentsModalComponent implements OnInit {
   private toNumber(value: unknown): number {
     const numericValue = Number(value);
     return Number.isNaN(numericValue) ? 0 : numericValue;
+  }
+
+  private normalizeNumber(value: unknown): number | null {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string' && value.trim() !== '') {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    return null;
+  }
+
+  private safeText(value: unknown): string {
+    return typeof value === 'string' ? value.trim() : '';
   }
 
   private getErrorMessage(error: unknown): string | null {

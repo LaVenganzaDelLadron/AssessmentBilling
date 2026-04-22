@@ -1,32 +1,55 @@
-z<div class="p-8">
-  <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
-    <div>
-      <h1 class="text-3xl font-bold text-slate-900">Payments</h1>
-      <p class="text-slate-500 text-sm mt-1">Listing data from <span class="font-semibold">GET /api/admin/payments</span>.</p>
-    </div>
-    <input
-      [(ngModel)]="searchQuery"
-      type="text"
-      placeholder="Search invoice, amount, reference, or method..."
-      class="w-full md:w-96 px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-    />
-  </div>
+<div class="min-h-screen bg-[#fcfdfe] p-6 font-sans text-slate-800 antialiased selection:bg-indigo-100 lg:p-12">
 
-  <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
-    <p class="text-red-700 font-semibold">{{ errorMessage }}</p>
-  </div>
-
-  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <app-payment-card
-        *ngFor="let payment of getFilteredPayments()"
-        [payment]="payment"
-        (editRequested)="openUpdateModal($event)"
-        (deleteRequested)="openDeleteModal($event)"
-      ></app-payment-card>
+  <div class="mx-auto max-w-[1600px]">
+    <div class="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+      <div>
+        <nav class="mb-1 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400">
+          <span>Billing</span>
+          <svg class="h-2.5 w-2.5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" /></svg>
+          <span class="text-indigo-500/80">Collections</span>
+        </nav>
+        <h1 class="text-4xl font-black tracking-tight text-slate-900">Payments</h1>
+        <p class="mt-1 text-sm font-medium text-slate-500">Track posted payments, references, and collection activity in one view.</p>
+      </div>
     </div>
-    <div *ngIf="getFilteredPayments().length === 0" class="px-6 py-8 text-center text-slate-500 italic">
-      {{ searchQuery ? 'No payments matched your search' : 'No payments found' }}
+
+    <div class="group relative mb-10 w-full max-w-2xl">
+      <input
+        [(ngModel)]="searchQuery"
+        type="text"
+        placeholder="Search by invoice, amount, reference, or payment method..."
+        class="w-full rounded-[1.5rem] border border-slate-200/80 bg-white py-4.5 pl-14 pr-6 text-base shadow-sm outline-none transition-all placeholder:text-slate-400 focus:border-indigo-500/40 focus:ring-4 focus:ring-indigo-500/5"
+      />
+      <svg class="absolute left-5 top-1/2 h-6 w-6 -translate-y-1/2 text-slate-300 transition-colors group-focus-within:text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+    </div>
+
+    <div *ngIf="errorMessage" class="mb-10 flex items-center gap-3 rounded-2xl border border-red-100 bg-red-50 p-5">
+      <div class="rounded-lg bg-white p-2 text-red-500 shadow-sm">
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      </div>
+      <p class="text-sm font-bold text-red-700">{{ errorMessage }}</p>
+    </div>
+
+    <div class="min-h-[400px] max-h-[70vh] overflow-y-auto rounded-[2.5rem] border border-slate-200/70 bg-white p-10 shadow-2xl shadow-slate-200/20">
+      <div class="grid grid-cols-1 gap-8 sm:gap-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <app-payment-card
+          *ngFor="let payment of getFilteredPayments()"
+          [payment]="payment"
+          (editRequested)="openUpdateModal($event)"
+          (deleteRequested)="openDeleteModal($event)"
+          class="h-full"
+        ></app-payment-card>
+      </div>
+
+      <div *ngIf="getFilteredPayments().length === 0" class="flex flex-col items-center justify-center py-32 text-center">
+        <div class="mb-6 flex h-28 w-28 rotate-3 items-center justify-center rounded-[2.5rem] border border-slate-100 bg-slate-50">
+          <svg class="h-14 w-14 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 9V7a5 5 0 00-10 0v2m-2 0h14a1 1 0 011 1v9a2 2 0 01-2 2H6a2 2 0 01-2-2v-9a1 1 0 011-1zm7 4h.01" /></svg>
+        </div>
+        <h3 class="mb-1 text-xl font-black text-slate-900">No Payment Records</h3>
+        <p class="mx-auto max-w-sm font-medium text-slate-400">
+          {{ searchQuery ? 'No payments match your current search query.' : 'There are currently no payment records in the system.' }}
+        </p>
+      </div>
     </div>
   </div>
 </div>

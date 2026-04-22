@@ -12,7 +12,7 @@
   <div class="flex-grow space-y-1 mb-5">
     <div class="flex items-start gap-2 text-slate-800 font-extrabold tracking-tight leading-snug">
       <svg class="w-4 h-4 mt-0.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-      <span class="min-h-[2.5rem] block">Student ID: {{ invoice.student_id }}</span>
+      <span class="min-h-[2.5rem] block">{{ invoice.student_name || ('Student ID: ' + invoice.student_id) }}</span>
     </div>
     <p class="text-[10px] font-bold text-slate-400 flex items-center gap-1.5">
       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>

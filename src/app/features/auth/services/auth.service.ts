@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { mapTo, tap, catchError } from 'rxjs/operators';
 import { environment } from '../../../../environments/assessment/environment';
 
 export type UserRole = 'admin' | 'teacher' | 'student' | 'guest';
@@ -102,11 +102,18 @@ export class AuthService {
   }
 
   logout(): void {
-    this.removeToken();
-    this.currentUser.next(null);
-    this.userRole.next('guest');
-    this.isAuthenticated.next(false);
-    localStorage.removeItem('user');
+    this.clearAuthState();
+  }
+
+  logoutFromServer(): Observable<void> {
+    return this.http.post(`${this.apiUrl}/user/logout`, {}).pipe(
+      tap(() => this.clearAuthState()),
+      mapTo(void 0),
+      catchError((error) => {
+        this.clearAuthState();
+        return throwError(() => error);
+      })
+    );
   }
 
   getUser(): Observable<User> {
@@ -154,6 +161,14 @@ export class AuthService {
 
   private removeToken(): void {
     localStorage.removeItem('auth_token');
+  }
+
+  private clearAuthState(): void {
+    this.removeToken();
+    this.currentUser.next(null);
+    this.userRole.next('guest');
+    this.isAuthenticated.next(false);
+    localStorage.removeItem('user');
   }
 
   private handleError(error: HttpErrorResponse) {

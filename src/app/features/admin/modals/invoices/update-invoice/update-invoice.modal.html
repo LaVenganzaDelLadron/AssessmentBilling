@@ -12,36 +12,19 @@
 
     <form (ngSubmit)="submit()" class="space-y-4">
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Student ID *</label>
-        <input
-          type="number"
-          [(ngModel)]="form.student_id"
-          name="studentId"
-          placeholder="Enter student ID"
-          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900"
-        />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Assessment ID *</label>
-        <input
-          type="number"
+        <label class="block text-sm font-medium text-slate-700 mb-1">Assessment *</label>
+        <select
           [(ngModel)]="form.assessment_id"
           name="assessmentId"
-          placeholder="Enter assessment ID"
+          (ngModelChange)="onAssessmentChange()"
+          [disabled]="isLoadingAssessments"
           class="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900"
-        />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Invoice Number *</label>
-        <input
-          type="text"
-          [(ngModel)]="form.invoice_number"
-          name="invoiceNumber"
-          placeholder="e.g., INV-001"
-          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900"
-        />
+        >
+          <option [ngValue]="0">-- Select Assessment --</option>
+          <option *ngFor="let assessment of assessmentOptions" [ngValue]="assessment.id">
+            {{ getAssessmentLabel(assessment) }}
+          </option>
+        </select>
       </div>
 
       <div>

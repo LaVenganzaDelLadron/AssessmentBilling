@@ -28,6 +28,8 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dashboard {
+  private readonly currencyLocale = 'en-PH';
+  private readonly currencyCode = 'PHP';
   private readonly refreshRequests = new Subject<boolean>();
   private latestOverview = this.createEmptyOverview();
 
@@ -93,9 +95,9 @@ export class Dashboard {
 
   formatCurrency(value: number | string): string {
     const num = typeof value === 'string' ? parseFloat(value) : value;
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat(this.currencyLocale, {
       style: 'currency',
-      currency: 'USD',
+      currency: this.currencyCode,
       minimumFractionDigits: 2
     }).format(num);
   }
@@ -103,9 +105,9 @@ export class Dashboard {
   formatCompactCurrency(value: number | string): string {
     const num = typeof value === 'string' ? parseFloat(value) : value;
 
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat(this.currencyLocale, {
       style: 'currency',
-      currency: 'USD',
+      currency: this.currencyCode,
       notation: 'compact',
       maximumFractionDigits: 1
     }).format(num);
@@ -116,7 +118,7 @@ export class Dashboard {
       return 'Not synced yet';
     }
 
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat(this.currencyLocale, {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -156,6 +158,40 @@ export class Dashboard {
     }
 
     return Math.max(point.percentage, 16);
+  }
+
+  getRevenueChartMax(revenueTrend: DashboardRevenuePoint[]): number {
+    return Math.max(...revenueTrend.map((point) => point.amount), 0);
+  }
+
+  getRevenueAxisTicks(revenueTrend: DashboardRevenuePoint[]): number[] {
+    const max = this.getRevenueChartMax(revenueTrend);
+    if (max <= 0) {
+      return [0];
+    }
+
+    return [max, max * 0.75, max * 0.5, max * 0.25, 0];
+  }
+
+  getRevenueInsightLabel(revenueTrend: DashboardRevenuePoint[]): string {
+    if (revenueTrend.length === 0) {
+      return 'No revenue data yet';
+    }
+
+    const current = revenueTrend[revenueTrend.length - 1];
+    const peak = revenueTrend.reduce((highest, point) =>
+      point.amount > highest.amount ? point : highest
+    , revenueTrend[0]);
+
+    if (peak.amount <= 0) {
+      return 'Waiting for posted revenue';
+    }
+
+    if (current.label === peak.label) {
+      return `${current.label} is your strongest month so far`;
+    }
+
+    return `${peak.label} recorded the strongest revenue in this view`;
   }
 
   getStatusBadgeClass(status: string): string {

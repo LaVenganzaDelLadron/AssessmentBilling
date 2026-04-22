@@ -1,12 +1,15 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   Invoice,
   InvoiceStatus,
   UpdateInvoicePayload
 } from '../../../models/invoice.model';
 import { InvoicesService } from '../../../services/invoices.service';
+import { AssessmentsService } from '../../../services/assessments.service';
+import { Assessment } from '../../../models/assessment.model';
 
 @Component({
   selector: 'app-update-invoice-modal',
@@ -15,19 +18,26 @@ import { InvoicesService } from '../../../services/invoices.service';
   templateUrl: './update-invoice.modal.html',
 })
 export class UpdateInvoiceModalComponent {
+  private readonly destroyRef = inject(DestroyRef);
+
   @Output() refresh = new EventEmitter<void>();
 
   isOpen = false;
   isLoading = false;
+  isLoadingAssessments = false;
   errorMessage = '';
   successMessage = '';
   selectedId: number | null = null;
 
   form: UpdateInvoicePayload = this.createEmptyForm();
+  assessmentOptions: Assessment[] = [];
 
   readonly statuses: InvoiceStatus[] = ['unpaid', 'partial', 'paid', 'overdue'];
 
-  constructor(private invoicesService: InvoicesService) {}
+  constructor(
+    private invoicesService: InvoicesService,
+    private assessmentsService: AssessmentsService
+  ) {}
 
   open(invoice: Invoice): void {
     this.selectedId = invoice.id || null;
@@ -43,6 +53,7 @@ export class UpdateInvoiceModalComponent {
     this.isOpen = true;
     this.errorMessage = '';
     this.successMessage = '';
+    this.loadAssessments();
   }
 
   close(): void {
@@ -59,6 +70,15 @@ export class UpdateInvoiceModalComponent {
 
   setBalanceToTotalAmount(): void {
     this.form.balance = Number(this.form.total_amount ?? 0);
+  }
+
+  getAssessmentLabel(assessment: Assessment): string {
+    return assessment.student_name?.trim() || `Student #${assessment.student_id}`;
+  }
+
+  onAssessmentChange(): void {
+    const selectedAssessment = this.getSelectedAssessment();
+    this.form.student_id = selectedAssessment?.student_id ?? this.form.student_id ?? 0;
   }
 
   submit(): void {
@@ -83,12 +103,8 @@ export class UpdateInvoiceModalComponent {
   }
 
   validate(): boolean {
-    if (!this.form.student_id) {
-      this.errorMessage = 'Student ID is required';
-      return false;
-    }
     if (!this.form.assessment_id) {
-      this.errorMessage = 'Assessment ID is required';
+      this.errorMessage = 'Assessment is required';
       return false;
     }
     if (!this.form.invoice_number) {
@@ -127,8 +143,10 @@ export class UpdateInvoiceModalComponent {
   }
 
   private buildPayload(): UpdateInvoicePayload {
+    const selectedAssessment = this.getSelectedAssessment();
+
     return {
-      student_id: Number(this.form.student_id),
+      student_id: Number(selectedAssessment?.student_id ?? this.form.student_id),
       assessment_id: Number(this.form.assessment_id),
       invoice_number: this.form.invoice_number?.trim(),
       total_amount: Number(this.form.total_amount),
@@ -138,8 +156,70 @@ export class UpdateInvoiceModalComponent {
     };
   }
 
+  private loadAssessments(): void {
+    const cached = this.assessmentsService.getCachedAssessments();
+    if (cached && cached.length > 0) {
+      this.assessmentOptions = [...cached].sort((a, b) => b.id - a.id);
+      this.onAssessmentChange();
+      return;
+    }
+
+    this.isLoadingAssessments = true;
+    this.assessmentsService
+      .list()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response: any) => {
+          const data = Array.isArray(response) ? response : response.data ?? [];
+
+          this.assessmentOptions = Array.isArray(data)
+            ? data
+                .map((item: any) => ({
+                  id: item.id ?? item.assessment_id ?? 0,
+                  student_id: item.student_id ?? 0,
+                  student_name: (
+                    item.student_name ??
+                    item.student?.name ??
+                    [item.student?.first_name, item.student?.last_name].filter(Boolean).join(' ').trim()
+                  ) || null,
+                  academic_term_id: item.academic_term_id ?? 0,
+                  semester: item.semester ?? '',
+                  school_year: item.school_year ?? '',
+                  total_units: item.total_units ?? 0,
+                  tuition_fee: item.tuition_fee ?? 0,
+                  misc_fee: item.misc_fee ?? 0,
+                  lab_fee: item.lab_fee ?? 0,
+                  other_fees: item.other_fees ?? 0,
+                  total_amount: item.total_amount ?? 0,
+                  discount: item.discount ?? 0,
+                  net_amount: item.net_amount ?? 0,
+                  status: item.status ?? 'draft',
+                  created_at: item.created_at ?? null,
+                  updated_at: item.updated_at ?? null
+                }))
+                .filter((assessment: Assessment) => !!assessment.id)
+                .sort((a: Assessment, b: Assessment) => b.id - a.id)
+            : [];
+
+          this.assessmentsService.setCachedAssessments(this.assessmentOptions);
+          this.onAssessmentChange();
+          this.isLoadingAssessments = false;
+        },
+        error: () => {
+          this.assessmentOptions = [];
+          this.isLoadingAssessments = false;
+        }
+      });
+  }
+
   private normalizeDateInput(value: string): string {
     return value ? value.slice(0, 10) : '';
+  }
+
+  private getSelectedAssessment(): Assessment | undefined {
+    return this.assessmentOptions.find(
+      (assessment) => assessment.id === Number(this.form.assessment_id)
+    );
   }
 
   private getErrorMessage(error: unknown): string | null {

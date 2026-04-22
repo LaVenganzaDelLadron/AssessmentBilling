@@ -8,6 +8,7 @@ export type InvoiceStatus = 'unpaid' | 'partial' | 'paid' | 'overdue';
 
 export interface Invoice extends BaseAdminModel {
   student_id: number;
+  student_name?: string | null;
   assessment_id: number;
   invoice_number: string;
   total_amount: AdminNumericValue;

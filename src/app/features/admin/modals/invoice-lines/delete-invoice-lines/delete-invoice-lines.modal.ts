@@ -62,6 +62,35 @@ export class DeleteInvoiceLinesModalComponent {
     this.selectedLine = null;
   }
 
+  getInvoiceLabel(): string {
+    if (!this.selectedLine) {
+      return 'N/A';
+    }
+
+    return this.selectedLine.invoice?.invoice_number?.trim() || `#${this.selectedLine.invoice_id}`;
+  }
+
+  getSubjectLabel(): string {
+    if (!this.selectedLine?.subject_id) {
+      return 'None';
+    }
+
+    return (
+      this.selectedLine.subject?.name?.trim() ||
+      this.selectedLine.subject?.subject_code?.trim() ||
+      this.selectedLine.subject?.code?.trim() ||
+      `#${this.selectedLine.subject_id}`
+    );
+  }
+
+  getLineTypeLabel(): string {
+    const type = this.selectedLine?.line_type ?? 'other';
+    return type
+      .split('_')
+      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
+  }
+
   private getErrorMessage(error: unknown): string | null {
     const apiError = error as {
       error?: {

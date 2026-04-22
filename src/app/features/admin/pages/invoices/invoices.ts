@@ -2,9 +2,12 @@ import { Component, OnInit, ViewChild, DestroyRef, inject } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { catchError, forkJoin, of } from 'rxjs';
 import { AdminNumericValue } from '../../models/admin-api.model';
 import { Invoice } from '../../models/invoice.model';
+import { Student } from '../../models/student.model';
 import { InvoicesService } from '../../services/invoices.service';
+import { StudentsService } from '../../services/students.service';
 import { AddInvoiceModalComponent } from '../../modals/invoices/add-invoice/add-invoice.modal';
 import { UpdateInvoiceModalComponent } from '../../modals/invoices/update-invoice/update-invoice.modal';
 import { DeleteInvoiceModalComponent } from '../../modals/invoices/delete-invoice/delete-invoice.modal';
@@ -36,9 +39,13 @@ export class Invoices implements OnInit {
   errorMessage = '';
   searchQuery = '';
   statusFilter = '';
+  private studentsById = new Map<number, Student>();
   readonly statuses = ['unpaid', 'partial', 'paid', 'overdue'] as const;
 
-  constructor(private invoicesService: InvoicesService) {}
+  constructor(
+    private invoicesService: InvoicesService,
+    private studentsService: StudentsService
+  ) {}
 
   ngOnInit() {
     this.loadInvoices();
@@ -47,16 +54,29 @@ export class Invoices implements OnInit {
   loadInvoices() {
     this.errorMessage = '';
     this.isLoading = true;
-    this.invoicesService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    forkJoin({
+      invoices: this.invoicesService.list(),
+      students: this.studentsService.list({ page: 1, per_page: 100 }).pipe(catchError(() => of([])))
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         console.log('[Invoices] API response:', response);
-        const data = Array.isArray(response) ? response : response.data ?? [];
-        if (Array.isArray(data)) {
-          console.log('[Invoices] First invoice:', data[0]);
+        const invoiceData = this.extractListData<Invoice>(response.invoices);
+        const students = this.extractListData<Student>(response.students);
+
+        this.studentsById = new Map(
+          students
+            .filter((student) => Number.isFinite(Number(student?.id)))
+            .map((student) => [Number(student.id), student])
+        );
+
+        if (Array.isArray(invoiceData)) {
+          console.log('[Invoices] First invoice:', invoiceData[0]);
           // Defensive: filter out any items missing required fields
-          this.invoices = data.filter(inv =>
-            inv && typeof inv.invoice_number === 'string' && inv.student_id !== undefined && inv.assessment_id !== undefined
-          );
+          this.invoices = invoiceData
+            .filter(inv =>
+              inv && typeof inv.invoice_number === 'string' && inv.student_id !== undefined && inv.assessment_id !== undefined
+            )
+            .map((invoice) => this.withStudentName(invoice));
         } else {
           this.invoices = [];
         }
@@ -92,9 +112,26 @@ export class Invoices implements OnInit {
   }
 
   getFilteredInvoices(): Invoice[] {
-    console.log('[Invoices] getFilteredInvoices - searchQuery:', this.searchQuery, 'invoices:', this.invoices);
-    // TEMP: Bypass filtering for debug
-    return this.invoices;
+    if (!this.searchQuery.trim()) {
+      return this.invoices;
+    }
+
+    const query = this.searchQuery.toLowerCase();
+
+    return this.invoices.filter((invoice) =>
+      [
+        invoice.invoice_number,
+        invoice.student_name ?? '',
+        invoice.student_id,
+        invoice.assessment_id,
+        invoice.status,
+        invoice.total_amount,
+        invoice.balance
+      ]
+        .join(' ')
+        .toLowerCase()
+        .includes(query)
+    );
   }
 
   getStatusColor(status: string) {
@@ -118,6 +155,27 @@ export class Invoices implements OnInit {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(numericValue);
+  }
+
+  private extractListData<T>(response: unknown): T[] {
+    if (Array.isArray(response)) {
+      return response as T[];
+    }
+
+    const data = (response as { data?: unknown } | null)?.data;
+    return Array.isArray(data) ? (data as T[]) : [];
+  }
+
+  private withStudentName(invoice: Invoice): Invoice {
+    const student = this.studentsById.get(Number(invoice.student_id));
+    const studentName = student
+      ? [student.first_name, student.middle_name, student.last_name].filter(Boolean).join(' ').trim()
+      : null;
+
+    return {
+      ...invoice,
+      student_name: studentName || invoice.student_name || null
+    };
   }
 
   private getErrorMessage(error: unknown): string | null {

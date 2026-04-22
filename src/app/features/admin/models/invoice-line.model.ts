@@ -31,6 +31,22 @@ export interface InvoiceLine extends BaseAdminModel {
   subject?: InvoiceLineSubjectRelation | null;
 }
 
+export interface InvoiceLineGroupView {
+  invoice_id: number;
+  invoice_label: string;
+  lines: InvoiceLine[];
+  line_count: number;
+  subject_labels: string[];
+  totals: {
+    overall: number;
+    tuition: number;
+    lab_fee: number;
+    misc_fee: number;
+    discount: number;
+    other: number;
+  };
+}
+
 export interface CreateInvoiceLinePayload {
   invoice_id: number;
   line_type: InvoiceLineType;
